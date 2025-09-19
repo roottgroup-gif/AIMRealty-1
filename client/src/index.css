@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+/* Removed redundant @import - fonts are loaded via HTML link tags for better performance */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Kurdish Fonts */
+/* Custom Kurdish Fonts - Proper public directory paths for Netlify */
 @font-face {
   font-family: 'UniQAIDAR Asiacell';
-  src: url('@assets/UniQAIDAR_Asiacell 001_1758107005933.ttf') format('truetype');
+  src: url('/fonts/UniQAIDAR_Asiacell 001_1758107005933.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: 'UniQAIDAR Asiacell';
-  src: url('@assets/UniQAIDAR_Asiacell 002_1758107005922.ttf') format('truetype');
+  src: url('/fonts/UniQAIDAR_Asiacell 002_1758107005922.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -56,7 +56,7 @@
   --sidebar-ring: hsl(25 95% 53%);
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-arabic: "Tajawal", "Cairo", "Geeza Pro", "SF Arabic", "Segoe UI Arabic", "Noto Naskh Arabic", sans-serif;
-  --font-kurdish: "Vazirmatn", "UniQAIDAR Asiacell", "Noto Sans Kurdish", "Noto Naskh Arabic", "Cairo", "Tajawal", "Geeza Pro", "SF Arabic", "Segoe UI Arabic", "Tahoma", sans-serif;
+  --font-kurdish: "Vazirmatn", "UniQAIDAR Asiacell", "Noto Sans Arabic", "Noto Naskh Arabic", "Cairo", "Tajawal", "Geeza Pro", "SF Arabic", "Segoe UI Arabic", "Tahoma", sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: 1.3rem;
@@ -157,7 +157,7 @@
   --sidebar-ring: hsl(25 95% 53%);
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-arabic: "Tajawal", "Cairo", "Geeza Pro", "SF Arabic", "Segoe UI Arabic", "Noto Naskh Arabic", sans-serif;
-  --font-kurdish: "Vazirmatn", "UniQAIDAR Asiacell", "Noto Sans Kurdish", "Noto Naskh Arabic", "Cairo", "Tajawal", "Geeza Pro", "SF Arabic", "Segoe UI Arabic", "Tahoma", sans-serif;
+  --font-kurdish: "Vazirmatn", "UniQAIDAR Asiacell", "Noto Sans Arabic", "Noto Naskh Arabic", "Cairo", "Tajawal", "Geeza Pro", "SF Arabic", "Segoe UI Arabic", "Tahoma", sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: 1.3rem;

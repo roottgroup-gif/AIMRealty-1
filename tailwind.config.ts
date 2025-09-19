@@ -64,6 +64,8 @@ export default {
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
+        arabic: ["var(--font-arabic)"],
+        kurdish: ["var(--font-kurdish)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
       },

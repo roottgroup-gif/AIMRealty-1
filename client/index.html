@@ -90,10 +90,10 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Arabic Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Kurdish Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Arabic and Persian Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Vazirmatn:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Kurdish and Additional Arabic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&subset=arabic&display=swap" rel="stylesheet">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -118,9 +118,10 @@
     
     <!-- FontAwesome and Leaflet Fallback System -->
     <script>
-      // Check if FontAwesome is loaded and provide fallbacks
+      // Check if FontAwesome, Leaflet, and Arabic fonts are loaded
       function checkAndSetupFallbacks() {
         setTimeout(() => {
+          // Test FontAwesome loading
           const faTest = document.createElement('i');
           faTest.className = 'fas fa-home';
           faTest.style.position = 'absolute';
@@ -132,7 +133,6 @@
           
           if (!isFALoaded) {
             console.warn('[Fallback] FontAwesome failed to load, applying fallback icons');
-            // Add fallback CSS for icons
             const fallbackStyle = document.createElement('style');
             fallbackStyle.innerHTML = `
               .fa-home:before, .fas.fa-home:before { content: '🏠'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -150,11 +150,74 @@
           } else {
             console.log('[Success] FontAwesome loaded successfully');
           }
+
+          // Test Arabic fonts using proper FontFaceSet API
+          async function testFont(fontName) {
+            try {
+              if (document.fonts && document.fonts.load) {
+                await document.fonts.load(`1em "${fontName}"`);
+                return document.fonts.check(`1em "${fontName}"`);
+              }
+              return false;
+            } catch (error) {
+              console.warn(`[Font] Error testing ${fontName}:`, error);
+              return false;
+            }
+          }
+
+          const arabicFonts = ['Tajawal', 'Cairo', 'Noto Naskh Arabic'];
+          const kurdishFonts = ['Vazirmatn', 'Noto Sans Arabic', 'UniQAIDAR Asiacell'];
+          const failedFonts = [];
+          
+          // Test fonts asynchronously
+          Promise.all([
+            ...arabicFonts.map(async font => {
+              const loaded = await testFont(font);
+              if (!loaded) {
+                failedFonts.push(font);
+                console.warn(`[Font] ${font} failed to load`);
+              } else {
+                console.log(`[Font] ${font} loaded successfully`);
+              }
+              return { font, loaded };
+            }),
+            ...kurdishFonts.map(async font => {
+              const loaded = await testFont(font);
+              if (!loaded) {
+                failedFonts.push(font);
+                console.warn(`[Font] ${font} failed to load`);
+              } else {
+                console.log(`[Font] ${font} loaded successfully`);
+              }
+              return { font, loaded };
+            })
+          ]).then(() => {
+            // Apply emergency fallbacks only if most core fonts fail
+            if (failedFonts.filter(f => ['Tajawal', 'Cairo', 'Vazirmatn'].includes(f)).length >= 2) {
+              console.warn('[Fallback] Multiple core Arabic fonts failed, applying emergency CSS');
+              const emergencyFontStyle = document.createElement('style');
+              emergencyFontStyle.innerHTML = `
+                :root {
+                  --font-arabic: "Arial Unicode MS", "Lucida Sans Unicode", "Times New Roman", serif !important;
+                  --font-kurdish: "Arial Unicode MS", "Lucida Sans Unicode", "Times New Roman", serif !important;
+                }
+                [lang="ar"], [lang="kur"], .arabic-font, .kurdish-font {
+                  font-family: "Arial Unicode MS", "Lucida Sans Unicode", "Times New Roman", serif !important;
+                }
+              `;
+              document.head.appendChild(emergencyFontStyle);
+            } else {
+              console.log('[Success] Core Arabic fonts are available');
+            }
+          }).catch(error => {
+            console.error('[Font] Font testing failed:', error);
+          });
+
+          // Font testing now handled in Promise.all above
           
           // Check if Leaflet is loaded
           if (typeof window.L === 'undefined') {
             console.error('[Error] Leaflet failed to load');
-            // Create a simple error message for map containers
             setTimeout(() => {
               const mapContainers = document.querySelectorAll('[id*="map"], .map-container, .leaflet-container');
               mapContainers.forEach(container => {
@@ -186,7 +249,7 @@
           }
           
           document.body.removeChild(faTest);
-        }, 500);
+        }, 1000); // Increased delay to give fonts more time to load
       }
       
       // Run checks when page loads
