@@ -108,8 +108,20 @@ export default function LocationSelectionMap({
         const L = (window as any).L;
         
         try {
+          console.log('[LocationMap] Starting map initialization...', {
+            hasMapContainer: !!mapRef.current,
+            hasLeaflet: !!(window as any).L,
+            leafletVersion: (window as any).L?.version,
+            userLocation,
+            containerDimensions: mapRef.current ? {
+              width: mapRef.current.offsetWidth,
+              height: mapRef.current.offsetHeight
+            } : null
+          });
+          
           // Ensure container is ready
           if (!mapRef.current.offsetParent) {
+            console.log('[LocationMap] Container not ready, retrying in 100ms...');
             setTimeout(initMap, 100);
             return;
           }
@@ -119,12 +131,31 @@ export default function LocationSelectionMap({
           const centerLocation = userLocation ? [userLocation.lat, userLocation.lng] : defaultLocation;
           const zoomLevel = userLocation ? 10 : 8; // Closer zoom if we have user location
           
+          console.log('[LocationMap] Creating map with settings:', {
+            center: centerLocation,
+            zoom: zoomLevel,
+            userLocationUsed: !!userLocation
+          });
+          
           const map = L.map(mapRef.current).setView(centerLocation, zoomLevel);
 
-          // Add OpenStreetMap tiles
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
+          console.log('[LocationMap] Map instance created, adding tile layer...');
+          
+          // Add OpenStreetMap tiles with error handling
+          const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            errorTileUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNmI3MjgwIiBmb250LXNpemU9IjE0cHgiPk1hcCBUaWxlIFVuYXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=='
+          });
+          
+          tileLayer.on('tileerror', (e: any) => {
+            console.warn('[LocationMap] Tile failed to load:', e.tile.src);
+          });
+          
+          tileLayer.on('tileload', () => {
+            console.log('[LocationMap] First tile loaded successfully');
+          });
+          
+          tileLayer.addTo(map);
 
           // Add click event to map
           map.on('click', async (e: any) => {
@@ -159,17 +190,60 @@ export default function LocationSelectionMap({
 
           mapInstanceRef.current = map;
           setIsMapLoaded(true);
+          
+          console.log('[LocationMap] Map initialized successfully', {
+            mapId: map._leaflet_id,
+            zoom: map.getZoom(),
+            center: map.getCenter(),
+            bounds: map.getBounds()
+          });
 
           // Invalidate size to ensure proper rendering
           setTimeout(() => {
             if (mapInstanceRef.current) {
               mapInstanceRef.current.invalidateSize();
+              console.log('[LocationMap] Map size invalidated for proper rendering');
             }
           }, 100);
 
         } catch (error) {
-          console.error('Error initializing location selection map:', error);
+          console.error('[LocationMap] Critical error during map initialization:', {
+            error: error instanceof Error ? error.message : error,
+            stack: error instanceof Error ? error.stack : undefined,
+            hasContainer: !!mapRef.current,
+            hasLeaflet: !!(window as any).L,
+            containerInfo: mapRef.current ? {
+              offsetWidth: mapRef.current.offsetWidth,
+              offsetHeight: mapRef.current.offsetHeight,
+              offsetParent: !!mapRef.current.offsetParent
+            } : 'No container'
+          });
+          
           setIsMapLoaded(false);
+          
+          // Try to show error message to user
+          if (mapRef.current) {
+            mapRef.current.innerHTML = `
+              <div style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: #fee2e2;
+                color: #dc2626;
+                font-family: system-ui, sans-serif;
+                text-align: center;
+                padding: 1rem;
+                border-radius: 8px;
+              ">
+                <div>
+                  <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                  <div style="font-weight: 600; margin-bottom: 0.5rem;">Map Failed to Load</div>
+                  <div style="font-size: 0.875rem; opacity: 0.8;">Unable to initialize location selection map</div>
+                </div>
+              </div>
+            `;
+          }
         }
       }
     };

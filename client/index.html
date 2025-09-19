@@ -58,11 +58,27 @@
     }
     </script>
     
+    <!-- Content Security Policy for Netlify deployment -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://replit.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com;
+      font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+      img-src 'self' data: https: http: blob:;
+      connect-src 'self' https: http: ws: wss:;
+      worker-src 'self' blob:;
+      child-src 'self' blob:;
+    ">
+    
     <!-- Performance optimizations -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
+    <link rel="preconnect" href="https://a.tile.openstreetmap.org">
+    <link rel="preconnect" href="https://b.tile.openstreetmap.org">
+    <link rel="preconnect" href="https://c.tile.openstreetmap.org">
     <link rel="dns-prefetch" href="https://images.unsplash.com">
     
     <!-- Favicon and App Icons -->
@@ -98,6 +114,87 @@
         // Navigate to property detail page
         window.location.href = '/property/' + propertyId;
       };
+    </script>
+    
+    <!-- FontAwesome and Leaflet Fallback System -->
+    <script>
+      // Check if FontAwesome is loaded and provide fallbacks
+      function checkAndSetupFallbacks() {
+        setTimeout(() => {
+          const faTest = document.createElement('i');
+          faTest.className = 'fas fa-home';
+          faTest.style.position = 'absolute';
+          faTest.style.left = '-9999px';
+          document.body.appendChild(faTest);
+          
+          const computedStyle = window.getComputedStyle(faTest, ':before');
+          const isFALoaded = computedStyle.getPropertyValue('font-family').includes('Font Awesome');
+          
+          if (!isFALoaded) {
+            console.warn('[Fallback] FontAwesome failed to load, applying fallback icons');
+            // Add fallback CSS for icons
+            const fallbackStyle = document.createElement('style');
+            fallbackStyle.innerHTML = `
+              .fa-home:before, .fas.fa-home:before { content: '🏠'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-building:before, .fas.fa-building:before { content: '🏢'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-university:before, .fas.fa-university:before { content: '🏛️'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-map-marked-alt:before, .fas.fa-map-marked-alt:before { content: '🗺️'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-map-marker-alt:before, .fas.fa-map-marker-alt:before { content: '📍'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-search:before, .fas.fa-search:before { content: '🔍'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-heart:before, .fas.fa-heart:before { content: '❤️'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-star:before, .fas.fa-star:before { content: '⭐'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-phone:before, .fas.fa-phone:before { content: '📞'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+              .fa-envelope:before, .fas.fa-envelope:before { content: '✉️'; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+            `;
+            document.head.appendChild(fallbackStyle);
+          } else {
+            console.log('[Success] FontAwesome loaded successfully');
+          }
+          
+          // Check if Leaflet is loaded
+          if (typeof window.L === 'undefined') {
+            console.error('[Error] Leaflet failed to load');
+            // Create a simple error message for map containers
+            setTimeout(() => {
+              const mapContainers = document.querySelectorAll('[id*="map"], .map-container, .leaflet-container');
+              mapContainers.forEach(container => {
+                if (container && container.innerHTML.trim() === '') {
+                  container.innerHTML = `
+                    <div style="
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center; 
+                      height: 100%; 
+                      background: #f3f4f6; 
+                      border-radius: 8px; 
+                      color: #6b7280; 
+                      font-family: system-ui, -apple-system, sans-serif;
+                      flex-direction: column;
+                      padding: 2rem;
+                      text-align: center;
+                    ">
+                      <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+                      <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">Map Loading...</div>
+                      <div style="font-size: 0.9rem;">Please refresh the page if the map doesn't appear.</div>
+                    </div>
+                  `;
+                }
+              });
+            }, 2000);
+          } else {
+            console.log('[Success] Leaflet loaded successfully');
+          }
+          
+          document.body.removeChild(faTest);
+        }, 500);
+      }
+      
+      // Run checks when page loads
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAndSetupFallbacks);
+      } else {
+        checkAndSetupFallbacks();
+      }
     </script>
     
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->

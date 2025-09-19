@@ -521,20 +521,32 @@ export default function PropertyMap({
         const L = (window as any).L;
 
         try {
+          console.log('[PropertyMap] Starting map initialization...', {
+            hasMapContainer: !!mapRef.current,
+            hasLeaflet: !!(window as any).L,
+            leafletVersion: (window as any).L?.version,
+            containerDimensions: mapRef.current ? {
+              width: mapRef.current.offsetWidth,
+              height: mapRef.current.offsetHeight
+            } : null
+          });
+
           // Clear any existing map first
           if (mapInstanceRef.current) {
+            console.log('[PropertyMap] Removing existing map instance');
             mapInstanceRef.current.remove();
             mapInstanceRef.current = null;
           }
 
           // Clear Leaflet ID if exists
           if ((mapRef.current as any)._leaflet_id) {
+            console.log('[PropertyMap] Clearing existing Leaflet ID');
             delete (mapRef.current as any)._leaflet_id;
           }
 
           // Ensure the container is ready
           if (!mapRef.current || !mapRef.current.offsetParent) {
-            // Container not ready yet, retry in a moment
+            console.log('[PropertyMap] Container not ready, retrying in 100ms...');
             setTimeout(initializeMap, 100);
             return;
           }
@@ -543,6 +555,14 @@ export default function PropertyMap({
           const viewportHeight = window.innerHeight;
           const minZoom = viewportHeight < 600 ? 6 : 4; // Allow more zoom out for better area coverage
           const maxZoom = 18;
+
+          console.log('[PropertyMap] Creating map instance with settings:', {
+            center: [36.1911, 44.0093],
+            zoom: 13,
+            minZoom,
+            maxZoom,
+            viewportHeight
+          });
 
           // Initialize map centered on Erbil, Kurdistan with zoom restrictions
           mapInstanceRef.current = L.map(mapRef.current, {
@@ -554,10 +574,27 @@ export default function PropertyMap({
             zoomDelta: 0.5, // Smoother zoom steps
           }).setView([36.1911, 44.0093], 13);
 
-          // Add OpenStreetMap tiles
-          L.tileLayer(
+          console.log('[PropertyMap] Map instance created, adding tile layer...');
+
+          // Add OpenStreetMap tiles with error handling
+          const tileLayer = L.tileLayer(
             "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          ).addTo(mapInstanceRef.current);
+            {
+              attribution: '© OpenStreetMap contributors',
+              maxZoom: maxZoom,
+              errorTileUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNmI3MjgwIiBmb250LXNpemU9IjE0cHgiPk1hcCBUaWxlIFVuYXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=='
+            }
+          );
+          
+          tileLayer.on('tileerror', (e: any) => {
+            console.warn('[PropertyMap] Tile failed to load:', e.tile.src);
+          });
+          
+          tileLayer.on('tileload', () => {
+            console.log('[PropertyMap] First tile loaded successfully');
+          });
+          
+          tileLayer.addTo(mapInstanceRef.current);
 
           // Add zoom event listener to refresh markers on zoom
           mapInstanceRef.current.on("zoomend", () => {
@@ -572,9 +609,48 @@ export default function PropertyMap({
             }
           }, 100);
 
-          console.log("Map initialized successfully");
+          console.log('[PropertyMap] Map initialized successfully', {
+            mapId: mapInstanceRef.current._leaflet_id,
+            zoom: mapInstanceRef.current.getZoom(),
+            center: mapInstanceRef.current.getCenter(),
+            bounds: mapInstanceRef.current.getBounds()
+          });
         } catch (error) {
-          console.error("Error initializing map:", error);
+          console.error('[PropertyMap] Critical error during map initialization:', {
+            error: error instanceof Error ? error.message : error,
+            stack: error instanceof Error ? error.stack : undefined,
+            hasContainer: !!mapRef.current,
+            hasLeaflet: !!(window as any).L,
+            containerInfo: mapRef.current ? {
+              offsetWidth: mapRef.current.offsetWidth,
+              offsetHeight: mapRef.current.offsetHeight,
+              offsetParent: !!mapRef.current.offsetParent
+            } : 'No container'
+          });
+          
+          // Try to show error message to user
+          if (mapRef.current) {
+            mapRef.current.innerHTML = `
+              <div style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: #fee2e2;
+                color: #dc2626;
+                font-family: system-ui, sans-serif;
+                text-align: center;
+                padding: 1rem;
+                border-radius: 8px;
+              ">
+                <div>
+                  <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                  <div style="font-weight: 600; margin-bottom: 0.5rem;">Map Failed to Load</div>
+                  <div style="font-size: 0.875rem; opacity: 0.8;">Please refresh the page or check your connection</div>
+                </div>
+              </div>
+            `;
+          }
         }
       }
     };
