@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic, log } from "./vite.local";
 import { performanceLogger, requestSizeMonitor } from "./middleware/performance";
 import { storage } from "./storage";
 import fs from "fs";
