@@ -1,0 +1,56 @@
+^Xçxz^C
+root@srv1027249:/var/www/dailynewscrypto.net# # Test locally first
+curl http://localhost:3000
+curl http://localhost:3000/api/properties
+
+# Test with IP
+curl http://72.60.134.44
+
+# Check PM2 status
+pm2 status
+pm2 logs
+curl: (7) Failed to connect to localhost port 3000 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to localhost port 3000 after 0 ms: Couldn't connect to server
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2025-09-24T20:25:23: PM2 log: Time                 : Wed Sep 24 2025 20:25:23 GMT+0000 (Coordinated Universal Time)
+PM2        | 2025-09-24T20:25:23: PM2 log: PM2 version          : 6.0.13
+PM2        | 2025-09-24T20:25:23: PM2 log: Node.js version      : 18.20.8
+PM2        | 2025-09-24T20:25:23: PM2 log: Current arch         : x64
+PM2        | 2025-09-24T20:25:23: PM2 log: PM2 home             : /root/.pm2
+PM2        | 2025-09-24T20:25:23: PM2 log: PM2 PID file         : /root/.pm2/pm2.pid
+PM2        | 2025-09-24T20:25:23: PM2 log: RPC socket file      : /root/.pm2/rpc.sock
+PM2        | 2025-09-24T20:25:23: PM2 log: BUS socket file      : /root/.pm2/pub.sock
+PM2        | 2025-09-24T20:25:23: PM2 log: Application log path : /root/.pm2/logs
+PM2        | 2025-09-24T20:25:23: PM2 log: Worker Interval      : 30000
+PM2        | 2025-09-24T20:25:23: PM2 log: Process dump file    : /root/.pm2/dump.pm2
+PM2        | 2025-09-24T20:25:23: PM2 log: Concurrent actions   : 2
+PM2        | 2025-09-24T20:25:23: PM2 log: SIGTERM timeout      : 1600
+PM2        | 2025-09-24T20:25:23: PM2 log: Runtime Binary       : /usr/bin/node
+PM2        | 2025-09-24T20:25:23: PM2 log: ==========================================================================
