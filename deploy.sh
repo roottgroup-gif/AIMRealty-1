@@ -7,7 +7,7 @@ set -e  # Exit on any error
 
 # Configuration
 PROJECT_NAME="mapestate"
-DOMAIN="yourdomain.com"  # Change this to your actual domain
+DOMAIN="dailynewscrypto.net"
 PROJECT_DIR="/var/www/$DOMAIN"
 BACKUP_DIR="/var/backups/$PROJECT_NAME"
 NGINX_AVAILABLE="/etc/nginx/sites-available"
