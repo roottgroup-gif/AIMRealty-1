@@ -1,6 +1,9 @@
 [build]
   publish = "dist/public"
   command = "npm run build"
+  
+[build.environment]
+  VITE_API_BASE_URL = "https://f0b18dee-e4b2-4168-a122-94ce1bd32cc5-00-2pvgynr9ktj8b.kirk.replit.dev:5000"
 
 [[redirects]]
   from = "/*"

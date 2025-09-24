@@ -42,13 +42,30 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Get API base URL - use environment variable or default to relative URLs
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+function getFullApiUrl(url: string): string {
+  // If URL already starts with http/https, return as-is
+  if (url.startsWith('http')) {
+    return url;
+  }
+  // If we have a base URL, prepend it
+  if (API_BASE_URL) {
+    return `${API_BASE_URL.replace(/\/$/, '')}${url}`;
+  }
+  // Otherwise return relative URL
+  return url;
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
   try {
-    const res = await fetch(url, {
+    const fullUrl = getFullApiUrl(url);
+    const res = await fetch(fullUrl, {
       method,
       headers: data ? { "Content-Type": "application/json" } : {},
       body: data ? JSON.stringify(data) : undefined,
@@ -74,7 +91,9 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     try {
-      const res = await fetch(queryKey.join("/") as string, {
+      const url = queryKey.join("/") as string;
+      const fullUrl = getFullApiUrl(url);
+      const res = await fetch(fullUrl, {
         credentials: "include",
       });
 
