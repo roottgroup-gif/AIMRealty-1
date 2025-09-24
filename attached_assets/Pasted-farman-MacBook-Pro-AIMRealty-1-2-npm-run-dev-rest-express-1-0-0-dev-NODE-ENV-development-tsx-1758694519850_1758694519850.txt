@@ -1,0 +1,44 @@
+farman@MacBook-Pro AIMRealty-1 2 % npm run dev
+
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+✅ Initialized 9 sample properties in memory storage
+✅ Initialized 3 default currency rates in memory storage
+/Users/farman/Downloads/AIMRealty-1 2/node_modules/rollup/dist/native.js:63
+                throw new Error(
+                      ^
+
+Error: Cannot find module @rollup/rollup-darwin-arm64. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+    at requireWithFriendlyError (/Users/farman/Downloads/AIMRealty-1 2/node_modules/rollup/dist/native.js:63:9)
+    at Object.<anonymous> (/Users/farman/Downloads/AIMRealty-1 2/node_modules/rollup/dist/native.js:72:76)
+    at Module._compile (node:internal/modules/cjs/loader:1241:14)
+    at Object.transformer (/Users/farman/Downloads/AIMRealty-1 2/node_modules/tsx/dist/register-DCnOAxY2.cjs:2:1186)
+    at Module.load (node:internal/modules/cjs/loader:1091:32)
+    at Module._load (node:internal/modules/cjs/loader:938:12)
+    at cjsLoader (node:internal/modules/esm/translators:284:17)
+    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:234:7)
+    at ModuleJob.run (node:internal/modules/esm/module_job:217:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:316:24) {
+  [cause]: Error: Cannot find module '@rollup/rollup-darwin-arm64'
+  Require stack:
+  - /Users/farman/Downloads/AIMRealty-1 2/node_modules/rollup/dist/native.js
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1048:15)
+      at nextResolveSimple (/Users/farman/Downloads/AIMRealty-1 2/node_modules/tsx/dist/register-DCnOAxY2.cjs:3:942)
+      at /Users/farman/Downloads/AIMRealty-1 2/node_modules/tsx/dist/register-DCnOAxY2.cjs:2:2550
+      at /Users/farman/Downloads/AIMRealty-1 2/node_modules/tsx/dist/register-DCnOAxY2.cjs:2:1624
+      at resolveTsPaths (/Users/farman/Downloads/AIMRealty-1 2/node_modules/tsx/dist/register-DCnOAxY2.cjs:3:760)
+      at /Users/farman/Downloads/AIMRealty-1 2/node_modules/tsx/dist/register-DCnOAxY2.cjs:3:1038
+      at m._resolveFilename (file:///Users/farman/Downloads/AIMRealty-1%202/node_modules/tsx/dist/register-RyGUjI6j.mjs:1:789)
+      at Module._load (node:internal/modules/cjs/loader:901:27)
+      at Module.require (node:internal/modules/cjs/loader:1115:19)
+      at require (node:internal/modules/helpers:130:18) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/Users/farman/Downloads/AIMRealty-1 2/node_modules/rollup/dist/native.js'
+    ]
+  }
+}
+
+Node.js v20.9.0
