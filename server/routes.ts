@@ -165,7 +165,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: "System",
         lastName: "Admin",
         phone: "+964 750 000 0000",
-        isVerified: true
+        isVerified: true,
+        allowedLanguages: ["en", "ar", "kur"]
       });
 
       // Create sample agent
@@ -178,7 +179,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: "John",
         lastName: "Smith",
         phone: "+964 750 123 4567",
-        isVerified: true
+        isVerified: true,
+        allowedLanguages: ["en"]
       });
 
       res.json({
@@ -965,7 +967,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/properties/:id", requireAnyRole(["user", "admin"]), validateLanguagePermission, async (req, res) => {
     try {
       const { id } = req.params;
-      const validatedData = updatePropertySchema.parse(req.body);
+      
+      // Preprocess request body to handle null images
+      const processedBody = { ...req.body };
+      if (processedBody.images === null) {
+        processedBody.images = undefined;
+      }
+      
+      const validatedData = updatePropertySchema.parse(processedBody);
       const property = await storage.updateProperty(id, validatedData);
       
       if (!property) {
@@ -1331,6 +1340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "Admin",
           phone: "+964-750-123-4567",
           isVerified: true,
+          allowedLanguages: ["en", "ar", "kur"]
         });
         createdUsers.push({ username: superAdmin.username, role: superAdmin.role });
       } else {
@@ -1349,6 +1359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "Doe",
           phone: "+964-750-987-6543",
           isVerified: true,
+          allowedLanguages: ["en"]
         });
         createdUsers.push({ username: regularUser.username, role: regularUser.role });
       } else {
