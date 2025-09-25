@@ -998,6 +998,92 @@ const translations: Translations = {
     kur: "لە AI بپرسە: 'ڤیلایەکی 3 ژووری نوستن بدۆزەرەوە کە کەمتر لە 300 هەزار دۆلار بێت لە هەولێر'",
   },
 
+  // SEO Meta Tags
+  "seo.homeTitle": {
+    en: "MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq",
+    ar: "MapEstate - محرك البحث العقاري المدعوم بالذكاء الاصطناعي | عقارات في كردستان، العراق",
+    kur: "MapEstate - دۆزەرەوەی خانووبەرەی پاڵپشتیکراو بە AI | خانووبەرە لە کوردستان، عێراق",
+  },
+  "seo.homeDescription": {
+    en: "Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents.",
+    ar: "اعثر على منزلك المثالي مع التوصيات المدعومة بالذكاء الاصطناعي. اكتشف العقارات للإيجار والبيع في كردستان، العراق مع البحث الذكي والوكلاء الخبراء.",
+    kur: "ماڵی تەواوی خۆت بدۆزەرەوە لەگەڵ پێشنیارەکانی پاڵپشتیکراو بە AI. خانووبەرەکان بۆ کرێ و فرۆشتن لە کوردستان، عێراق بدۆزەرەوە لەگەڵ گەڕانی زیرەک و بریکارە شارەزاکان.",
+  },
+  "seo.propertiesTitle": {
+    en: "Properties for Sale and Rent in Kurdistan, Iraq | MapEstate",
+    ar: "عقارات للبيع والإيجار في كردستان، العراق | MapEstate",
+    kur: "خانووبەرە بۆ فرۆشتن و کرێ لە کوردستان، عێراق | MapEstate",
+  },
+  "seo.propertiesDescription": {
+    en: "Browse thousands of properties for sale and rent. Find apartments, houses, villas, and land in Kurdistan, Iraq with advanced search and AI recommendations.",
+    ar: "تصفح آلاف العقارات للبيع والإيجار. ابحث عن شقق ومنازل وفيلات وأراضي في كردستان، العراق مع البحث المتقدم والتوصيات الذكية.",
+    kur: "هەزاران خانووبەرە بۆ فرۆشتن و کرێ بگەڕێ. شوقە، ماڵ، ڤیلا و زەوی لە کوردستان، عێراق بدۆزەرەوە لەگەڵ گەڕانی پێشکەوتوو و پێشنیاری AI.",
+  },
+  "seo.propertyDetailTitle": {
+    en: "{propertyType} for {listingType} - {price} | {city}, Iraq | MapEstate",
+    ar: "{propertyType} لل{listingType} - {price} | {city}، العراق | MapEstate",
+    kur: "{propertyType} بۆ {listingType} - {price} | {city}، عێراق | MapEstate",
+  },
+  "seo.propertyDetailDescription": {
+    en: "{bedrooms} bedroom {propertyType} for {listingType} in {city}. {description} Contact our expert agents for viewing and details.",
+    ar: "{propertyType} بـ {bedrooms} غرفة نوم لل{listingType} في {city}. {description} اتصل بوكلائنا الخبراء للمعاينة والتفاصيل.",
+    kur: "{propertyType}ی {bedrooms} ژووری نوستن بۆ {listingType} لە {city}. {description} پەیوەندی بە بریکارە شارەزاکانمانەوە بکە بۆ بینین و وردەکاری.",
+  },
+  "seo.favoritesTitle": {
+    en: "My Favorite Properties - Saved Listings | MapEstate",
+    ar: "عقاراتي المفضلة - الإعلانات المحفوظة | MapEstate",
+    kur: "خانووبەرە بەرگریکراوەکانم - لیستی پاشەکەوتکراو | MapEstate",
+  },
+  "seo.aboutTitle": {
+    en: "About MapEstate - Leading Real Estate Platform in Kurdistan, Iraq",
+    ar: "حول MapEstate - منصة العقارات الرائدة في كردستان، العراق",
+    kur: "دەربارەی MapEstate - پلاتفۆرمی پێشەنگی خانووبەرە لە کوردستان، عێراق",
+  },
+  "seo.settingsTitle": {
+    en: "Settings - Customize Your Experience | MapEstate",
+    ar: "الإعدادات - خصص تجربتك | MapEstate",
+    kur: "ڕێکخستنەکان - ئەزموونەکەت خۆت بخە | MapEstate",
+  },
+  "seo.keywords": {
+    en: "real estate, Kurdistan, Iraq, properties for sale, properties for rent, apartments, houses, villas, land, AI search, Erbil, Sulaymaniyah, Dohuk",
+    ar: "عقارات، كردستان، العراق، عقارات للبيع، عقارات للإيجار، شقق، منازل، فيلات، أراضي، بحث ذكي، أربيل، السليمانية، دهوك",
+    kur: "خانووبەرە، کوردستان، عێراق، خانووبەرە بۆ فرۆشتن، خانووبەرە بۆ کرێ، شوقە، ماڵ، ڤیلا، زەوی، گەڕانی AI، هەولێر، سلێمانی، دهۆک",
+  },
+  
+  // Property type translations for SEO
+  "seo.propertyType.apartment": {
+    en: "Apartment",
+    ar: "شقة",
+    kur: "شوقە",
+  },
+  "seo.propertyType.house": {
+    en: "House",
+    ar: "منزل", 
+    kur: "ماڵ",
+  },
+  "seo.propertyType.villa": {
+    en: "Villa",
+    ar: "فيلا",
+    kur: "ڤیلا",
+  },
+  "seo.propertyType.land": {
+    en: "Land",
+    ar: "أرض",
+    kur: "زەوی",
+  },
+  
+  // Listing type translations for SEO
+  "seo.listingType.sale": {
+    en: "Sale",
+    ar: "البيع",
+    kur: "فرۆشتن",
+  },
+  "seo.listingType.rent": {
+    en: "Rent", 
+    ar: "الإيجار",
+    kur: "کرێ",
+  },
+
   // Map
   "map.loadingTitle": {
     en: "Loading Interactive Map",

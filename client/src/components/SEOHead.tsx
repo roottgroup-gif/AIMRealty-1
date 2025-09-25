@@ -1,6 +1,96 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useLanguage, getLocalizedPath, detectLanguageFromUrl, detectLanguageFromUrlEnhanced, getLanguageInfo, LANGUAGE_MAPPING, type Language } from '@/lib/i18n';
+import { useLanguage, useTranslation, getLocalizedPath, detectLanguageFromUrl, detectLanguageFromUrlEnhanced, getLanguageInfo, LANGUAGE_MAPPING, type Language } from '@/lib/i18n';
+
+// Helper functions for dynamic SEO content generation
+function generateDynamicTitle(
+  pageType: string,
+  propertyData: SEOProps['propertyData'],
+  language: Language,
+  t: (key: string) => string,
+  customTitle?: string
+): string {
+  if (customTitle) return customTitle;
+  
+  switch (pageType) {
+    case 'home':
+      return t('seo.homeTitle');
+    case 'properties':
+      return t('seo.propertiesTitle');
+    case 'property-detail':
+      if (propertyData) {
+        const propertyType = t(`seo.propertyType.${propertyData.propertyType?.toLowerCase()}` as any) || propertyData.propertyType || 'Property';
+        const listingType = t(`seo.listingType.${propertyData.listingType?.toLowerCase()}` as any) || propertyData.listingType || 'Sale';
+        const price = propertyData.price || '';
+        const city = propertyData.city || '';
+        
+        return t('seo.propertyDetailTitle')
+          .replace('{propertyType}', propertyType)
+          .replace('{listingType}', listingType)
+          .replace('{price}', price)
+          .replace('{city}', city);
+      }
+      return t('seo.homeTitle');
+    case 'favorites':
+      return t('seo.favoritesTitle');
+    case 'about':
+      return t('seo.aboutTitle');
+    case 'settings':
+      return t('seo.settingsTitle');
+    default:
+      return t('seo.homeTitle');
+  }
+}
+
+function generateDynamicDescription(
+  pageType: string,
+  propertyData: SEOProps['propertyData'],
+  language: Language,
+  t: (key: string) => string,
+  customDescription?: string
+): string {
+  if (customDescription) return customDescription;
+  
+  switch (pageType) {
+    case 'home':
+      return t('seo.homeDescription');
+    case 'properties':
+      return t('seo.propertiesDescription');
+    case 'property-detail':
+      if (propertyData) {
+        const propertyType = t(`seo.propertyType.${propertyData.propertyType?.toLowerCase()}` as any) || propertyData.propertyType || 'property';
+        const listingType = t(`seo.listingType.${propertyData.listingType?.toLowerCase()}` as any) || propertyData.listingType || 'sale';
+        const bedrooms = propertyData.bedrooms || 0;
+        const city = propertyData.city || '';
+        const description = '';
+        
+        return t('seo.propertyDetailDescription')
+          .replace('{propertyType}', propertyType)
+          .replace('{listingType}', listingType)
+          .replace('{bedrooms}', bedrooms.toString())
+          .replace('{city}', city)
+          .replace('{description}', description);
+      }
+      return t('seo.homeDescription');
+    case 'favorites':
+      return t('favorites.description');
+    case 'about':
+      return t('about.missionText');
+    case 'settings':
+      return 'Customize your MapEstate experience with language, currency, and notification preferences.';
+    default:
+      return t('seo.homeDescription');
+  }
+}
+
+function generateDynamicKeywords(
+  language: Language,
+  t: (key: string) => string,
+  customKeywords?: string
+): string {
+  if (customKeywords) return customKeywords;
+  return t('seo.keywords');
+}
 
 interface SEOProps {
   title?: string;
@@ -17,10 +107,12 @@ interface SEOProps {
     price?: string;
     currency?: string;
     propertyType?: string;
+    listingType?: 'sale' | 'rent';
     bedrooms?: number;
     bathrooms?: number;
     area?: number;
   };
+  pageType?: 'home' | 'properties' | 'property-detail' | 'favorites' | 'about' | 'settings';
 }
 
 function generateCanonicalUrl(location: string, language: Language): string {
@@ -221,39 +313,48 @@ function generateCombinedStructuredData(
 }
 
 export function SEOHead({ 
-  title = "MapEstate - AI-Powered Real Estate Finder",
-  description = "Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents on MapEstate.",
-  keywords = "real estate, Kurdistan, Iraq, properties for sale, properties for rent, apartments, houses, villas, land",
+  title,
+  description,
+  keywords,
   ogImage = `${window.location.protocol}//${window.location.host}/mapestate-og-image.jpg`,
   canonicalUrl,
   structuredData,
   breadcrumbs,
-  propertyData
+  propertyData,
+  pageType = 'home'
 }: SEOProps) {
   const [location] = useLocation();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   
   useEffect(() => {
-    // Update document title
-    document.title = title;
-    
-    // Update meta description
-    updateMetaTag('name', 'description', description);
-    updateMetaTag('name', 'keywords', keywords);
-    
-    // Comprehensive Open Graph tags for Facebook, LinkedIn, and general sharing
-    updateMetaTag('property', 'og:title', title);
-    updateMetaTag('property', 'og:description', description);
-    updateMetaTag('property', 'og:image', ogImage);
-    updateMetaTag('property', 'og:image:secure_url', ogImage.replace('http://', 'https://'));
-    updateMetaTag('property', 'og:image:width', '1200');
-    updateMetaTag('property', 'og:image:height', '630');
-    updateMetaTag('property', 'og:image:alt', title);
-    updateMetaTag('property', 'og:image:type', 'image/jpeg');
     // Enhanced language detection for proper canonical URL generation
     const fullUrl = window.location.href;
     const { language: detectedLang } = detectLanguageFromUrlEnhanced(fullUrl);
     const currentLanguage = detectedLang || language;
+    
+    // Generate dynamic SEO content based on page type and language
+    const dynamicTitle = generateDynamicTitle(pageType, propertyData, currentLanguage, t, title);
+    const dynamicDescription = generateDynamicDescription(pageType, propertyData, currentLanguage, t, description);
+    const dynamicKeywords = generateDynamicKeywords(currentLanguage, t, keywords);
+    
+    // Update document title
+    document.title = dynamicTitle;
+    
+    // Update meta description
+    updateMetaTag('name', 'description', dynamicDescription);
+    updateMetaTag('name', 'keywords', dynamicKeywords);
+    
+    // Comprehensive Open Graph tags for Facebook, LinkedIn, and general sharing
+    updateMetaTag('property', 'og:title', dynamicTitle);
+    updateMetaTag('property', 'og:description', dynamicDescription);
+    updateMetaTag('property', 'og:image', ogImage);
+    updateMetaTag('property', 'og:image:secure_url', ogImage.replace('http://', 'https://'));
+    updateMetaTag('property', 'og:image:width', '1200');
+    updateMetaTag('property', 'og:image:height', '630');
+    updateMetaTag('property', 'og:image:alt', dynamicTitle);
+    updateMetaTag('property', 'og:image:type', 'image/jpeg');
+    
     const properCanonicalUrl = canonicalUrl || generateCanonicalUrl(location, currentLanguage);
     
     updateMetaTag('property', 'og:url', properCanonicalUrl);
@@ -275,10 +376,10 @@ export function SEOHead({
     
     // Enhanced Twitter Card tags for Twitter sharing
     updateMetaTag('name', 'twitter:card', 'summary_large_image');
-    updateMetaTag('name', 'twitter:title', title);
-    updateMetaTag('name', 'twitter:description', description);
+    updateMetaTag('name', 'twitter:title', dynamicTitle);
+    updateMetaTag('name', 'twitter:description', dynamicDescription);
     updateMetaTag('name', 'twitter:image', ogImage);
-    updateMetaTag('name', 'twitter:image:alt', title);
+    updateMetaTag('name', 'twitter:image:alt', dynamicTitle);
     updateMetaTag('name', 'twitter:site', '@MapEstate');
     updateMetaTag('name', 'twitter:creator', '@MapEstate');
     updateMetaTag('name', 'twitter:domain', window.location.hostname);
@@ -299,10 +400,10 @@ export function SEOHead({
       updateMetaTag('property', 'og:text_direction', languageInfo.dir);
       
       // Arabic/Kurdish specific social media optimization
-      updateMetaTag('property', 'og:title:ar', currentLanguage === 'ar' ? title : '');
-      updateMetaTag('property', 'og:description:ar', currentLanguage === 'ar' ? description : '');
-      updateMetaTag('property', 'og:title:ku', currentLanguage === 'kur' ? title : '');
-      updateMetaTag('property', 'og:description:ku', currentLanguage === 'kur' ? description : '');
+      updateMetaTag('property', 'og:title:ar', currentLanguage === 'ar' ? dynamicTitle : '');
+      updateMetaTag('property', 'og:description:ar', currentLanguage === 'ar' ? dynamicDescription : '');
+      updateMetaTag('property', 'og:title:ku', currentLanguage === 'kur' ? dynamicTitle : '');
+      updateMetaTag('property', 'og:description:ku', currentLanguage === 'kur' ? dynamicDescription : '');
       
       // Additional platform-specific tags for Middle East region
       updateMetaTag('property', 'og:region', 'Middle East');
@@ -310,11 +411,11 @@ export function SEOHead({
       updateMetaTag('property', 'og:region_name', 'Kurdistan');
       
       // WhatsApp and Telegram optimization (popular in Middle East)
-      updateMetaTag('property', 'whatsapp:title', title);
-      updateMetaTag('property', 'whatsapp:description', description);
+      updateMetaTag('property', 'whatsapp:title', dynamicTitle);
+      updateMetaTag('property', 'whatsapp:description', dynamicDescription);
       updateMetaTag('property', 'whatsapp:image', ogImage);
-      updateMetaTag('property', 'telegram:title', title);
-      updateMetaTag('property', 'telegram:description', description);
+      updateMetaTag('property', 'telegram:title', dynamicTitle);
+      updateMetaTag('property', 'telegram:description', dynamicDescription);
       updateMetaTag('property', 'telegram:image', ogImage);
     }
     
