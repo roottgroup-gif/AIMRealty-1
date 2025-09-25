@@ -2377,9 +2377,69 @@ class MemStorage implements IStorage {
   }
 }
 
-// Use database storage for wave management
-// Use MemStorage when database is not available
-export const storage = new MemStorage();
+// Initialize database and create storage instance
+import { initializeDb } from "./db";
+
+// Create a storage wrapper that handles database initialization
+class StorageManager {
+  private _storage: IStorage | null = null;
+  private _initialized = false;
+  private _initializing = false;
+
+  async getStorage(): Promise<IStorage> {
+    if (this._storage) {
+      return this._storage;
+    }
+
+    if (this._initializing) {
+      // Wait for current initialization to complete
+      while (this._initializing) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      return this._storage!;
+    }
+
+    this._initializing = true;
+    
+    try {
+      // Try to initialize database storage
+      await initializeDb();
+      console.log("✅ Database connection initialized");
+      
+      this._storage = new DatabaseStorage();
+      console.log("✅ Using DatabaseStorage with MySQL");
+      
+      // Initialize database with default data
+      await initializeDatabase();
+      await initializeWaves();
+      console.log("✅ Database initialized with default data");
+      
+    } catch (error) {
+      console.error("❌ Failed to initialize database storage, falling back to memory:", error);
+      // Fall back to memory storage if database fails
+      this._storage = new MemStorage();
+      console.log("✅ Using MemStorage as fallback");
+    }
+    
+    this._initialized = true;
+    this._initializing = false;
+    return this._storage;
+  }
+}
+
+const storageManager = new StorageManager();
+
+// Export a storage proxy that automatically initializes
+export const storage = new Proxy({} as IStorage, {
+  get(target, prop) {
+    // For async methods, return a wrapper that initializes storage first
+    return async (...args: any[]) => {
+      const actualStorage = await storageManager.getStorage();
+      const method = (actualStorage as any)[prop];
+      return method.apply(actualStorage, args);
+    };
+  }
+});
 
 // Initialize database with default users if they don't exist
 async function initializeDatabase() {
@@ -3064,12 +3124,4 @@ async function initializeWaves() {
   }
 }
 
-// Initialize database for non-memory storage
-if (!(storage instanceof MemStorage)) {
-  // Initialize database without loading sample properties
-  initializeDatabase().then(() => {
-    return initializeWaves();
-  }).then(() => {
-    console.log("✅ Database initialized - starting with empty property data");
-  }).catch(console.error);
-}
+// Database initialization is now handled by StorageManager
