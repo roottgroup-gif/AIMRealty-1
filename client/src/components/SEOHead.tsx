@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useLanguage, getLocalizedPath, detectLanguageFromUrl, getLanguageInfo, LANGUAGE_MAPPING, type Language } from '@/lib/i18n';
+import { useLanguage, getLocalizedPath, detectLanguageFromUrl, detectLanguageFromUrlEnhanced, getLanguageInfo, LANGUAGE_MAPPING, type Language } from '@/lib/i18n';
 
 interface SEOProps {
   title?: string;
@@ -25,15 +25,27 @@ interface SEOProps {
 
 function generateCanonicalUrl(location: string, language: Language): string {
   const baseUrl = window.location.origin;
+  
+  // Check if current URL has query parameters for language
+  const fullUrl = window.location.href;
+  const { language: detectedLang, source } = detectLanguageFromUrlEnhanced(fullUrl);
+  
+  // Always use path-based URLs for canonical (better for SEO)
   // Parse URL to get clean pathname without query/hash
   const pathname = location.split('?')[0].split('#')[0];
   // Remove existing language prefix if present
   let cleanPath = pathname.replace(/^\/(en|ar|kur)(?=\/|$)/, '') || '/';
+  
+  // If language was detected from query params, we need to preserve the clean path
+  // but use the detected language for canonical URL
+  const canonicalLanguage = detectedLang || language;
+  
   // Normalize trailing slashes: no trailing slash except for home
   if (cleanPath !== '/' && cleanPath.endsWith('/')) {
     cleanPath = cleanPath.slice(0, -1);
   }
-  const localizedPath = getLocalizedPath(cleanPath, language);
+  
+  const localizedPath = getLocalizedPath(cleanPath, canonicalLanguage);
   return `${baseUrl}${localizedPath}`;
 }
 
@@ -238,8 +250,10 @@ export function SEOHead({
     updateMetaTag('property', 'og:image:height', '630');
     updateMetaTag('property', 'og:image:alt', title);
     updateMetaTag('property', 'og:image:type', 'image/jpeg');
-    // Generate proper canonical URL and use it for OG url
-    const currentLanguage = detectLanguageFromUrl(location) || language;
+    // Enhanced language detection for proper canonical URL generation
+    const fullUrl = window.location.href;
+    const { language: detectedLang } = detectLanguageFromUrlEnhanced(fullUrl);
+    const currentLanguage = detectedLang || language;
     const properCanonicalUrl = canonicalUrl || generateCanonicalUrl(location, currentLanguage);
     
     updateMetaTag('property', 'og:url', properCanonicalUrl);
@@ -341,9 +355,25 @@ function updateHreflangTags(currentLocation: string, currentLanguage: Language) 
   const existing = document.querySelectorAll('link[rel="alternate"][hreflang]');
   existing.forEach(element => element.remove());
   
+  // Enhanced logic to handle query parameter-based URLs
+  const fullUrl = window.location.href;
+  const { source } = detectLanguageFromUrlEnhanced(fullUrl);
+  
   // Parse URL to get clean pathname without query/hash, then strip language prefix
   const pathname = currentLocation.split('?')[0].split('#')[0];
   let cleanPath = pathname.replace(/^\/(en|ar|kur)(?=\/|$)/, '') || '/';
+  
+  // If language was detected from query parameters, preserve query params for hreflang
+  const urlObj = new URL(fullUrl);
+  let queryParams = urlObj.search;
+  
+  // Remove lang parameter from query string for hreflang URLs
+  if (source === 'query') {
+    const params = new URLSearchParams(queryParams);
+    params.delete('lang');
+    queryParams = params.toString() ? `?${params.toString()}` : '';
+  }
+  
   // Normalize trailing slashes: no trailing slash except for home
   if (cleanPath !== '/' && cleanPath.endsWith('/')) {
     cleanPath = cleanPath.slice(0, -1);
@@ -356,13 +386,13 @@ function updateHreflangTags(currentLocation: string, currentLanguage: Language) 
     hreflang: info.hreflang
   }));
   
-  // Add hreflang tags for each supported language
+  // Add hreflang tags for each supported language (always use path-based URLs for SEO)
   languages.forEach(lang => {
     const localizedPath = getLocalizedPath(cleanPath, lang.internal);
     const link = document.createElement('link');
     link.rel = 'alternate';
     link.hreflang = lang.hreflang;
-    link.href = `${baseUrl}${localizedPath}`;
+    link.href = `${baseUrl}${localizedPath}${queryParams}`;
     document.head.appendChild(link);
   });
   
@@ -371,7 +401,7 @@ function updateHreflangTags(currentLocation: string, currentLanguage: Language) 
   const defaultLink = document.createElement('link');
   defaultLink.rel = 'alternate';
   defaultLink.hreflang = 'x-default';
-  defaultLink.href = `${baseUrl}${defaultPath}`;
+  defaultLink.href = `${baseUrl}${defaultPath}${queryParams}`;
   document.head.appendChild(defaultLink);
 }
 
