@@ -289,9 +289,7 @@ export default function HomePage() {
   return (
     <div className="map-page h-screen w-full bg-background relative">
       <SEOHead
-        title={homeMeta.title}
-        description={homeMeta.description}
-        keywords={homeMeta.keywords.join(', ')}
+        pageType="home"
         ogImage={
           featuredProperties && featuredProperties.length > 0
             ? featuredProperties[0].images?.[0]

@@ -347,23 +347,22 @@ export default function PropertyDetailPage() {
     <div className="min-h-screen bg-background">
       {property && (
         <SEOHead
-          title={`${property.title} - ${formatPrice(property.price, property.currency || 'USD', property.listingType, displayCurrency, convertedAmount, t)} | MapEstate`}
-          description={`${property.description || `${property.bedrooms} bedroom ${property.type} for ${property.listingType} in ${property.city}, ${property.country}.`} View details, photos, and contact information on MapEstate - AI-powered real estate platform.`}
-          keywords={`${property.type}, ${property.city}, ${property.country}, ${property.listingType}, real estate, property, ${property.bedrooms} bedroom, ${property.bathrooms} bathroom, MapEstate, Kurdistan Iraq properties`}
+          pageType="property-detail"
+          propertyData={{
+            propertyType: property.type,
+            listingType: property.listingType,
+            price: formatPrice(property.price, property.currency || 'USD', property.listingType, displayCurrency, convertedAmount, t),
+            city: property.city,
+            bedrooms: property.bedrooms,
+            bathrooms: property.bathrooms,
+            address: property.address,
+            country: property.country,
+            currency: property.currency || 'USD',
+            area: property.area
+          }}
           ogImage={property.images && property.images.length > 0 ? property.images[0] : `${window.location.origin}/mapestate-og-image.jpg`}
           canonicalUrl={undefined}
           structuredData={getPropertyStructuredData(property)}
-          propertyData={{
-            address: property.address,
-            city: property.city,
-            country: property.country,
-            price: property.price?.toString(),
-            currency: property.currency || 'USD',
-            propertyType: property.type,
-            bedrooms: property.bedrooms,
-            bathrooms: property.bathrooms,
-            area: property.area
-          }}
           breadcrumbs={[
             { name: 'Home', url: '/' },
             { name: 'Properties', url: '/properties' },

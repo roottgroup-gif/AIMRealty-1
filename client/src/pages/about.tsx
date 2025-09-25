@@ -12,9 +12,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <SEOHead
-        title={`${t('about.title')} | MapEstate - AI-Powered Real Estate Platform`}
-        description={`${t('about.subtitle')} Learn about our mission to revolutionize real estate in Kurdistan, Iraq with AI-powered property search and expert agent services.`}
-        keywords="about MapEstate, AI real estate platform, Kurdistan Iraq property platform, real estate technology, property search innovation, digital real estate solutions"
+        pageType="about"
         canonicalUrl={undefined}
         ogImage={`${window.location.origin}/mapestate-og-image.jpg`}
         breadcrumbs={[

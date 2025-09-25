@@ -118,9 +118,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <SEOHead
-        title={`${t('settings.title')} | MapEstate - AI-Powered Real Estate Finder`}
-        description={`Customize your MapEstate experience with personalized settings. Manage language preferences, currency, notifications, and display options for the best real estate search experience in Kurdistan, Iraq.`}
-        keywords="MapEstate settings, real estate preferences, property search settings, language settings, currency preferences, Kurdistan Iraq real estate customization"
+        pageType="settings"
         canonicalUrl={undefined}
         ogImage={`${window.location.origin}/mapestate-og-image.jpg`}
         breadcrumbs={[
