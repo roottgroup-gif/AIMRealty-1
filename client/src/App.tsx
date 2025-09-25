@@ -10,7 +10,7 @@ import { CurrencyProvider } from "@/lib/currency-context";
 import { useNetworkError } from "@/hooks/useNetworkError";
 import { Suspense, lazy, useState, useEffect } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { useLanguage, detectLanguageFromUrl, redirectToLanguage, detectBrowserLanguage, globalChangeLanguage, type Language } from "@/lib/i18n";
+import { useLanguage, detectLanguageFromUrl, detectLanguageFromUrlEnhanced, redirectToLanguage, redirectToLanguageEnhanced, detectBrowserLanguage, globalChangeLanguage, type Language } from "@/lib/i18n";
 import { Redirect } from "@/components/Redirect";
 
 // Lazy load page components for better performance
@@ -32,20 +32,28 @@ function Router() {
   const [location, setLocation] = useLocation();
   const { language } = useLanguage();
 
-  // Language detection and redirect effect
+  // Enhanced language detection and redirect effect
   useEffect(() => {
-    const currentLang = detectLanguageFromUrl(location);
+    // Get full URL including query parameters
+    const fullUrl = window.location.href;
+    const { language: detectedLang, source } = detectLanguageFromUrlEnhanced(fullUrl);
     
-    // If no language in URL, redirect to language-prefixed version
-    if (!currentLang) {
+    // If language found in URL
+    if (detectedLang) {
+      // If it's from query parameter, convert to path-based URL for SEO
+      if (source === 'query') {
+        redirectToLanguageEnhanced(fullUrl, setLocation, true);
+        return;
+      }
+      
+      // If URL language differs from current language, update language
+      if (detectedLang !== language) {
+        globalChangeLanguage(detectedLang);
+      }
+    } else {
+      // No language detected, use browser language and redirect
       const browserLang = detectBrowserLanguage();
       redirectToLanguage(browserLang, location, setLocation);
-      return;
-    }
-    
-    // If URL language differs from current language, update language
-    if (currentLang !== language) {
-      globalChangeLanguage(currentLang as any);
     }
   }, [location, language, setLocation]);
 
