@@ -1690,92 +1690,147 @@ export default function PropertyMap({
     onFilterChange?.(newFilters);
   };
 
-  // Geolocation function
+  // Enhanced geolocation function with better error handling
   const handleGetMyLocation = () => {
-    if (!mapInstanceRef.current) return;
+    console.log("🔍 Getting user location...");
+    
+    if (!mapInstanceRef.current) {
+      console.error("❌ Map instance not available");
+      alert("Map is not ready yet. Please wait a moment and try again.");
+      return;
+    }
 
     setIsLocating(true);
 
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const L = (window as any).L;
-
-          if (mapInstanceRef.current && L) {
-            // Smoothly fly to user's location with animation
-            mapInstanceRef.current.flyTo([latitude, longitude], 15, {
-              animate: true,
-              duration: 2.5, // 2.5 seconds smooth animation
-              easeLinearity: 0.25,
-            });
-
-            // Add a marker for user's location
-            const userLocationIcon = L.divIcon({
-              html: `
-                <div style="
-                  background: #FF7800;
-                  width: 20px;
-                  height: 20px;
-                  border-radius: 50%;
-                  border: 3px solid white;
-                  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                  position: relative;
-                ">
-                  <div style="
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    width: 8px;
-                    height: 8px;
-                    background: white;
-                    border-radius: 50%;
-                  "></div>
-                </div>
-              `,
-              className: "user-location-marker",
-              iconSize: [20, 20],
-              iconAnchor: [10, 10],
-            });
-
-            // Remove any existing user location markers
-            markersRef.current.forEach((marker) => {
-              if (
-                marker.options &&
-                marker.options.icon &&
-                marker.options.icon.options.className === "user-location-marker"
-              ) {
-                mapInstanceRef.current.removeLayer(marker);
-              }
-            });
-
-            const userMarker = L.marker([latitude, longitude], {
-              icon: userLocationIcon,
-            }).addTo(mapInstanceRef.current);
-            userMarker.bindPopup("📍 Your Current Location");
-            markersRef.current.push(userMarker);
-          }
-
-          setIsLocating(false);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setIsLocating(false);
-          alert(
-            "Unable to get your location. Please check your browser permissions.",
-          );
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        },
-      );
-    } else {
+    // Check if geolocation is supported
+    if (!("geolocation" in navigator)) {
+      console.error("❌ Geolocation not supported by this browser");
       setIsLocating(false);
-      alert("Geolocation is not supported by your browser.");
+      alert("Geolocation is not supported by your browser. Please try using a modern browser like Chrome, Firefox, or Safari.");
+      return;
     }
+
+    // Check if we're on a secure context (HTTPS or localhost)
+    const isSecureContext = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost';
+    if (!isSecureContext) {
+      console.error("❌ Geolocation requires secure context (HTTPS)");
+      setIsLocating(false);
+      alert("Location services require a secure connection (HTTPS). Please make sure you're accessing the site securely.");
+      return;
+    }
+
+    console.log("✅ Geolocation is supported and context is secure");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log("✅ Location obtained successfully:", {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        });
+        
+        const { latitude, longitude } = position.coords;
+        const L = (window as any).L;
+
+        if (mapInstanceRef.current && L) {
+          // Smoothly fly to user's location with animation
+          mapInstanceRef.current.flyTo([latitude, longitude], 15, {
+            animate: true,
+            duration: 2.5, // 2.5 seconds smooth animation
+            easeLinearity: 0.25,
+          });
+
+          // Add a marker for user's location
+          const userLocationIcon = L.divIcon({
+            html: `
+              <div style="
+                background: #FF7800;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                position: relative;
+              ">
+                <div style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  width: 8px;
+                  height: 8px;
+                  background: white;
+                  border-radius: 50%;
+                "></div>
+              </div>
+            `,
+            className: "user-location-marker",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          });
+
+          // Remove any existing user location markers
+          markersRef.current.forEach((marker) => {
+            if (
+              marker.options &&
+              marker.options.icon &&
+              marker.options.icon.options.className === "user-location-marker"
+            ) {
+              mapInstanceRef.current.removeLayer(marker);
+            }
+          });
+
+          const userMarker = L.marker([latitude, longitude], {
+            icon: userLocationIcon,
+          }).addTo(mapInstanceRef.current);
+          userMarker.bindPopup("📍 Your Current Location");
+          markersRef.current.push(userMarker);
+          
+          console.log("✅ User location marker added to map");
+        } else {
+          console.error("❌ Map instance or Leaflet not available");
+        }
+
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("❌ Geolocation error:", error);
+        setIsLocating(false);
+        
+        let errorMessage = "Unable to get your location. ";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage += "You denied location access. To enable location services:\n\n";
+            errorMessage += "• Click the location icon in your browser's address bar\n";
+            errorMessage += "• Select 'Allow' for location access\n";
+            errorMessage += "• Refresh the page and try again";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage += "Location information is unavailable. Please check:\n\n";
+            errorMessage += "• Your device's location services are enabled\n";
+            errorMessage += "• You have a stable internet connection\n";
+            errorMessage += "• Try moving to a location with better GPS signal";
+            break;
+          case error.TIMEOUT:
+            errorMessage += "Location request timed out. Please:\n\n";
+            errorMessage += "• Check your internet connection\n";
+            errorMessage += "• Try again in a moment\n";
+            errorMessage += "• Make sure location services are enabled on your device";
+            break;
+          default:
+            errorMessage += "An unknown error occurred. Please try again or check your browser settings.";
+            break;
+        }
+        
+        alert(errorMessage);
+      },
+      {
+        enableHighAccuracy: false, // Set to false for faster response
+        timeout: 15000, // Increased timeout to 15 seconds
+        maximumAge: 60000, // 1 minute cache
+      },
+    );
   };
 
   return (
