@@ -62,7 +62,11 @@ function generateDynamicDescription(
         const listingType = t(`seo.listingType.${propertyData.listingType?.toLowerCase()}` as any) || propertyData.listingType || 'sale';
         const bedrooms = propertyData.bedrooms || 0;
         const city = propertyData.city || '';
-        const description = '';
+        // Use property description if available, truncated for SEO best practices
+        const description = (propertyData as any).description ? 
+          ((propertyData as any).description.length > 120 ? 
+            (propertyData as any).description.substring(0, 120) + '...' : 
+            (propertyData as any).description) : '';
         
         return t('seo.propertyDetailDescription')
           .replace('{propertyType}', propertyType)
@@ -86,10 +90,32 @@ function generateDynamicDescription(
 function generateDynamicKeywords(
   language: Language,
   t: (key: string) => string,
-  customKeywords?: string
+  customKeywords?: string,
+  pageType?: string,
+  propertyData?: any
 ): string {
   if (customKeywords) return customKeywords;
-  return t('seo.keywords');
+  
+  let baseKeywords = t('seo.keywords');
+  
+  // Add property-specific keywords for property detail pages
+  if (pageType === 'property-detail' && propertyData) {
+    const propertySpecificKeywords = [
+      propertyData.propertyType,
+      propertyData.city,
+      propertyData.country,
+      propertyData.listingType,
+      // Only include bedroom/bathroom counts if they are valid numbers
+      Number.isFinite(propertyData.bedrooms) && propertyData.bedrooms > 0 ? 
+        `${propertyData.bedrooms} bedroom${propertyData.bedrooms > 1 ? 's' : ''}` : null,
+      Number.isFinite(propertyData.bathrooms) && propertyData.bathrooms > 0 ? 
+        `${propertyData.bathrooms} bathroom${propertyData.bathrooms > 1 ? 's' : ''}` : null
+    ].filter(Boolean).join(', ');
+    
+    baseKeywords += `, ${propertySpecificKeywords}`;
+  }
+  
+  return baseKeywords;
 }
 
 interface SEOProps {
@@ -336,7 +362,7 @@ export function SEOHead({
     // Generate dynamic SEO content based on page type and language
     const dynamicTitle = generateDynamicTitle(pageType, propertyData, currentLanguage, t, title);
     const dynamicDescription = generateDynamicDescription(pageType, propertyData, currentLanguage, t, description);
-    const dynamicKeywords = generateDynamicKeywords(currentLanguage, t, keywords);
+    const dynamicKeywords = generateDynamicKeywords(currentLanguage, t, keywords, pageType, propertyData);
     
     // Update document title
     document.title = dynamicTitle;
