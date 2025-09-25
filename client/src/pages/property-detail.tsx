@@ -360,7 +360,7 @@ export default function PropertyDetailPage() {
             currency: property.currency || 'USD',
             area: property.area
           }}
-          ogImage={property.images && property.images.length > 0 ? property.images[0] : `${window.location.origin}/mapestate-og-image.jpg`}
+          ogImage={property.images && property.images.length > 0 ? property.images[0] : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
           canonicalUrl={undefined}
           structuredData={getPropertyStructuredData(property)}
           breadcrumbs={[

@@ -420,7 +420,7 @@ export function SEOHead({
   title,
   description,
   keywords,
-  ogImage = `${window.location.protocol}//${window.location.host}/mapestate-og-image.jpg`,
+  ogImage = `${window.location.protocol}//${window.location.host}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`,
   canonicalUrl,
   structuredData,
   breadcrumbs,

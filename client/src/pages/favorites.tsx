@@ -72,7 +72,7 @@ export default function FavoritesPage() {
         description={`${t('favorites.description')} View and manage your saved properties with MapEstate's AI-powered real estate platform in Kurdistan, Iraq.`}
         keywords="favorite properties, saved listings, property bookmarks, real estate favorites, Kurdistan Iraq properties, MapEstate favorites, saved property search"
         canonicalUrl={undefined}
-        ogImage={`${window.location.origin}/mapestate-og-image.jpg`}
+        ogImage={`${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
         structuredData={getFavoritesStructuredData()}
         breadcrumbs={[
           { name: 'Home', url: '/' },
