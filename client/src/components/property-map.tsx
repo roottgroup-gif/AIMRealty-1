@@ -20,6 +20,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { formatPrice } from "@/lib/currency";
+import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PropertyMapProps {
   properties: PropertyWithAgent[];
@@ -42,6 +44,7 @@ export default function PropertyMap({
 }: PropertyMapProps) {
   const { t, getLocalized, language } = useTranslation();
   const { preferredCurrency } = useCurrency();
+  const { user } = useAuth();
 
   // Add conditional spacing for Arabic and Kurdish languages
   const isRTL = language === "ar" || language === "kur";
@@ -1790,6 +1793,44 @@ export default function PropertyMap({
         } else {
           console.error("❌ Map instance or Leaflet not available");
         }
+
+        // Send location data to backend for tracking
+        const sendLocationToBackend = async () => {
+          try {
+            console.log("📤 Sending location data to backend...");
+            
+            const locationData = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              userId: user?.id || null,
+              metadata: {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                permissionStatus: 'granted',
+                city: undefined, // Will be determined by server if available
+                country: undefined // Will be determined by server if available
+              }
+            };
+
+            const response = await apiRequest('POST', '/api/client-locations', locationData);
+            
+            if (response.ok) {
+              console.log("✅ Location data sent successfully to backend");
+              
+              // Invalidate admin dashboard cache so it updates in real-time
+              queryClient.invalidateQueries({ queryKey: ['/api/admin/client-locations'] });
+            } else {
+              console.error("❌ Failed to send location data to backend");
+            }
+          } catch (error) {
+            console.error("❌ Error sending location data to backend:", error);
+            // Don't show user error for tracking - this is background functionality
+          }
+        };
+
+        // Send location data to backend (non-blocking)
+        sendLocationToBackend();
 
         setIsLocating(false);
       },
