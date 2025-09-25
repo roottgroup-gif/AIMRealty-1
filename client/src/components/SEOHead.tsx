@@ -2,43 +2,123 @@ import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useLanguage, useTranslation, getLocalizedPath, detectLanguageFromUrl, detectLanguageFromUrlEnhanced, getLanguageInfo, LANGUAGE_MAPPING, type Language } from '@/lib/i18n';
 
+// Import translations object for SEO language override
+// Note: This assumes translations are exported from i18n.ts
+const translations: { [key: string]: { en: string; ar: string; kur: string } } = {
+  "seo.homeTitle": {
+    en: "MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq",
+    ar: "MapEstate - محرك البحث العقاري المدعوم بالذكاء الاصطناعي | عقارات في كردستان، العراق",
+    kur: "MapEstate - دۆزەرەوەی خانووبەرەی پاڵپشتیکراو بە AI | خانووبەرە لە کوردستان، عێراق",
+  },
+  "seo.homeDescription": {
+    en: "Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents.",
+    ar: "اعثر على منزلك المثالي مع التوصيات المدعومة بالذكاء الاصطناعي. اكتشف العقارات للإيجار والبيع في كردستان، العراق مع البحث الذكي والوكلاء الخبراء.",
+    kur: "ماڵی تەواوی خۆت بدۆزەرەوە لەگەڵ پێشنیارەکانی پاڵپشتیکراو بە AI. خانووبەرەکان بۆ کرێ و فرۆشتن لە کوردستان، عێراق بدۆزەرەوە لەگەڵ گەڕانی زیرەک و بریکارە شارەزاکان.",
+  },
+  "seo.propertiesTitle": {
+    en: "Properties for Sale and Rent in Kurdistan, Iraq | MapEstate",
+    ar: "عقارات للبيع والإيجار في كردستان، العراق | MapEstate",
+    kur: "خانووبەرە بۆ فرۆشتن و کرێ لە کوردستان، عێراق | MapEstate",
+  },
+  "seo.propertiesDescription": {
+    en: "Browse thousands of properties for sale and rent. Find apartments, houses, villas, and land in Kurdistan, Iraq with advanced search and AI recommendations.",
+    ar: "تصفح آلاف العقارات للبيع والإيجار. ابحث عن شقق ومنازل وفيلات وأراضي في كردستان، العراق مع البحث المتقدم والتوصيات الذكية.",
+    kur: "هەزاران خانووبەرە بۆ فرۆشتن و کرێ بگەڕێ. شوقە، ماڵ، ڤیلا و زەوی لە کوردستان، عێراق بدۆزەرەوە لەگەڵ گەڕانی پێشکەوتوو و پێشنیاری AI.",
+  },
+  "seo.propertyDetailTitle": {
+    en: "{propertyType} for {listingType} - {price} | {city}, Iraq | MapEstate",
+    ar: "{propertyType} لل{listingType} - {price} | {city}، العراق | MapEstate",
+    kur: "{propertyType} بۆ {listingType} - {price} | {city}، عێراق | MapEstate",
+  },
+  "seo.propertyDetailDescription": {
+    en: "{bedrooms} bedroom {propertyType} for {listingType} in {city}. {description} Contact our expert agents for viewing and details.",
+    ar: "{propertyType} بـ {bedrooms} غرفة نوم لل{listingType} في {city}. {description} اتصل بوكلائنا الخبراء للمعاينة والتفاصيل.",
+    kur: "{propertyType}ی {bedrooms} ژووری نوستن بۆ {listingType} لە {city}. {description} پەیوەندی بە بریکارە شارەزاکانمانەوە بکە بۆ بینین و وردەکاری.",
+  },
+  "seo.keywords": {
+    en: "real estate, Kurdistan, Iraq, properties for sale, properties for rent, apartments, houses, villas, land, AI search, Erbil, Sulaymaniyah, Dohuk",
+    ar: "عقارات، كردستان، العراق، عقارات للبيع، عقارات للإيجار، شقق، منازل، فيلات، أراضي، بحث ذكي، أربيل، السليمانية، دهوك",
+    kur: "خانووبەرە، کوردستان، عێراق، خانووبەرە بۆ فرۆشتن، خانووبەرە بۆ کرێ، شوقە، ماڵ، ڤیلا، زەوی، گەڕانی AI، هەولێر، سلێمانی، دهۆک",
+  },
+  "seo.propertyType.apartment": {
+    en: "Apartment",
+    ar: "شقة",
+    kur: "شوقە",
+  },
+  "seo.propertyType.house": {
+    en: "House",
+    ar: "منزل", 
+    kur: "ماڵ",
+  },
+  "seo.propertyType.villa": {
+    en: "Villa",
+    ar: "فيلا",
+    kur: "ڤیلا",
+  },
+  "seo.propertyType.land": {
+    en: "Land",
+    ar: "أرض",
+    kur: "زەوی",
+  },
+  "seo.listingType.sale": {
+    en: "Sale",
+    ar: "البيع",
+    kur: "فرۆشتن",
+  },
+  "seo.listingType.rent": {
+    en: "Rent", 
+    ar: "الإيجار",
+    kur: "کرێ",
+  }
+};
+
+// SEO language override helper - maps Kurdish to English for SEO meta content
+function resolveSeoLanguage(language: Language): Language {
+  // User requested that Kurdish URLs show English SEO content for social media sharing
+  return language === 'kur' ? 'en' : language;
+}
+
+// Custom translation function for SEO that can handle language override
+function seoTranslate(key: string, language: Language): string {
+  return translations[key]?.[language] || key;
+}
+
 // Helper functions for dynamic SEO content generation
 function generateDynamicTitle(
   pageType: string,
   propertyData: SEOProps['propertyData'],
   language: Language,
-  t: (key: string) => string,
   customTitle?: string
 ): string {
   if (customTitle) return customTitle;
   
   switch (pageType) {
     case 'home':
-      return t('seo.homeTitle');
+      return seoTranslate('seo.homeTitle', language);
     case 'properties':
-      return t('seo.propertiesTitle');
+      return seoTranslate('seo.propertiesTitle', language);
     case 'property-detail':
       if (propertyData) {
-        const propertyType = t(`seo.propertyType.${propertyData.propertyType?.toLowerCase()}` as any) || propertyData.propertyType || 'Property';
-        const listingType = t(`seo.listingType.${propertyData.listingType?.toLowerCase()}` as any) || propertyData.listingType || 'Sale';
+        const propertyType = seoTranslate(`seo.propertyType.${propertyData.propertyType?.toLowerCase()}`, language) || propertyData.propertyType || 'Property';
+        const listingType = seoTranslate(`seo.listingType.${propertyData.listingType?.toLowerCase()}`, language) || propertyData.listingType || 'Sale';
         const price = propertyData.price || '';
         const city = propertyData.city || '';
         
-        return t('seo.propertyDetailTitle')
+        return seoTranslate('seo.propertyDetailTitle', language)
           .replace('{propertyType}', propertyType)
           .replace('{listingType}', listingType)
           .replace('{price}', price)
           .replace('{city}', city);
       }
-      return t('seo.homeTitle');
+      return seoTranslate('seo.homeTitle', language);
     case 'favorites':
-      return t('seo.favoritesTitle');
+      return seoTranslate('seo.favoritesTitle', language);
     case 'about':
-      return t('seo.aboutTitle');
+      return seoTranslate('seo.aboutTitle', language);
     case 'settings':
-      return t('seo.settingsTitle');
+      return seoTranslate('seo.settingsTitle', language);
     default:
-      return t('seo.homeTitle');
+      return seoTranslate('seo.homeTitle', language);
   }
 }
 
@@ -46,20 +126,19 @@ function generateDynamicDescription(
   pageType: string,
   propertyData: SEOProps['propertyData'],
   language: Language,
-  t: (key: string) => string,
   customDescription?: string
 ): string {
   if (customDescription) return customDescription;
   
   switch (pageType) {
     case 'home':
-      return t('seo.homeDescription');
+      return seoTranslate('seo.homeDescription', language);
     case 'properties':
-      return t('seo.propertiesDescription');
+      return seoTranslate('seo.propertiesDescription', language);
     case 'property-detail':
       if (propertyData) {
-        const propertyType = t(`seo.propertyType.${propertyData.propertyType?.toLowerCase()}` as any) || propertyData.propertyType || 'property';
-        const listingType = t(`seo.listingType.${propertyData.listingType?.toLowerCase()}` as any) || propertyData.listingType || 'sale';
+        const propertyType = seoTranslate(`seo.propertyType.${propertyData.propertyType?.toLowerCase()}`, language) || propertyData.propertyType || 'property';
+        const listingType = seoTranslate(`seo.listingType.${propertyData.listingType?.toLowerCase()}`, language) || propertyData.listingType || 'sale';
         const bedrooms = propertyData.bedrooms || 0;
         const city = propertyData.city || '';
         // Use property description if available, truncated for SEO best practices
@@ -68,35 +147,34 @@ function generateDynamicDescription(
             (propertyData as any).description.substring(0, 120) + '...' : 
             (propertyData as any).description) : '';
         
-        return t('seo.propertyDetailDescription')
+        return seoTranslate('seo.propertyDetailDescription', language)
           .replace('{propertyType}', propertyType)
           .replace('{listingType}', listingType)
           .replace('{bedrooms}', bedrooms.toString())
           .replace('{city}', city)
           .replace('{description}', description);
       }
-      return t('seo.homeDescription');
+      return seoTranslate('seo.homeDescription', language);
     case 'favorites':
-      return t('favorites.description');
+      return 'Your favorite properties saved for later viewing and quick access.';
     case 'about':
-      return t('about.missionText');
+      return 'Learn about MapEstate - your trusted real estate platform in Kurdistan, Iraq.';
     case 'settings':
       return 'Customize your MapEstate experience with language, currency, and notification preferences.';
     default:
-      return t('seo.homeDescription');
+      return seoTranslate('seo.homeDescription', language);
   }
 }
 
 function generateDynamicKeywords(
   language: Language,
-  t: (key: string) => string,
   customKeywords?: string,
   pageType?: string,
   propertyData?: any
 ): string {
   if (customKeywords) return customKeywords;
   
-  let baseKeywords = t('seo.keywords');
+  let baseKeywords = seoTranslate('seo.keywords', language);
   
   // Add property-specific keywords for property detail pages
   if (pageType === 'property-detail' && propertyData) {
@@ -359,10 +437,13 @@ export function SEOHead({
     const { language: detectedLang } = detectLanguageFromUrlEnhanced(fullUrl);
     const currentLanguage = detectedLang || language;
     
-    // Generate dynamic SEO content based on page type and language
-    const dynamicTitle = generateDynamicTitle(pageType, propertyData, currentLanguage, t, title);
-    const dynamicDescription = generateDynamicDescription(pageType, propertyData, currentLanguage, t, description);
-    const dynamicKeywords = generateDynamicKeywords(currentLanguage, t, keywords, pageType, propertyData);
+    // Resolve SEO language - Kurdish routes will use English SEO content
+    const seoLanguage = resolveSeoLanguage(currentLanguage);
+    
+    // Generate dynamic SEO content based on page type and SEO language
+    const dynamicTitle = generateDynamicTitle(pageType, propertyData, seoLanguage, title);
+    const dynamicDescription = generateDynamicDescription(pageType, propertyData, seoLanguage, description);
+    const dynamicKeywords = generateDynamicKeywords(seoLanguage, keywords, pageType, propertyData);
     
     // Update document title
     document.title = dynamicTitle;
@@ -387,12 +468,12 @@ export function SEOHead({
     updateMetaTag('property', 'og:type', propertyData ? 'product' : 'website');
     updateMetaTag('property', 'og:site_name', 'MapEstate');
     
-    // Set og:locale based on current language
-    const ogLocale = getOGLocale(currentLanguage);
+    // Set og:locale based on SEO language (Kurdish routes will use English locale)
+    const ogLocale = getOGLocale(seoLanguage);
     updateMetaTag('property', 'og:locale', ogLocale);
     
     // Handle multiple og:locale:alternate tags for other languages
-    const alternateLocales = getAlternateOGLocales(currentLanguage);
+    const alternateLocales = getAlternateOGLocales(seoLanguage);
     if (alternateLocales.length > 0) {
       ensureMultiMeta('property', 'og:locale:alternate', alternateLocales);
     }
@@ -414,16 +495,17 @@ export function SEOHead({
     updateMetaTag('name', 'twitter:app:name:ipad', 'MapEstate');
     updateMetaTag('name', 'twitter:app:name:googleplay', 'MapEstate');
     
-    // Language-specific social sharing optimizations
-    const languageInfo = getLanguageInfo(currentLanguage);
-    updateMetaTag('property', 'og:language', languageInfo.iso);
-    updateMetaTag('name', 'twitter:language', languageInfo.iso);
+    // Language-specific social sharing optimizations (use SEO language)
+    const seoLanguageInfo = getLanguageInfo(seoLanguage);
+    updateMetaTag('property', 'og:language', seoLanguageInfo.iso);
+    updateMetaTag('name', 'twitter:language', seoLanguageInfo.iso);
     
     // Enhanced social sharing for Arabic and Kurdish content
     if (currentLanguage === 'ar' || currentLanguage === 'kur') {
-      // RTL-specific meta tags for social platforms
-      updateMetaTag('name', 'text-direction', languageInfo.dir);
-      updateMetaTag('property', 'og:text_direction', languageInfo.dir);
+      // RTL-specific meta tags for social platforms (use current language for UI direction)
+      const currentLanguageInfo = getLanguageInfo(currentLanguage);
+      updateMetaTag('name', 'text-direction', currentLanguageInfo.dir);
+      updateMetaTag('property', 'og:text_direction', currentLanguageInfo.dir);
       
       // Arabic/Kurdish specific social media optimization
       updateMetaTag('property', 'og:title:ar', currentLanguage === 'ar' ? dynamicTitle : '');
