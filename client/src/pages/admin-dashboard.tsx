@@ -118,6 +118,8 @@ const ClientLocationTracking = () => {
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [selectedUserId, setSelectedUserId] = useState<string>('all');
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<ClientLocation | null>(null);
   const limit = 50;
 
   // Query for client locations
@@ -138,8 +140,8 @@ const ClientLocationTracking = () => {
     enabled: true
   });
 
-  const locations = locationData?.items || [];
-  const total = locationData?.total || 0;
+  const locations = (locationData as any)?.items || [];
+  const total = (locationData as any)?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
   const formatDate = (dateString: string) => {
@@ -153,7 +155,7 @@ const ClientLocationTracking = () => {
   const getUserDisplayName = (userId: string | null) => {
     if (!userId) return 'Anonymous';
     
-    const user = users?.items?.find((u: User) => u.id === userId);
+    const user = (users as any)?.items?.find((u: User) => u.id === userId);
     if (!user) return userId; // Fallback to ID if user not found
     
     if (user.firstName && user.lastName) {
@@ -210,7 +212,7 @@ const ClientLocationTracking = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All users</SelectItem>
-              {users?.items?.map((user: User) => (
+              {((users as any)?.items || []).map((user: User) => (
                 <SelectItem key={user.id} value={user.id}>
                   {user.firstName && user.lastName 
                     ? `${user.firstName} ${user.lastName}` 
@@ -278,6 +280,9 @@ const ClientLocationTracking = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Timestamp
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-orange-100 dark:divide-gray-700">
@@ -328,8 +333,23 @@ const ClientLocationTracking = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-gray-100" data-testid={`text-timestamp-${index}`}>
-                          {formatDate(location.createdAt)}
+                          {formatDate(location.createdAt || new Date().toISOString())}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedLocation(location);
+                            setShowMapModal(true);
+                          }}
+                          className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                          data-testid={`button-show-map-${index}`}
+                        >
+                          <MapPin className="h-4 w-4 mr-1" />
+                          Show Map
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -406,6 +426,78 @@ const ClientLocationTracking = () => {
           </>
         )}
       </CardContent>
+
+      {/* Map Modal */}
+      <Dialog open={showMapModal} onOpenChange={setShowMapModal}>
+        <DialogContent className="max-w-4xl w-full h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-orange-600" />
+              Location Details
+            </DialogTitle>
+            <DialogDescription>
+              {selectedLocation && (
+                <div className="text-sm space-y-1">
+                  <p><strong>User:</strong> {getUserDisplayName(selectedLocation.userId)}</p>
+                  <p><strong>Coordinates:</strong> {formatCoordinate(selectedLocation.latitude)}, {formatCoordinate(selectedLocation.longitude)}</p>
+                  <p><strong>Accuracy:</strong> {selectedLocation.accuracy ? `${selectedLocation.accuracy}m` : 'Unknown'}</p>
+                  <p><strong>Timestamp:</strong> {formatDate(selectedLocation.createdAt || new Date().toISOString())}</p>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 w-full h-full min-h-[400px]">
+            {selectedLocation && (
+              <div className="w-full h-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                <iframe
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(selectedLocation.longitude)-0.01},${parseFloat(selectedLocation.latitude)-0.01},${parseFloat(selectedLocation.longitude)+0.01},${parseFloat(selectedLocation.latitude)+0.01}&layer=mapnik&marker=${selectedLocation.latitude},${selectedLocation.longitude}`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  title="Location Map"
+                ></iframe>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex justify-between items-center pt-4">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (selectedLocation) {
+                    const googleMapsUrl = `https://www.google.com/maps?q=${selectedLocation.latitude},${selectedLocation.longitude}`;
+                    window.open(googleMapsUrl, '_blank');
+                  }
+                }}
+                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                Open in Google Maps
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (selectedLocation) {
+                    const osmUrl = `https://www.openstreetmap.org/?mlat=${selectedLocation.latitude}&mlon=${selectedLocation.longitude}&zoom=15`;
+                    window.open(osmUrl, '_blank');
+                  }
+                }}
+                className="text-green-600 border-green-200 hover:bg-green-50"
+              >
+                Open in OpenStreetMap
+              </Button>
+            </div>
+            <Button onClick={() => setShowMapModal(false)} className="bg-orange-600 hover:bg-orange-700">
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

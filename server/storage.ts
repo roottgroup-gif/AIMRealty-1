@@ -113,6 +113,16 @@ export interface IStorage {
     from?: string; 
     to?: string; 
   }): Promise<number>;
+  getClientLocationStats(params?: { 
+    from?: string; 
+    to?: string; 
+  }): Promise<{
+    totalLocations: number;
+    dailyStats: Array<{ date: string; count: number }>;
+    topCities: Array<{ city: string; count: number }>;
+    deviceStats: Array<{ device: string; count: number }>;
+    accuracyStats: { average: number; median: number };
+  }>;
 }
 
 export interface PropertyFilters {
@@ -1100,6 +1110,118 @@ export class DatabaseStorage implements IStorage {
 
     const [result] = await query;
     return result.count;
+  }
+
+  async getClientLocationStats(params?: { 
+    from?: string; 
+    to?: string; 
+  }) {
+    // Apply date filters
+    const conditions = [];
+    if (params?.from) {
+      conditions.push(gte(clientLocations.createdAt, new Date(params.from)));
+    }
+    if (params?.to) {
+      conditions.push(lte(clientLocations.createdAt, new Date(params.to)));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Get total count
+    const totalQuery = db()
+      .select({ count: sql<number>`count(*)` })
+      .from(clientLocations);
+    
+    if (whereClause) {
+      totalQuery.where(whereClause);
+    }
+    
+    const [{ count: totalLocations }] = await totalQuery;
+
+    // Get daily stats
+    const dailyStatsQuery = db()
+      .select({
+        date: sql<string>`DATE(${clientLocations.createdAt})`,
+        count: sql<number>`count(*)`
+      })
+      .from(clientLocations)
+      .groupBy(sql`DATE(${clientLocations.createdAt})`)
+      .orderBy(sql`DATE(${clientLocations.createdAt})`);
+    
+    if (whereClause) {
+      dailyStatsQuery.where(whereClause);
+    }
+    
+    const dailyStats = await dailyStatsQuery;
+
+    // Get top cities
+    const topCitiesQuery = db()
+      .select({
+        city: sql<string>`JSON_EXTRACT(${clientLocations.metadata}, '$.city')`,
+        count: sql<number>`count(*)`
+      })
+      .from(clientLocations)
+      .where(
+        whereClause 
+          ? and(whereClause, sql`JSON_EXTRACT(${clientLocations.metadata}, '$.city') IS NOT NULL`)
+          : sql`JSON_EXTRACT(${clientLocations.metadata}, '$.city') IS NOT NULL`
+      )
+      .groupBy(sql`JSON_EXTRACT(${clientLocations.metadata}, '$.city')`)
+      .orderBy(sql`count(*) DESC`)
+      .limit(10);
+    
+    const topCities = await topCitiesQuery;
+
+    // Get device stats
+    const deviceStatsQuery = db()
+      .select({
+        device: sql<string>`SUBSTRING_INDEX(JSON_EXTRACT(${clientLocations.metadata}, '$.userAgent'), ' ', 1)`,
+        count: sql<number>`count(*)`
+      })
+      .from(clientLocations)
+      .where(
+        whereClause 
+          ? and(whereClause, sql`JSON_EXTRACT(${clientLocations.metadata}, '$.userAgent') IS NOT NULL`)
+          : sql`JSON_EXTRACT(${clientLocations.metadata}, '$.userAgent') IS NOT NULL`
+      )
+      .groupBy(sql`SUBSTRING_INDEX(JSON_EXTRACT(${clientLocations.metadata}, '$.userAgent'), ' ', 1)`)
+      .orderBy(sql`count(*) DESC`)
+      .limit(10);
+    
+    const deviceStats = await deviceStatsQuery;
+
+    // Get accuracy stats
+    const accuracyQuery = db()
+      .select({
+        average: sql<number>`AVG(${clientLocations.accuracy})`,
+        median: sql<number>`AVG(${clientLocations.accuracy})`
+      })
+      .from(clientLocations)
+      .where(
+        whereClause 
+          ? and(whereClause, sql`${clientLocations.accuracy} IS NOT NULL`)
+          : sql`${clientLocations.accuracy} IS NOT NULL`
+      );
+    
+    const [accuracyResult] = await accuracyQuery;
+    const accuracyStats = {
+      average: accuracyResult?.average || 0,
+      median: accuracyResult?.median || 0
+    };
+
+    return {
+      totalLocations,
+      dailyStats,
+      topCities: topCities.map(city => ({
+        city: city.city || 'Unknown',
+        count: city.count
+      })),
+      deviceStats: deviceStats.map(device => ({
+        device: device.device || 'Unknown',
+        count: device.count
+      })),
+      accuracyStats
+    };
   }
 }
 
@@ -2179,6 +2301,79 @@ class MemStorage implements IStorage {
     }
 
     return filteredLocations.length;
+  }
+
+  async getClientLocationStats(params?: { 
+    from?: string; 
+    to?: string; 
+  }) {
+    let filteredLocations = [...this.clientLocations];
+
+    // Apply date filters
+    if (params?.from) {
+      const fromDate = new Date(params.from);
+      filteredLocations = filteredLocations.filter(loc => loc.createdAt >= fromDate);
+    }
+    if (params?.to) {
+      const toDate = new Date(params.to);
+      filteredLocations = filteredLocations.filter(loc => loc.createdAt <= toDate);
+    }
+
+    const totalLocations = filteredLocations.length;
+
+    // Generate daily stats
+    const dailyGrouped = filteredLocations.reduce((acc, loc) => {
+      const date = loc.createdAt.toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const dailyStats = Object.entries(dailyGrouped)
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    // Generate top cities
+    const cityGrouped = filteredLocations.reduce((acc, loc) => {
+      const city = loc.metadata?.city || 'Unknown';
+      acc[city] = (acc[city] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const topCities = Object.entries(cityGrouped)
+      .map(([city, count]) => ({ city, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Generate device stats
+    const deviceGrouped = filteredLocations.reduce((acc, loc) => {
+      const userAgent = loc.metadata?.userAgent;
+      const device = userAgent ? userAgent.split(' ')[0] : 'Unknown';
+      acc[device] = (acc[device] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const deviceStats = Object.entries(deviceGrouped)
+      .map(([device, count]) => ({ device, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    // Calculate accuracy stats
+    const accuracyValues = filteredLocations
+      .map(loc => loc.accuracy)
+      .filter((acc): acc is number => acc !== null && acc !== undefined);
+    
+    const accuracyStats = {
+      average: accuracyValues.length ? accuracyValues.reduce((sum, acc) => sum + acc, 0) / accuracyValues.length : 0,
+      median: accuracyValues.length ? accuracyValues.sort((a, b) => a - b)[Math.floor(accuracyValues.length / 2)] : 0
+    };
+
+    return {
+      totalLocations,
+      dailyStats,
+      topCities,
+      deviceStats,
+      accuracyStats
+    };
   }
 }
 

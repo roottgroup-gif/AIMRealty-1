@@ -815,6 +815,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route for client location analytics/stats
+  app.get("/api/admin/client-locations/stats", adminRateLimit, requireAnyRole("admin", "super_admin"), async (req, res) => {
+    try {
+      const { from, to } = req.query;
+      
+      // Validate dates
+      const params: { from?: string; to?: string } = {};
+      if (from) {
+        const fromDate = new Date(String(from));
+        if (isNaN(fromDate.getTime())) {
+          return res.status(400).json({ message: "Invalid 'from' date format. Use ISO 8601 format." });
+        }
+        params.from = String(from);
+      }
+
+      if (to) {
+        const toDate = new Date(String(to));
+        if (isNaN(toDate.getTime())) {
+          return res.status(400).json({ message: "Invalid 'to' date format. Use ISO 8601 format." });
+        }
+        params.to = String(to);
+      }
+
+      const stats = await storage.getClientLocationStats(params);
+      res.json(stats);
+    } catch (error) {
+      console.error("Get client location stats error:", error);
+      res.status(500).json({ message: "Failed to fetch client location stats" });
+    }
+  });
+
   // Public currency conversion endpoint
   app.get("/api/currency/convert", apiRateLimit, async (req, res) => {
     try {
