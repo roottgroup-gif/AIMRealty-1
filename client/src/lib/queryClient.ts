@@ -91,7 +91,28 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     try {
-      const url = queryKey.join("/") as string;
+      let url = queryKey[0] as string;
+      
+      // Handle query parameters if the second element is an object
+      if (queryKey.length > 1 && typeof queryKey[1] === 'object' && queryKey[1] !== null) {
+        const params = queryKey[1] as Record<string, unknown>;
+        const searchParams = new URLSearchParams();
+        
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            searchParams.append(key, String(value));
+          }
+        });
+        
+        const queryString = searchParams.toString();
+        if (queryString) {
+          url += `?${queryString}`;
+        }
+      } else if (queryKey.length > 1) {
+        // Fallback to joining for backward compatibility
+        url = queryKey.join("/") as string;
+      }
+      
       const fullUrl = getFullApiUrl(url);
       const res = await fetch(fullUrl, {
         credentials: "include",

@@ -17,7 +17,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { User, CurrencyRate, InsertCurrencyRate, UpdateCurrencyRate } from '@shared/schema';
+import type { User, CurrencyRate, InsertCurrencyRate, UpdateCurrencyRate, ClientLocation } from '@shared/schema';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, insertCurrencyRateSchema, updateCurrencyRateSchema } from '@shared/schema';
 import { 
   Shield, Users, Building2, Settings, Plus, Edit, Trash2, 
@@ -110,6 +110,304 @@ const getExpirationStatus = (daysUntilExpiration: number | null): { status: stri
   }
   
   return { status: `${daysUntilExpiration} days left`, color: 'text-green-600', bgColor: 'bg-green-100' };
+};
+
+// Client Location Tracking Component
+const ClientLocationTracking = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const limit = 50;
+
+  // Query for client locations
+  const { data: locationData, isLoading: isLoadingLocations, error: locationsError } = useQuery({
+    queryKey: ['/api/admin/client-locations', { 
+      limit, 
+      offset: (currentPage - 1) * limit,
+      from: fromDate || undefined,
+      to: toDate || undefined,
+      userId: selectedUserId || undefined
+    }],
+    enabled: true
+  });
+
+  // Query for users list for filtering
+  const { data: users, error: usersError } = useQuery({
+    queryKey: ['/api/admin/users'],
+    enabled: true
+  });
+
+  const locations = locationData?.items || [];
+  const total = locationData?.total || 0;
+  const totalPages = Math.ceil(total / limit);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  const formatCoordinate = (coord: string | number) => {
+    return typeof coord === 'string' ? parseFloat(coord).toFixed(6) : coord.toFixed(6);
+  };
+
+  const getUserDisplayName = (userId: string | null) => {
+    if (!userId) return 'Anonymous';
+    
+    const user = users?.items?.find((u: User) => u.id === userId);
+    if (!user) return userId; // Fallback to ID if user not found
+    
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user.username;
+  };
+
+  const handleClearFilters = () => {
+    setFromDate('');
+    setToDate('');
+    setSelectedUserId('');
+    setCurrentPage(1);
+  };
+
+  return (
+    <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 mt-8">
+      <CardHeader className="border-b border-orange-100 dark:border-gray-700 bg-gradient-to-r from-orange-50 to-white dark:from-gray-800 dark:to-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div>
+            <CardTitle className="text-lg sm:text-xl text-orange-800 dark:text-orange-200 font-bold">
+              Client Location Tracking
+            </CardTitle>
+            <CardDescription className="text-orange-600 dark:text-orange-300 mt-1">
+              Track when and where clients access location services on your platform
+            </CardDescription>
+          </div>
+        </div>
+        
+        {/* Filters */}
+        <div className="flex flex-col lg:flex-row gap-4 pt-4 border-t border-orange-100 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              placeholder="From date"
+              className="border-orange-200 focus:border-orange-500"
+              data-testid="input-from-date"
+            />
+            <Input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              placeholder="To date"
+              className="border-orange-200 focus:border-orange-500"
+              data-testid="input-to-date"
+            />
+          </div>
+          
+          <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+            <SelectTrigger className="w-full sm:w-[200px] border-orange-200 focus:border-orange-500" data-testid="select-user-filter">
+              <SelectValue placeholder="Filter by user" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All users</SelectItem>
+              {users?.items?.map((user: User) => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.firstName && user.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user.username}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Button 
+            variant="outline" 
+            onClick={handleClearFilters}
+            className="text-orange-600 border-orange-200 hover:bg-orange-50"
+            data-testid="button-clear-filters"
+          >
+            Clear Filters
+          </Button>
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-0">
+        {/* Error states */}
+        {(locationsError || usersError) && (
+          <div className="flex flex-col items-center justify-center h-32 text-red-600 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
+            <AlertTriangle className="h-8 w-8 mb-2" />
+            <p className="font-medium">Error loading data</p>
+            <p className="text-sm text-red-500 mt-1">
+              {locationsError && "Failed to load client locations. "}
+              {usersError && "Failed to load users list. "}
+              Please try again later.
+            </p>
+          </div>
+        )}
+        
+        {!locationsError && !usersError && isLoadingLocations ? (
+          <div className="flex justify-center items-center h-32">
+            <div className="text-orange-600">Loading client locations...</div>
+          </div>
+        ) : !locationsError && !usersError && locations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-32 text-gray-500">
+            <MapPin className="h-12 w-12 mb-2" />
+            <p>No client location data found</p>
+            {(fromDate || toDate || selectedUserId) && (
+              <p className="text-sm mt-1">Try adjusting your filters</p>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-orange-50 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                      Accuracy
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                      Device Info
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                      Timestamp
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-orange-100 dark:divide-gray-700">
+                  {locations.map((location: ClientLocation, index: number) => (
+                    <tr key={location.id} className="hover:bg-orange-50 dark:hover:bg-gray-700" data-testid={`row-location-${index}`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100" data-testid={`text-user-${index}`}>
+                          {getUserDisplayName(location.userId)}
+                        </div>
+                        {location.userId && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            ID: {location.userId}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-gray-100" data-testid={`text-location-${index}`}>
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-1 text-orange-600" />
+                            {formatCoordinate(location.latitude)}, {formatCoordinate(location.longitude)}
+                          </div>
+                          {location.metadata?.city && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              {location.metadata.city}
+                              {location.metadata.country && `, ${location.metadata.country}`}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-gray-100" data-testid={`text-accuracy-${index}`}>
+                          {location.accuracy ? `${location.accuracy}m` : 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-gray-100" data-testid={`text-device-${index}`}>
+                          {location.metadata?.userAgent ? (
+                            <div className="max-w-xs truncate" title={location.metadata.userAgent}>
+                              {location.metadata.userAgent.split(' ')[0]}
+                            </div>
+                          ) : 'Unknown'}
+                          {location.metadata?.language && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Language: {location.metadata.language}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-gray-100" data-testid={`text-timestamp-${index}`}>
+                          {formatDate(location.createdAt)}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="bg-white dark:bg-gray-800 px-4 py-3 border-t border-orange-100 dark:border-gray-700">
+                <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    Showing {((currentPage - 1) * limit) + 1} to {Math.min(currentPage * limit, total)} of {total} locations
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                      data-testid="button-prev-page"
+                    >
+                      Previous
+                    </Button>
+                    
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNumber;
+                        if (totalPages <= 5) {
+                          pageNumber = i + 1;
+                        } else if (currentPage <= 3) {
+                          pageNumber = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNumber = totalPages - 4 + i;
+                        } else {
+                          pageNumber = currentPage - 2 + i;
+                        }
+                        
+                        return (
+                          <Button
+                            key={pageNumber}
+                            variant={currentPage === pageNumber ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCurrentPage(pageNumber)}
+                            className={`w-8 h-8 p-0 ${
+                              currentPage === pageNumber
+                                ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                : 'text-orange-600 border-orange-200 hover:bg-orange-50'
+                            }`}
+                            data-testid={`button-page-${pageNumber}`}
+                          >
+                            {pageNumber}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                      data-testid="button-next-page"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
 };
 
 export default function AdminDashboard() {
@@ -1592,6 +1890,11 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Client Location Tracking Section - Admin and Super Admin */}
+        {(user?.role === 'admin' || user?.role === 'super_admin') && (
+          <ClientLocationTracking />
+        )}
 
         {/* Currency Rate Management Section - Admin and Super Admin */}
         {(user?.role === 'admin' || user?.role === 'super_admin') && (
