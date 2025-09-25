@@ -301,8 +301,8 @@ const translations: Translations = {
   },
   "property.sqFt": {
     en: "M²",
-    ar: "متر مربع",
-    kur: "مەتری چوارگۆشە",
+    ar: "M²",
+    kur: "M²",
   },
   "property.parking": {
     en: "Parking",
@@ -328,8 +328,8 @@ const translations: Translations = {
   },
   "property.perSqFt": {
     en: "/M²",
-    ar: "/متر مربع",
-    kur: "/مەتری چوارگۆشە",
+    ar: "/M²",
+    kur: "/M²",
   },
   "property.perMonth": {
     en: "/mo",
