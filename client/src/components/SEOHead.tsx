@@ -287,8 +287,52 @@ export function SEOHead({
     updateMetaTag('name', 'twitter:app:name:ipad', 'MapEstate');
     updateMetaTag('name', 'twitter:app:name:googleplay', 'MapEstate');
     
+    // Language-specific social sharing optimizations
+    const languageInfo = getLanguageInfo(currentLanguage);
+    updateMetaTag('property', 'og:language', languageInfo.iso);
+    updateMetaTag('name', 'twitter:language', languageInfo.iso);
+    
+    // Enhanced social sharing for Arabic and Kurdish content
+    if (currentLanguage === 'ar' || currentLanguage === 'kur') {
+      // RTL-specific meta tags for social platforms
+      updateMetaTag('name', 'text-direction', languageInfo.dir);
+      updateMetaTag('property', 'og:text_direction', languageInfo.dir);
+      
+      // Arabic/Kurdish specific social media optimization
+      updateMetaTag('property', 'og:title:ar', currentLanguage === 'ar' ? title : '');
+      updateMetaTag('property', 'og:description:ar', currentLanguage === 'ar' ? description : '');
+      updateMetaTag('property', 'og:title:ku', currentLanguage === 'kur' ? title : '');
+      updateMetaTag('property', 'og:description:ku', currentLanguage === 'kur' ? description : '');
+      
+      // Additional platform-specific tags for Middle East region
+      updateMetaTag('property', 'og:region', 'Middle East');
+      updateMetaTag('property', 'og:country_name', 'Iraq');
+      updateMetaTag('property', 'og:region_name', 'Kurdistan');
+      
+      // WhatsApp and Telegram optimization (popular in Middle East)
+      updateMetaTag('property', 'whatsapp:title', title);
+      updateMetaTag('property', 'whatsapp:description', description);
+      updateMetaTag('property', 'whatsapp:image', ogImage);
+      updateMetaTag('property', 'telegram:title', title);
+      updateMetaTag('property', 'telegram:description', description);
+      updateMetaTag('property', 'telegram:image', ogImage);
+    }
+    
     // WhatsApp uses Open Graph tags, ensure mobile compatibility
     updateMetaTag('name', 'format-detection', 'telephone=no');
+    
+    // Enhanced WhatsApp and social media sharing optimization
+    updateMetaTag('property', 'og:rich_attachment', 'true');
+    updateMetaTag('property', 'og:see_also', properCanonicalUrl);
+    
+    // LinkedIn-specific optimizations
+    updateMetaTag('name', 'linkedin:owner', 'MapEstate');
+    updateMetaTag('name', 'linkedin:site', properCanonicalUrl);
+    
+    // Additional social platform compatibility
+    updateMetaTag('name', 'skype_toolbar', 'skype_toolbar_parser_compatible');
+    updateMetaTag('name', 'pinterest', 'nopin'); // Prevent pinning if not desired
+    updateMetaTag('name', 'pinterest-rich-pin', 'true');
     
     // Additional meta tags for better SEO and social sharing
     updateMetaTag('name', 'robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
@@ -303,11 +347,20 @@ export function SEOHead({
     updateMetaTag('name', 'apple-mobile-web-app-status-bar-style', 'default');
     updateMetaTag('name', 'mobile-web-app-capable', 'yes');
     
-    // Geo-location tags for better local SEO
+    // Enhanced geo-location tags for better local SEO
     updateMetaTag('name', 'geo.region', 'IQ-KR'); // Kurdistan, Iraq
     updateMetaTag('name', 'geo.placename', 'Kurdistan Region, Iraq');
     updateMetaTag('name', 'geo.position', '36.1911;44.0091'); // Erbil coordinates
     updateMetaTag('name', 'ICBM', '36.1911, 44.0091');
+    
+    // Additional geo tags for Arabic/Kurdish regions
+    if (currentLanguage === 'ar' || currentLanguage === 'kur') {
+      updateMetaTag('name', 'geo.region_name', 'Kurdistan Region');
+      updateMetaTag('name', 'geo.country_code', 'IQ');
+      updateMetaTag('name', 'geo.subregion', 'Middle East');
+      updateMetaTag('property', 'place:location:latitude', '36.1911');
+      updateMetaTag('property', 'place:location:longitude', '44.0091');
+    }
     
     // Business/Organization info
     updateMetaTag('name', 'rating', 'general');
