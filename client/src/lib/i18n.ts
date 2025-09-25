@@ -1219,6 +1219,46 @@ export function detectLanguageFromUrl(url: string): Language | null {
   return null;
 }
 
+// Detect language from URL query parameters
+export function detectLanguageFromQuery(url: string): Language | null {
+  try {
+    const urlObj = new URL(url, window.location.origin);
+    const langParam = urlObj.searchParams.get('lang');
+    
+    if (langParam && (langParam === 'en' || langParam === 'ar' || langParam === 'kur')) {
+      return langParam as Language;
+    }
+  } catch (error) {
+    // If URL parsing fails, try simple string parsing
+    const match = url.match(/[?&]lang=([^&#]*)/i);
+    if (match && match[1]) {
+      const lang = match[1].toLowerCase();
+      if (lang === 'en' || lang === 'ar' || lang === 'kur') {
+        return lang as Language;
+      }
+    }
+  }
+  
+  return null;
+}
+
+// Enhanced language detection that checks both path and query parameters
+export function detectLanguageFromUrlEnhanced(url: string): { language: Language | null, source: 'path' | 'query' | null } {
+  // First check path parameters (higher priority)
+  const pathLang = detectLanguageFromUrl(url);
+  if (pathLang) {
+    return { language: pathLang, source: 'path' };
+  }
+  
+  // Then check query parameters
+  const queryLang = detectLanguageFromQuery(url);
+  if (queryLang) {
+    return { language: queryLang, source: 'query' };
+  }
+  
+  return { language: null, source: null };
+}
+
 // Redirect to language-prefixed URL
 export function redirectToLanguage(language: Language, currentPath: string, setLocation: (path: string) => void) {
   // Remove existing language prefix if present
@@ -1228,6 +1268,59 @@ export function redirectToLanguage(language: Language, currentPath: string, setL
   const newPath = `/${language}${cleanPath}`;
   
   setLocation(newPath);
+}
+
+// Convert query parameter language URL to path-based URL for SEO
+export function convertQueryToPathLanguage(url: string, language: Language): string {
+  try {
+    const urlObj = new URL(url, window.location.origin);
+    
+    // Remove language query parameter
+    urlObj.searchParams.delete('lang');
+    
+    // Get clean path without existing language prefix
+    let pathname = urlObj.pathname;
+    const cleanPath = pathname.replace(/^\/(en|ar|kur)(?=\/|$)/, '') || '/';
+    
+    // Create new path with language prefix
+    const newPath = `/${language}${cleanPath}`;
+    
+    // Reconstruct URL with new path and remaining query parameters
+    urlObj.pathname = newPath;
+    
+    return urlObj.toString();
+  } catch (error) {
+    // Fallback for malformed URLs
+    const fallbackPath = url.split('?')[0].replace(/^\/(en|ar|kur)/, '') || '/';
+    return `/${language}${fallbackPath}`;
+  }
+}
+
+// Enhanced redirect function that handles both path and query parameter detection
+export function redirectToLanguageEnhanced(currentUrl: string, setLocation: (path: string) => void, updateUrl: boolean = true) {
+  const { language, source } = detectLanguageFromUrlEnhanced(currentUrl);
+  
+  if (language) {
+    if (source === 'query' && updateUrl) {
+      // Convert query parameter to path-based URL for better SEO
+      const newUrl = convertQueryToPathLanguage(currentUrl, language);
+      const newPath = new URL(newUrl, window.location.origin).pathname + new URL(newUrl, window.location.origin).search;
+      setLocation(newPath);
+      
+      // Update global language
+      globalChangeLanguage(language);
+    } else if (source === 'path') {
+      // Update global language for path-based detection
+      globalChangeLanguage(language);
+    }
+    
+    return language;
+  }
+  
+  // No language detected, use browser language and redirect
+  const browserLang = detectBrowserLanguage();
+  redirectToLanguage(browserLang, currentUrl, setLocation);
+  return browserLang;
 }
 
 // Get localized path for a given route (idempotent)
