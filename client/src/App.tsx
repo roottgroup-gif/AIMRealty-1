@@ -22,6 +22,7 @@ const Settings = lazy(() => import("@/pages/settings.tsx"));
 const CustomerDashboard = lazy(() => import("@/pages/customer-dashboard"));
 const AdminLogin = lazy(() => import("@/pages/admin-login.tsx"));
 const AdminDashboard = lazy(() => import("@/pages/admin-dashboard"));
+const ClientLocationTracking = lazy(() => import("@/pages/client-location-tracking"));
 const DashboardRedirect = lazy(() => import("@/pages/dashboard-redirect.tsx"));
 const AboutPage = lazy(() => import("@/pages/about.tsx"));
 const TypographyShowcasePage = lazy(() => import("@/pages/typography-showcase.tsx"));
@@ -71,6 +72,7 @@ function Router() {
         <Route path="/:lang/customer/dashboard" component={CustomerDashboard} />
         <Route path="/:lang/admin/login" component={AdminLogin} />
         <Route path="/:lang/admin/dashboard" component={AdminDashboard} />
+        <Route path="/:lang/admin/client-locations" component={ClientLocationTracking} />
         <Route path="/:lang/about" component={AboutPage} />
         <Route path="/:lang/typography" component={TypographyShowcasePage} />
         
