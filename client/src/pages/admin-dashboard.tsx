@@ -117,7 +117,7 @@ const ClientLocationTracking = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
-  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedUserId, setSelectedUserId] = useState<string>('all');
   const limit = 50;
 
   // Query for client locations
@@ -127,7 +127,7 @@ const ClientLocationTracking = () => {
       offset: (currentPage - 1) * limit,
       from: fromDate || undefined,
       to: toDate || undefined,
-      userId: selectedUserId || undefined
+      userId: selectedUserId === 'all' ? undefined : selectedUserId
     }],
     enabled: true
   });
@@ -165,7 +165,7 @@ const ClientLocationTracking = () => {
   const handleClearFilters = () => {
     setFromDate('');
     setToDate('');
-    setSelectedUserId('');
+    setSelectedUserId('all');
     setCurrentPage(1);
   };
 
@@ -209,7 +209,7 @@ const ClientLocationTracking = () => {
               <SelectValue placeholder="Filter by user" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All users</SelectItem>
+              <SelectItem value="all">All users</SelectItem>
               {users?.items?.map((user: User) => (
                 <SelectItem key={user.id} value={user.id}>
                   {user.firstName && user.lastName 
