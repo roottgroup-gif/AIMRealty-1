@@ -181,6 +181,24 @@ export const currencyRates = mysqlTable("currency_rates", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 
+// Client location tracking for admin dashboard
+export const clientLocations = mysqlTable("client_locations", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id), // Optional: if user is logged in
+  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
+  accuracy: int("accuracy"), // GPS accuracy in meters
+  source: varchar("source", { length: 32 }).default("map_button"), // "map_button", "search", etc.
+  metadata: json("metadata").$type<{
+    userAgent?: string;
+    language?: string;
+    permissionStatus?: string;
+    city?: string;
+    country?: string;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Wave management tables
 export const waves = mysqlTable("waves", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -214,6 +232,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   customerPoints: one(customerPoints),
   wavePermissions: many(customerWavePermissions),
   createdWaves: many(waves),
+  clientLocations: many(clientLocations),
 }));
 
 export const propertiesRelations = relations(properties, ({ one, many }) => ({
@@ -256,6 +275,13 @@ export const customerWavePermissionsRelations = relations(customerWavePermission
 export const currencyRatesRelations = relations(currencyRates, ({ one }) => ({
   setBy: one(users, {
     fields: [currencyRates.setBy],
+    references: [users.id],
+  }),
+}));
+
+export const clientLocationsRelations = relations(clientLocations, ({ one }) => ({
+  user: one(users, {
+    fields: [clientLocations.userId],
     references: [users.id],
   }),
 }));
@@ -396,6 +422,26 @@ export const updateCurrencyRateSchema = createInsertSchema(currencyRates).omit({
   effectiveDate: true,
 }).partial();
 
+export const insertClientLocationSchema = createInsertSchema(clientLocations).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  // Coerce numbers to strings for DECIMAL columns
+  latitude: z.union([z.number(), z.string()]).transform(v => 
+    typeof v === 'number' ? v.toFixed(8) : v
+  ),
+  longitude: z.union([z.number(), z.string()]).transform(v => 
+    typeof v === 'number' ? v.toFixed(8) : v
+  ),
+  metadata: z.object({
+    userAgent: z.string().optional(),
+    language: z.string().optional(),
+    permissionStatus: z.string().optional(),
+    city: z.string().optional(),
+    country: z.string().optional(),
+  }).optional(),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -418,6 +464,8 @@ export type InsertCustomerWavePermission = z.infer<typeof insertCustomerWavePerm
 export type CurrencyRate = typeof currencyRates.$inferSelect;
 export type InsertCurrencyRate = z.infer<typeof insertCurrencyRateSchema>;
 export type UpdateCurrencyRate = z.infer<typeof updateCurrencyRateSchema>;
+export type ClientLocation = typeof clientLocations.$inferSelect;
+export type InsertClientLocation = z.infer<typeof insertClientLocationSchema>;
 
 // Property with relations
 export type PropertyWithAgent = Property & {

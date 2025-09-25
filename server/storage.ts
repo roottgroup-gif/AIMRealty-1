@@ -1,6 +1,6 @@
 import { 
   users, properties, inquiries, favorites, searchHistory, customerActivity, customerPoints,
-  waves, customerWavePermissions, currencyRates,
+  waves, customerWavePermissions, currencyRates, clientLocations,
   type User, type InsertUser,
   type Property, type InsertProperty, type PropertyWithAgent,
   type Inquiry, type InsertInquiry,
@@ -10,7 +10,8 @@ import {
   type CustomerPoints, type InsertCustomerPoints,
   type Wave, type InsertWave,
   type CustomerWavePermission, type InsertCustomerWavePermission,
-  type CurrencyRate, type InsertCurrencyRate, type UpdateCurrencyRate
+  type CurrencyRate, type InsertCurrencyRate, type UpdateCurrencyRate,
+  type ClientLocation, type InsertClientLocation
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, like, gte, lte, desc, asc, sql, inArray } from "drizzle-orm";
@@ -97,6 +98,21 @@ export interface IStorage {
   updateCurrencyRate(id: string, rate: UpdateCurrencyRate): Promise<CurrencyRate | undefined>;
   deactivateCurrencyRate(id: string): Promise<boolean>;
   convertPrice(amount: number, fromCurrency: string, toCurrency: string): Promise<number>;
+
+  // Client location tracking
+  createClientLocation(data: InsertClientLocation): Promise<ClientLocation>;
+  getClientLocations(params?: { 
+    userId?: string; 
+    from?: string; 
+    to?: string; 
+    limit?: number; 
+    offset?: number; 
+  }): Promise<ClientLocation[]>;
+  countClientLocations(params?: { 
+    userId?: string; 
+    from?: string; 
+    to?: string; 
+  }): Promise<number>;
 }
 
 export interface PropertyFilters {
@@ -1007,6 +1023,84 @@ export class DatabaseStorage implements IStorage {
 
     return amount * parseFloat(rate.rate);
   }
+
+  // Client location tracking
+  async createClientLocation(data: InsertClientLocation): Promise<ClientLocation> {
+    const locationId = `cloc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const locationWithId = { ...data, id: locationId };
+    
+    await db().insert(clientLocations).values(locationWithId);
+    const [created] = await db().select().from(clientLocations).where(eq(clientLocations.id, locationId));
+    return created;
+  }
+
+  async getClientLocations(params?: { 
+    userId?: string; 
+    from?: string; 
+    to?: string; 
+    limit?: number; 
+    offset?: number; 
+  }): Promise<ClientLocation[]> {
+    let query = db()
+      .select()
+      .from(clientLocations)
+      .orderBy(desc(clientLocations.createdAt));
+
+    // Apply filters
+    const conditions = [];
+    if (params?.userId) {
+      conditions.push(eq(clientLocations.userId, params.userId));
+    }
+    if (params?.from) {
+      conditions.push(gte(clientLocations.createdAt, new Date(params.from)));
+    }
+    if (params?.to) {
+      conditions.push(lte(clientLocations.createdAt, new Date(params.to)));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    // Apply pagination
+    if (params?.limit) {
+      query = query.limit(params.limit);
+    }
+    if (params?.offset) {
+      query = query.offset(params.offset);
+    }
+
+    return await query;
+  }
+
+  async countClientLocations(params?: { 
+    userId?: string; 
+    from?: string; 
+    to?: string; 
+  }): Promise<number> {
+    let query = db()
+      .select({ count: sql<number>`count(*)` })
+      .from(clientLocations);
+
+    // Apply filters
+    const conditions = [];
+    if (params?.userId) {
+      conditions.push(eq(clientLocations.userId, params.userId));
+    }
+    if (params?.from) {
+      conditions.push(gte(clientLocations.createdAt, new Date(params.from)));
+    }
+    if (params?.to) {
+      conditions.push(lte(clientLocations.createdAt, new Date(params.to)));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const [result] = await query;
+    return result.count;
+  }
 }
 
 class MemStorage implements IStorage {
@@ -1017,6 +1111,7 @@ class MemStorage implements IStorage {
   private searchHistories: SearchHistory[] = [];
   private waves: Wave[] = [];
   private currencyRates: CurrencyRate[] = [];
+  private clientLocations: ClientLocation[] = [];
 
   constructor() {
     // Initialize with admin and customer users
@@ -2013,6 +2108,77 @@ class MemStorage implements IStorage {
     }
 
     return amount * parseFloat(rate.rate);
+  }
+
+  // Client location tracking
+  async createClientLocation(data: InsertClientLocation): Promise<ClientLocation> {
+    const locationId = `cloc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const location: ClientLocation = {
+      ...data,
+      id: locationId,
+      createdAt: new Date()
+    };
+    this.clientLocations.push(location);
+    return location;
+  }
+
+  async getClientLocations(params?: { 
+    userId?: string; 
+    from?: string; 
+    to?: string; 
+    limit?: number; 
+    offset?: number; 
+  }): Promise<ClientLocation[]> {
+    let filteredLocations = [...this.clientLocations];
+
+    // Apply filters
+    if (params?.userId) {
+      filteredLocations = filteredLocations.filter(loc => loc.userId === params.userId);
+    }
+    if (params?.from) {
+      const fromDate = new Date(params.from);
+      filteredLocations = filteredLocations.filter(loc => loc.createdAt >= fromDate);
+    }
+    if (params?.to) {
+      const toDate = new Date(params.to);
+      filteredLocations = filteredLocations.filter(loc => loc.createdAt <= toDate);
+    }
+
+    // Sort by created date (newest first)
+    filteredLocations.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    // Apply pagination
+    const offset = params?.offset || 0;
+    const limit = params?.limit;
+    
+    if (limit) {
+      return filteredLocations.slice(offset, offset + limit);
+    }
+    
+    return filteredLocations.slice(offset);
+  }
+
+  async countClientLocations(params?: { 
+    userId?: string; 
+    from?: string; 
+    to?: string; 
+  }): Promise<number> {
+    let filteredLocations = [...this.clientLocations];
+
+    // Apply filters
+    if (params?.userId) {
+      filteredLocations = filteredLocations.filter(loc => loc.userId === params.userId);
+    }
+    if (params?.from) {
+      const fromDate = new Date(params.from);
+      filteredLocations = filteredLocations.filter(loc => loc.createdAt >= fromDate);
+    }
+    if (params?.to) {
+      const toDate = new Date(params.to);
+      filteredLocations = filteredLocations.filter(loc => loc.createdAt <= toDate);
+    }
+
+    return filteredLocations.length;
   }
 }
 

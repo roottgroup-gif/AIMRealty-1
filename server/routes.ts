@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertPropertySchema, updatePropertySchema, insertInquirySchema, insertFavoriteSchema, insertUserSchema,
-  insertWaveSchema, insertCustomerWavePermissionSchema, insertCurrencyRateSchema, updateCurrencyRateSchema
+  insertWaveSchema, insertCustomerWavePermissionSchema, insertCurrencyRateSchema, updateCurrencyRateSchema,
+  insertClientLocationSchema
 } from "@shared/schema";
 import { extractPropertyIdentifier } from "@shared/slug-utils";
 import { hashPassword, requireAuth, requireRole, requireAnyRole, populateUser, validateLanguagePermission } from "./auth";
@@ -716,6 +717,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Deactivate currency rate error:", error);
       res.status(500).json({ message: "Failed to deactivate currency rate" });
+    }
+  });
+
+  // Client location tracking routes
+  // Public route for creating client locations (when users click location button)
+  app.post("/api/client-locations", apiRateLimit, async (req, res) => {
+    try {
+      const validatedData = insertClientLocationSchema.parse({
+        ...req.body,
+        userId: req.user?.id || null // Include user ID if logged in, otherwise null for anonymous tracking
+      });
+      
+      const location = await storage.createClientLocation(validatedData);
+      res.status(201).json(location);
+    } catch (error) {
+      console.error("Create client location error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid location data", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Failed to record client location" });
+    }
+  });
+
+  // Admin route for retrieving client location data
+  app.get("/api/admin/client-locations", adminRateLimit, requireAnyRole("admin", "super_admin"), async (req, res) => {
+    try {
+      const { userId, from, to, limit, offset } = req.query;
+      
+      // Validate and sanitize parameters
+      const params = {
+        userId: userId ? String(userId) : undefined,
+        from: undefined as string | undefined,
+        to: undefined as string | undefined,
+        limit: undefined as number | undefined,
+        offset: undefined as number | undefined,
+      };
+
+      // Validate date strings
+      if (from) {
+        const fromDate = new Date(String(from));
+        if (isNaN(fromDate.getTime())) {
+          return res.status(400).json({ message: "Invalid 'from' date format. Use ISO 8601 format." });
+        }
+        params.from = String(from);
+      }
+
+      if (to) {
+        const toDate = new Date(String(to));
+        if (isNaN(toDate.getTime())) {
+          return res.status(400).json({ message: "Invalid 'to' date format. Use ISO 8601 format." });
+        }
+        params.to = String(to);
+      }
+
+      // Validate and clamp limit
+      if (limit) {
+        const limitNum = parseInt(String(limit));
+        if (isNaN(limitNum) || limitNum < 1 || limitNum > 200) {
+          return res.status(400).json({ message: "Limit must be between 1 and 200." });
+        }
+        params.limit = limitNum;
+      }
+
+      // Validate offset
+      if (offset) {
+        const offsetNum = parseInt(String(offset));
+        if (isNaN(offsetNum) || offsetNum < 0) {
+          return res.status(400).json({ message: "Offset must be 0 or greater." });
+        }
+        params.offset = offsetNum;
+      } else {
+        params.offset = 0;
+      }
+
+      const [locations, total] = await Promise.all([
+        storage.getClientLocations(params),
+        storage.countClientLocations({ 
+          userId: params.userId, 
+          from: params.from, 
+          to: params.to 
+        })
+      ]);
+
+      res.json({
+        items: locations,
+        total,
+        limit: params.limit || null,
+        offset: params.offset || 0
+      });
+    } catch (error) {
+      console.error("Get client locations error:", error);
+      res.status(500).json({ message: "Failed to fetch client locations" });
     }
   });
 
