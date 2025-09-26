@@ -485,6 +485,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/users", adminRateLimit, requireRole("admin"), async (req, res) => {
     try {
+      console.log('🔍 DEBUG: Raw request body:', JSON.stringify(req.body, null, 2));
+      console.log('🔍 DEBUG: User role:', req.user?.role);
+      
       // Preprocess the request body to handle date conversion
       const processedBody = { ...req.body };
       
@@ -513,6 +516,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!processedBody.allowedLanguages && req.user?.role === 'super_admin') {
         processedBody.allowedLanguages = ['en']; // Default to English only
       }
+      
+      console.log('🔍 DEBUG: Processed body before validation:', JSON.stringify(processedBody, null, 2));
       
       const validatedData = insertUserSchema.parse(processedBody);
       
