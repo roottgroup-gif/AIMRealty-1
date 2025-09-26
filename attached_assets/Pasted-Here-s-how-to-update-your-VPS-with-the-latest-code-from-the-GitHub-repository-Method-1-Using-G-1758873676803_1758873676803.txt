@@ -1,0 +1,169 @@
+Here's how to update your VPS with the latest code from the GitHub repository:
+
+## Method 1: Using Git Pull (Recommended)
+
+### 1. Navigate to your project directory:
+```bash
+cd /var/www/dailynewscrypto.net
+```
+
+### 2. Backup your current files and database:
+```bash
+# Backup database
+mysqldump -u mapestate_user -p mapestate_db > backup_$(date +%Y%m%d).sql
+
+# Backup current files
+cp -r /var/www/dailynewscrypto.net /var/www/dailynewscrypto.net_backup_$(date +%Y%m%d)
+```
+
+### 3. Stash local changes and pull updates:
+```bash
+# If you have a git repository
+git stash
+git pull origin main
+
+# If you need to specify credentials
+git pull https://github.com/roottgroup-gif/AIMRealty-1.git main
+```
+
+## Method 2: Fresh Clone (If git pull doesn't work)
+
+### 1. Backup and fresh setup:
+```bash
+# Create backup
+tar -czf /var/www/backup_$(date +%Y%m%d).tar.gz /var/www/dailynewscrypto.net
+
+# Clone fresh copy
+cd /var/www
+git clone https://github.com/roottgroup-gif/AIMRealty-1.git dailynewscrypto.net_new
+
+# Copy your configuration files
+cp dailynewscrypto.net/.env dailynewscrypto.net_new/
+cp dailynewscrypto.net/ecosystem.config.js dailynewscrypto.net_new/
+
+# Replace old with new
+mv dailynewscrypto.net dailynewscrypto.net_old
+mv dailynewscrypto.net_new dailynewscrypto.net
+```
+
+## Method 3: Manual Download (If git isn't set up)
+
+### 1. Download and extract:
+```bash
+cd /var/www
+wget https://github.com/roottgroup-gif/AIMRealty-1/archive/refs/heads/main.zip
+unzip main.zip
+cp -r AIMRealty-1-main/* dailynewscrypto.net/
+rm -rf AIMRealty-1-main main.zip
+```
+
+## Post-Update Steps:
+
+### 1. Install/Update Dependencies:
+```bash
+cd /var/www/dailynewscrypto.net
+npm install
+```
+
+### 2. Update Environment Configuration:
+```bash
+# Compare and update .env file
+cp .env .env.backup
+# Edit .env with your specific settings (database credentials, etc.)
+nano .env
+```
+
+### 3. Database Updates:
+```bash
+# Check if there are new database migrations
+ls -la migrations/  # if exists
+
+# If using database migrations
+npx knex migrate:latest
+# or
+npm run db:migrate
+```
+
+### 4. Build the Application:
+```bash
+npm run build
+```
+
+### 5. Restart Services:
+```bash
+pm2 delete all
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup
+```
+
+### 6. Test the Application:
+```bash
+# Test API
+curl http://localhost:5000/api/properties
+
+# Test frontend
+curl -I http://yourdomain.com
+```
+
+## Specific Update Considerations:
+
+### Check for Breaking Changes:
+```bash
+# Look for any update instructions
+cat README.md
+cat CHANGELOG.md
+ls -la update-instructions*
+```
+
+### Database Schema Changes:
+```bash
+# If there are database changes, you might need to run:
+mysql -u mapestate_user -p mapestate_db < new_schema_updates.sql
+```
+
+### Configuration Changes:
+```bash
+# Compare your current .env with the new example
+cat .env.example
+# Update your .env accordingly
+```
+
+## Troubleshooting:
+
+### If the update fails:
+```bash
+# Restore from backup
+pm2 stop all
+cd /var/www
+rm -rf dailynewscrypto.net
+mv dailynewscrypto.net_old dailynewscrypto.net
+pm2 start all
+```
+
+### Check logs for errors:
+```bash
+pm2 logs
+tail -f /var/log/nginx/error.log
+```
+
+## Pre-Update Checklist:
+
+1. **Backup everything** (files + database)
+2. **Check the repository** for any specific update instructions
+3. **Review changes** in the GitHub repository
+4. **Test in off-hours** to minimize downtime
+5. **Have a rollback plan** ready
+
+## Quick One-Liner Update Script:
+
+```bash
+cd /var/www/dailynewscrypto.net && \
+git stash && \
+git pull origin main && \
+npm install && \
+npm run build && \
+pm2 restart all
+```
+
+**Would you like me to walk you through any specific part of the update process, or do you need help with a particular step?**
