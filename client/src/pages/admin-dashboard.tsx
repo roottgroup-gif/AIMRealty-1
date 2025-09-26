@@ -40,7 +40,7 @@ const createUserSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['user', 'agent', 'admin']),
+  role: z.enum(['user', 'agent', 'admin', 'super_admin']),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().optional(),
@@ -55,7 +55,7 @@ const editUserSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters').optional(),
-  role: z.enum(['user', 'agent', 'admin']),
+  role: z.enum(['user', 'agent', 'admin', 'super_admin']),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().optional(),
@@ -830,6 +830,7 @@ export default function AdminDashboard() {
                                 <SelectItem value="user">Customer</SelectItem>
                                 <SelectItem value="agent">Real Estate Agent</SelectItem>
                                 <SelectItem value="admin">Administrator</SelectItem>
+                                <SelectItem value="super_admin">Super Administrator</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -1153,6 +1154,7 @@ export default function AdminDashboard() {
                                 <SelectItem value="user">Customer</SelectItem>
                                 <SelectItem value="agent">Real Estate Agent</SelectItem>
                                 <SelectItem value="admin">Administrator</SelectItem>
+                                <SelectItem value="super_admin">Super Administrator</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -1393,6 +1395,7 @@ export default function AdminDashboard() {
                       <SelectItem value="user">Customers</SelectItem>
                       <SelectItem value="agent">Agents</SelectItem>
                       <SelectItem value="admin">Admins</SelectItem>
+                      <SelectItem value="super_admin">Super Admins</SelectItem>
                     </SelectContent>
                   </Select>
                   {(user?.role === 'admin' || user?.role === 'super_admin') && (
