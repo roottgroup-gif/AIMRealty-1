@@ -146,7 +146,7 @@ export default function PropertiesPage() {
             name: property.title,
             url: `${window.location.origin}/property/${property.id}`,
             image:
-              property.images && property.images.length > 0
+              Array.isArray(property.images) && property.images.length > 0
                 ? property.images.map((img) =>
                     img.startsWith("http")
                       ? img

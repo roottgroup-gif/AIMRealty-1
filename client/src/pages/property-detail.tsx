@@ -341,7 +341,7 @@ export default function PropertyDetailPage() {
   }
 
   const primaryImage = property.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600';
-  const images = property.images?.length ? property.images : [primaryImage];
+  const images = Array.isArray(property.images) && property.images.length > 0 ? property.images : [primaryImage];
 
   return (
     <div className="min-h-screen bg-background">
