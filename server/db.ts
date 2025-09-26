@@ -3,7 +3,7 @@ import mysql from 'mysql2/promise';
 import * as schema from "@shared/schema";
 import { getValidatedDatabaseConfig } from './config/dbConfig';
 
-let client: mysql.Connection;
+let pool: mysql.Pool;
 let db: ReturnType<typeof drizzle>;
 const dbType = 'mysql';
 
@@ -12,13 +12,31 @@ async function initializeDb() {
     const config = getValidatedDatabaseConfig();
     
     console.log("🔄 Connecting to MySQL database...");
-    client = await mysql.createConnection(config.connectionUrl);
-    db = drizzle(client, { schema, mode: 'default' });
-    console.log("✅ MySQL database connection established successfully");
     
-    // Test the connection
-    await client.ping();
-    console.log("💓 Database connection is healthy");
+    // Create connection pool with proper mysql2 configuration
+    pool = mysql.createPool({
+      host: config.host,
+      port: config.port,
+      user: config.user,
+      password: config.password,
+      database: config.database,
+      connectionLimit: 10,          // Maximum number of connections in pool
+      waitForConnections: true,     // Queue requests when pool is full
+      queueLimit: 0,               // No limit on queued requests
+      acquireTimeout: 60000,        // 60 seconds to get connection from pool
+      keepAliveInitialDelay: 10000, // 10 seconds before first keep-alive
+      enableKeepAlive: true,        // Enable TCP keep-alive
+      reconnect: true,              // Automatically reconnect
+    });
+    
+    db = drizzle(pool, { schema, mode: 'default' });
+    console.log("✅ MySQL connection pool established successfully");
+    
+    // Test the connection pool
+    const connection = await pool.getConnection();
+    await connection.ping();
+    connection.release();
+    console.log("💓 Database connection pool is healthy");
     
     return db;
   } catch (error) {
@@ -42,8 +60,35 @@ function getDb() {
   return db;
 }
 
+// Health check function
+async function checkDatabaseHealth() {
+  try {
+    const connection = await pool.getConnection();
+    await connection.ping();
+    connection.release();
+    return true;
+  } catch (error) {
+    console.warn("⚠️ Database health check failed:", error);
+    return false;
+  }
+}
+
+// Connection recovery function
+async function recoverConnection() {
+  try {
+    console.log("🔄 Attempting database connection recovery...");
+    if (pool) {
+      await pool.end();
+    }
+    return await initializeDb();
+  } catch (error) {
+    console.error("❌ Connection recovery failed:", error);
+    throw error;
+  }
+}
+
 function getDbType(): 'mysql' {
   return dbType;
 }
 
-export { getDb as db, initializeDb, getDbType };
+export { getDb as db, initializeDb, getDbType, checkDatabaseHealth, recoverConnection };
