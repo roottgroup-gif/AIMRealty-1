@@ -517,7 +517,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         processedBody.allowedLanguages = ['en']; // Default to English only
       }
       
-      console.log('🔍 DEBUG: Processed body before validation:', JSON.stringify(processedBody, null, 2));
+      console.log('🔍 DEBUG: Processed body before validation (avatar truncated):', {
+        ...processedBody,
+        avatar: processedBody.avatar ? `[Base64 image ${processedBody.avatar.length} chars]` : undefined
+      });
       
       const validatedData = insertUserSchema.parse(processedBody);
       
