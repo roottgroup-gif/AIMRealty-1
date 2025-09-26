@@ -1,0 +1,49 @@
+arman@MacBook-Pro AIMRealty-1 % npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+5:37:53 PM [express] serving on port 5001
+GET /api/auth/me 401 in 2ms :: {"message":"Unauthorized"}
+📝 No MYSQL_URL found, using default XAMPP configuration
+🔧 Default: mysql://root:@localhost:3305/mapestate
+💡 Tip: Create a .env file with MYSQL_URL to customize
+🔗 Database configuration:
+   Host: localhost:3305
+   User: root
+   Database: mapestate
+🔄 Connecting to MySQL database...
+🔌 New SSE connection established
+📡 SSE padding sent, forcing stream start
+📡 SSE initial connection message sent and flushed
+📊 SSE clients connected: 1
+✅ MySQL database connection established successfully
+💓 Database connection is healthy
+✅ Database connection initialized
+✅ Using DatabaseStorage with MySQL
+Users already exist, skipping initialization
+Cleared wave assignments from properties
+Cleared existing waves
+Creating default waves...
+Failed to initialize waves: Error: Field 'id' doesn't have a default value
+    at PromiseConnection.query (/Users/farman/Downloads/AIMRealty-1/node_modules/mysql2/lib/promise/connection.js:29:22)
+    at MySql2PreparedQuery.execute (file:///Users/farman/Downloads/AIMRealty-1/node_modules/drizzle-orm/mysql2/session.js:51:32)
+    at QueryPromise.execute (file:///Users/farman/Downloads/AIMRealty-1/node_modules/drizzle-orm/mysql-core/query-builders/insert.js:114:27)
+    at QueryPromise.then (file:///Users/farman/Downloads/AIMRealty-1/node_modules/drizzle-orm/query-promise.js:21:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  code: 'ER_NO_DEFAULT_FOR_FIELD',
+  errno: 1364,
+  sql: "insert into `waves` (`id`, `name`, `description`, `color`, `is_active`, `created_by`, `created_at`, `updated_at`) values (default, 'Premium Wave', 'Premium properties with special circle motion effect', '#F59E0B', true, 'admin-001', default, default)",
+  sqlState: 'HY000',
+  sqlMessage: "Field 'id' doesn't have a default value"
+}
+✅ Database initialized with default data
+GET /api/properties 304 in 77ms :: [{"id":"prop-001","title":"farman","descript…
+GET /api/currency/convert 200 in 2ms :: {"originalAmount":450000,"fromCurrency"…
+GET /api/currency/convert 200 in 2ms :: {"originalAmount":1200,"fromCurrency":"…
+GET /api/currency/convert 200 in 2ms :: {"originalAmount":280000,"fromCurrency"…
+🔌 SSE client disconnected (error): aborted
+📊 SSE clients connected: 0
+🔌 SSE client disconnected (close)
+📊 SSE clients connected: 0
+GET /api/properties/featured 304 in 104ms

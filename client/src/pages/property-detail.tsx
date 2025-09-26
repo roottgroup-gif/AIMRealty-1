@@ -101,7 +101,7 @@ export default function PropertyDetailPage() {
 
   // Generate property structured data
   const getPropertyStructuredData = (property: Property) => {
-    const images = property.images && property.images.length > 0 ? property.images : [];
+    const images = Array.isArray(property.images) && property.images.length > 0 ? property.images : [];
     
     return {
       "@context": "https://schema.org",
