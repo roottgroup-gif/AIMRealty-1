@@ -201,7 +201,7 @@ export const clientLocations = mysqlTable("client_locations", {
 
 // Wave management tables
 export const waves = mysqlTable("waves", {
-  id: varchar("id", { length: 36 }).primaryKey(),
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   description: text("description"),
   color: varchar("color", { length: 7 }).default("#3B82F6"), // Hex color for map display
