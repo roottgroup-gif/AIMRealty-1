@@ -11,7 +11,7 @@ interface DatabaseConfig {
 
 // Default XAMPP MySQL configuration
 const DEFAULT_XAMPP_CONFIG = {
-  host: 'localhost',
+  host: '127.0.0.1', // Use IP instead of localhost to force TCP connection
   port: 3306,
   user: 'root',
   password: '', // XAMPP default (no password)
@@ -31,7 +31,7 @@ function getDatabaseConfig(): DatabaseConfig {
   // If no URL provided, use default XAMPP configuration
   if (!connectionUrl) {
     console.log('📝 No MYSQL_URL found, using default XAMPP configuration');
-    console.log('🔧 Default: mysql://root:@localhost:3306/mapestate');
+    console.log('🔧 Default: mysql://root:@127.0.0.1:3306/mapestate');
     console.log('💡 Tip: Create a .env file with MYSQL_URL to customize');
     
     connectionUrl = createConnectionUrl(DEFAULT_XAMPP_CONFIG);
