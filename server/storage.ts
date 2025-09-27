@@ -284,7 +284,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProperties(filters: PropertyFilters = {}): Promise<PropertyWithDetails[]> {
-    let query = this.dbConn
+    // Build the base query
+    const baseQuery = this.dbConn
       .select()
       .from(properties)
       .leftJoin(users, eq(properties.agentId, users.id))
@@ -326,9 +327,8 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    // Build query with conditions
+    let query: any = conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
 
     // Apply sorting
     if (filters.sortBy === 'price') {
@@ -353,7 +353,7 @@ export class DatabaseStorage implements IStorage {
 
     // Get additional data for each property
     const propertiesWithDetails = await Promise.all(
-      results.map(async (result) => {
+      results.map(async (result: any) => {
         if (!result.properties) return null;
         
         const [images, amenities, features, inquiriesData, favoritesData] = await Promise.all([
@@ -465,7 +465,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async isSlugTaken(slug: string, excludePropertyId?: string): Promise<boolean> {
-    let query = this.dbConn.select().from(properties).where(eq(properties.slug, slug));
+    let query: any = this.dbConn.select().from(properties).where(eq(properties.slug, slug));
     
     if (excludePropertyId) {
       query = query.where(and(eq(properties.slug, slug), sql`${properties.id} != ${excludePropertyId}`));
