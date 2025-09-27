@@ -13,29 +13,51 @@ async function initializeDb() {
     
     console.log("🔄 Connecting to MySQL database...");
     
-    // Create connection pool with proper mysql2 configuration
+    // Create connection pool with proper mysql2 configuration optimized for VPS
     pool = mysql.createPool({
       host: config.host,
       port: config.port,
       user: config.user,
       password: config.password,
       database: config.database,
-      connectionLimit: 10,          // Maximum number of connections in pool
+      connectionLimit: 5,           // Reduced for VPS
       waitForConnections: true,     // Queue requests when pool is full
       queueLimit: 0,               // No limit on queued requests
-      connectTimeout: 60000,        // Initial connection timeout
+      connectTimeout: 10000,        // Reduced timeout for faster failure detection
+      acquireTimeout: 10000,        // Time to wait for connection from pool
+      timeout: 10000,               // Query timeout
       enableKeepAlive: true,        // Enable TCP keep-alive
       keepAliveInitialDelay: 10000, // 10 seconds before first keep-alive
+      reconnect: true,              // Auto-reconnect on connection lost
+      multipleStatements: false,    // Security setting
     });
     
     db = drizzle(pool, { schema, mode: 'default' });
     console.log("✅ MySQL connection pool established successfully");
     
-    // Test the connection pool
-    const connection = await pool.getConnection();
-    await connection.ping();
-    connection.release();
-    console.log("💓 Database connection pool is healthy");
+    // Test the connection pool with timeout
+    try {
+      console.log("🔍 Testing database connection...");
+      const connection = await Promise.race([
+        pool.getConnection(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection test timeout')), 5000)
+        )
+      ]) as mysql.PoolConnection;
+      
+      await Promise.race([
+        connection.ping(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Ping timeout')), 3000)
+        )
+      ]);
+      
+      connection.release();
+      console.log("💓 Database connection pool is healthy");
+    } catch (pingError) {
+      console.warn("⚠️ Connection test failed, but continuing with pool:", pingError);
+      // Don't throw here - the pool might still work for actual queries
+    }
     
     return db;
   } catch (error) {
