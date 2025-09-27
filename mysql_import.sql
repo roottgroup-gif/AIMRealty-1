@@ -7,8 +7,8 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 SET time_zone = '+00:00';
 
 -- Create database if it doesn't exist
--- CREATE DATABASE IF NOT EXISTS `mapestate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE `mapestate`;
+CREATE DATABASE IF NOT EXISTS `mapestate` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `mapestate`;
 
 -- --------------------------------------------------------
 -- Table structure for table `users`
