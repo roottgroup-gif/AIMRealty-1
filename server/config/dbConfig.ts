@@ -1,4 +1,4 @@
-import 'dotenv/config';
+// Remove dotenv import to let Replit handle environment variables natively
 
 interface DatabaseConfig {
   host: string;
@@ -34,6 +34,15 @@ function getDatabaseConfig(): DatabaseConfig {
   const mysqlUser = process.env.MYSQL_USER;
   const mysqlPassword = process.env.MYSQL_PASSWORD;
   const mysqlDatabase = process.env.MYSQL_DATABASE;
+  
+  // Debug logging for environment variables
+  console.log('🔍 Environment Variables Debug:');
+  console.log(`   MYSQL_URL: ${connectionUrl ? '[SET]' : '[NOT SET]'}`);
+  console.log(`   MYSQL_HOST: ${mysqlHost ? '[SET]' : '[NOT SET]'}`);
+  console.log(`   MYSQL_USER: ${mysqlUser ? '[SET]' : '[NOT SET]'}`);
+  console.log(`   MYSQL_DATABASE: ${mysqlDatabase ? '[SET]' : '[NOT SET]'}`);
+  console.log(`   MYSQL_PORT: ${mysqlPort || '[NOT SET]'}`);
+  console.log(`   MYSQL_PASSWORD: ${mysqlPassword ? '[SET]' : '[NOT SET]'}`);
   
   // If individual MySQL environment variables are provided, use them
   if (mysqlHost && mysqlUser && mysqlDatabase) {
