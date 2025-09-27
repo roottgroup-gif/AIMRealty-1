@@ -12,7 +12,9 @@ class StorageFactory {
       return this.instance;
     }
 
-    // Try MySQL first (for local development)
+    // Check if VPS database is explicitly configured
+    const isVpsConfigured = process.env.MYSQL_URL || process.env.DATABASE_URL;
+    
     try {
       await initializeDb();
       console.log("✅ MySQL database initialized successfully");
@@ -22,10 +24,19 @@ class StorageFactory {
       this.instance = new DatabaseStorage();
       console.log("🔗 Using MySQL DatabaseStorage");
     } catch (error) {
-      console.warn("⚠️ MySQL connection failed, using in-memory storage");
-      console.warn("💡 For MySQL support locally, ensure XAMPP is running with MySQL on port 3306");
+      // If VPS database is configured but failing, don't fall back to MemStorage
+      if (isVpsConfigured) {
+        console.error("❌ VPS database is configured but connection failed!");
+        console.error("🔧 Fix the database connection issue before proceeding.");
+        console.error("💡 Check IP permissions and database credentials.");
+        throw new Error(`VPS database connection failed: ${error}`);
+      }
+      
+      // Only fall back to MemStorage if no database is configured (local dev)
+      console.warn("⚠️ No database configured, using in-memory storage for development");
+      console.warn("💡 Set MYSQL_URL environment variable to use a database");
       this.instance = new MemStorage();
-      console.log("💾 Using MemStorage (in-memory)");
+      console.log("💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY");
     }
 
     this.isInitialized = true;
