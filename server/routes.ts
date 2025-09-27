@@ -1,6 +1,12 @@
 import type { Express, Response } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from 'url';
 import { storage } from "./storage";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { 
   insertPropertySchema, updatePropertySchema, insertInquirySchema, insertFavoriteSchema, insertUserSchema,
   insertWaveSchema, insertCustomerWavePermissionSchema, insertCurrencyRateSchema, updateCurrencyRateSchema,
@@ -146,6 +152,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to get wave balance" });
     }
   });
+
+  // Multer configuration for file uploads
+  const ALLOWED_UPLOAD_TYPES = {
+    'avatar': path.join(__dirname, 'uploads', 'avatar'),
+    'customer': path.join(__dirname, 'uploads', 'customer'), 
+    'properties': path.join(__dirname, 'uploads', 'properties')
+  } as const;
+
+  const storage_multer = multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadType = req.params.type as string;
+      const folderPath = ALLOWED_UPLOAD_TYPES[uploadType as keyof typeof ALLOWED_UPLOAD_TYPES];
+      
+      if (!folderPath) {
+        return cb(new Error('Invalid upload type'), '');
+      }
+      
+      cb(null, folderPath);
+    },
+    filename: (req, file, cb) => {
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
+    }
+  });
+
+  const upload = multer({
+    storage: storage_multer,
+    limits: { 
+      fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Invalid file type. Only JPEG, PNG, and WebP images are allowed.'));
+      }
+    }
+  });
+
+  // File upload endpoints
+  app.post("/api/upload/:type", requireAuth, uploadRateLimit, upload.single('file'), async (req, res) => {
+    try {
+      const { type } = req.params;
+      
+      // Validate upload type
+      if (!['avatar', 'customer', 'properties'].includes(type)) {
+        return res.status(400).json({ message: "Invalid upload type. Use 'avatar', 'customer', or 'properties'" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const fileUrl = `/uploads/${type}/${req.file.filename}`;
+      
+      res.json({
+        message: "File uploaded successfully",
+        url: fileUrl,
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).json({ message: "Failed to upload file" });
+    }
+  });
+
+  // Serve static files
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
   // Database initialization route (temporary for setup)
   app.post("/api/init-db", async (req, res) => {

@@ -2415,10 +2415,29 @@ class StorageManager {
       console.log("✅ Database initialized with default data");
       
     } catch (error) {
-      console.error("❌ Failed to initialize database storage, falling back to memory:", error);
-      // Fall back to memory storage if database fails
+      console.error("❌ Failed to initialize database storage:", error);
+      console.log("");
+      console.log("🔧 To fix this MySQL connection issue:");
+      console.log("   1. Start XAMPP Control Panel");
+      console.log("   2. Click 'Start' next to MySQL");
+      console.log("   3. Create 'mapestate' database in phpMyAdmin");
+      console.log("   4. Restart this application");
+      console.log("");
+      
+      // In production, fail fast instead of falling back to memory
+      if (process.env.NODE_ENV === 'production') {
+        console.error("❌ CRITICAL: Database connection failed in production. Exiting...");
+        process.exit(1);
+      }
+      
+      // In development, warn about memory storage data loss
+      console.log("⚠️  WARNING: Using temporary memory storage - data will be lost!");
+      console.log("❌ Property creation will fail without MySQL database!");
+      console.log("");
+      
+      // Fall back to memory storage only in development
       this._storage = new MemStorage();
-      console.log("✅ Using MemStorage as fallback");
+      console.log("✅ Using MemStorage as fallback (development only)");
     }
     
     this._initialized = true;
