@@ -247,13 +247,12 @@ app.use(injectPropertyMetaTags);
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 50001 if not specified.
+  // Default to 5000 for Replit compatibility
   // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '50001', 10);
+  const port = parseInt(process.env.PORT || '5000', 10);
   
-  // Force use custom port if not in production
-  const actualPort = process.env.NODE_ENV === 'production' ? port : 50001;
+  // Use the specified port (5000 for Replit)
+  const actualPort = port;
   server.listen({
     port: actualPort,
     host: "0.0.0.0",
