@@ -1,5 +1,5 @@
 import { sql, relations } from "drizzle-orm";
-import { mysqlTable, text, varchar, int, decimal, boolean, timestamp, json } from "drizzle-orm/mysql-core";
+import { mysqlTable, text, varchar, int, decimal, boolean, timestamp } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -12,227 +12,236 @@ export const LANGUAGE_NAMES = {
 } as const;
 export type Language = typeof SUPPORTED_LANGUAGES[number];
 
+// Users table (no JSON columns)
 export const users = mysqlTable("users", {
   id: varchar("id", { length: 36 }).primaryKey(),
   username: varchar("username", { length: 191 }).notNull().unique(),
   email: varchar("email", { length: 320 }).notNull().unique(),
   password: text("password").notNull(),
-  role: varchar("role", { length: 20 }).notNull().default("user"), // "user" | "admin" | "super_admin"
-  firstName: text("first_name"),
-  lastName: text("last_name"),
-  phone: text("phone"),
+  role: varchar("role", { length: 20 }).notNull().default("user"),
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  phone: varchar("phone", { length: 20 }),
   avatar: text("avatar"),
   isVerified: boolean("is_verified").default(false),
-  waveBalance: int("wave_balance").default(10), // Number of waves user can assign to properties
-  expiresAt: timestamp("expires_at"), // User account expiration date
-  isExpired: boolean("is_expired").default(false), // Computed or manual flag for expiration status
-  allowedLanguages: json("allowed_languages").$type<string[]>(), // Languages user can add data in: "en", "ar", "ku"
+  waveBalance: int("wave_balance").default(10),
+  expiresAt: timestamp("expires_at"),
+  isExpired: boolean("is_expired").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const properties = mysqlTable("properties", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  title: text("title").notNull(),
-  description: text("description"),
-  type: text("type").notNull(), // "house" | "apartment" | "villa" | "land"
-  listingType: text("listing_type").notNull(), // "sale" | "rent"
-  price: decimal("price", { precision: 12, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).default("USD"),
-  bedrooms: int("bedrooms"),
-  bathrooms: int("bathrooms"),
-  area: int("area"), // in square meters
-  address: text("address").notNull(),
-  city: text("city").notNull(),
-  country: text("country").notNull(),
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
-  images: json("images").$type<string[]>(),
-  amenities: json("amenities").$type<string[]>(),
-  features: json("features").$type<string[]>(),
-  status: varchar("status", { length: 16 }).default("active"), // "active" | "sold" | "rented" | "pending"
-  language: varchar("language", { length: 3 }).notNull().default("en"), // Language of the property data: "en", "ar", "ku"
-  agentId: varchar("agent_id", { length: 36 }).references(() => users.id),
-  contactPhone: text("contact_phone"), // Contact phone number for this property (WhatsApp and calls)
-  waveId: varchar("wave_id", { length: 36 }).references(() => waves.id), // Wave assignment
-  views: int("views").default(0),
-  isFeatured: boolean("is_featured").default(false),
-  slug: varchar("slug", { length: 255 }).unique(), // SEO-friendly URL slug (nullable for backward compatibility)
+// User languages table (normalized from users.allowed_languages JSON)
+export const userLanguages = mysqlTable("user_languages", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  language: varchar("language", { length: 3 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-});
+}, (table) => ({
+  uniqueUserLanguage: sql`UNIQUE KEY unique_user_language (user_id, language)`,
+}));
 
-export const inquiries = mysqlTable("inquiries", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  phone: text("phone"),
-  message: text("message").notNull(),
-  status: varchar("status", { length: 16 }).default("pending"), // "pending" | "replied" | "closed"
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const favorites = mysqlTable("favorites", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id),
-  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const searchHistory = mysqlTable("search_history", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id),
-  query: text("query").notNull(),
-  filters: json("filters").$type<Record<string, any>>(),
-  results: int("results").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const customerActivity = mysqlTable("customer_activity", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id).notNull(),
-  activityType: text("activity_type").notNull(), // "property_view" | "search" | "favorite_add" | "favorite_remove" | "inquiry_sent" | "login" | "profile_update"
-  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
-  metadata: json("metadata").$type<Record<string, any>>(),
-  points: int("points").default(0), // Points earned for this activity
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const customerPoints = mysqlTable("customer_points", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id).notNull().unique(),
-  totalPoints: int("total_points").default(0),
-  currentLevel: varchar("current_level", { length: 20 }).default("Bronze"), // Bronze, Silver, Gold, Platinum
-  pointsThisMonth: int("points_this_month").default(0),
-  lastActivity: timestamp("last_activity").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-});
-
-// User preference profiles for personalized recommendations
-export const userPreferences = mysqlTable("user_preferences", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id).notNull().unique(),
-  preferredPropertyTypes: json("preferred_property_types").$type<string[]>(), // ["apartment", "house", "villa"]
-  preferredListingTypes: json("preferred_listing_types").$type<string[]>(), // ["sale", "rent"]
-  budgetRange: json("budget_range").$type<{ min: number; max: number; currency: string }>(),
-  preferredLocations: json("preferred_locations").$type<string[]>(), // ["erbil", "baghdad"]
-  preferredBedrooms: json("preferred_bedrooms").$type<number[]>(), // [2, 3, 4]
-  preferredAmenities: json("preferred_amenities").$type<string[]>(), // ["parking", "pool"]
-  viewingHistory: json("viewing_history").$type<Record<string, number>>(), // propertyId -> view_count
-  interactionScores: json("interaction_scores").$type<Record<string, number>>(), // propertyId -> score
-  lastRecommendationUpdate: timestamp("last_recommendation_update").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-});
-
-// AI-generated recommendations for users
-export const userRecommendations = mysqlTable("user_recommendations", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id).notNull(),
-  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id).notNull(),
-  recommendationType: text("recommendation_type").notNull(), // "personalized", "similar", "trending", "location_based"
-  confidence: decimal("confidence", { precision: 3, scale: 2 }).notNull().default("0.50"), // 0.0 - 1.0
-  reasoning: json("reasoning").$type<string[]>(), // ["matches_price_range", "similar_to_favorites"]
-  isViewed: boolean("is_viewed").default(false),
-  isClicked: boolean("is_clicked").default(false),
-  isFavorited: boolean("is_favorited").default(false),
-  feedbackScore: int("feedback_score"), // User feedback: -1 (negative), 0 (neutral), 1 (positive)
-  createdAt: timestamp("created_at").defaultNow(),
-  expiresAt: timestamp("expires_at").default(sql`(NOW() + INTERVAL 7 DAY)`),
-});
-
-// Property similarity matrix for content-based recommendations
-export const propertySimilarity = mysqlTable("property_similarity", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  propertyId1: varchar("property_id_1", { length: 36 }).references(() => properties.id).notNull(),
-  propertyId2: varchar("property_id_2", { length: 36 }).references(() => properties.id).notNull(),
-  similarityScore: decimal("similarity_score", { precision: 3, scale: 2 }).notNull(), // 0.0 - 1.0
-  similarityFactors: json("similarity_factors").$type<Record<string, number>>(), // {"price": 0.8, "location": 0.9}
-  calculatedAt: timestamp("calculated_at").defaultNow(),
-});
-
-// Recommendation analytics and performance tracking
-export const recommendationAnalytics = mysqlTable("recommendation_analytics", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id),
-  recommendationType: text("recommendation_type").notNull(),
-  totalGenerated: int("total_generated").default(0),
-  totalViewed: int("total_viewed").default(0),
-  totalClicked: int("total_clicked").default(0),
-  totalFavorited: int("total_favorited").default(0),
-  clickThroughRate: decimal("click_through_rate", { precision: 3, scale: 2 }).default("0.00"),
-  conversionRate: decimal("conversion_rate", { precision: 3, scale: 2 }).default("0.00"),
-  avgConfidenceScore: decimal("avg_confidence_score", { precision: 3, scale: 2 }).default("0.50"),
-  period: text("period").notNull(), // "daily", "weekly", "monthly"
-  date: timestamp("date").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Currency exchange rates management
-export const currencyRates = mysqlTable("currency_rates", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  fromCurrency: varchar("from_currency", { length: 3 }).notNull().default("USD"), // Base currency (always USD)
-  toCurrency: text("to_currency").notNull(), // Target currency (IQD, AED, EUR, etc.)
-  rate: decimal("rate", { precision: 12, scale: 6 }).notNull(), // Exchange rate (e.g., 1173.0 for USD to IQD)
-  isActive: boolean("is_active").default(true),
-  setBy: varchar("set_by", { length: 36 }).references(() => users.id), // Super admin who set this rate
-  effectiveDate: timestamp("effective_date").defaultNow(), // When this rate becomes effective
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-});
-
-// Client location tracking for admin dashboard
-export const clientLocations = mysqlTable("client_locations", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id), // Optional: if user is logged in
-  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
-  accuracy: int("accuracy"), // GPS accuracy in meters
-  source: varchar("source", { length: 32 }).default("map_button"), // "map_button", "search", etc.
-  metadata: json("metadata").$type<{
-    userAgent?: string;
-    language?: string;
-    permissionStatus?: string;
-    city?: string;
-    country?: string;
-  }>(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Wave management tables
+// Waves table
 export const waves = mysqlTable("waves", {
-  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  name: text("name").notNull(),
+  id: varchar("id", { length: 36 }).primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
   description: text("description"),
-  color: varchar("color", { length: 7 }).default("#3B82F6"), // Hex color for map display
+  color: varchar("color", { length: 7 }).default("#3B82F6"),
   isActive: boolean("is_active").default(true),
   createdBy: varchar("created_by", { length: 36 }).references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 
+// Properties table (no JSON columns)
+export const properties = mysqlTable("properties", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  type: varchar("type", { length: 50 }).notNull(),
+  listingType: varchar("listing_type", { length: 20 }).notNull(),
+  price: decimal("price", { precision: 12, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  bedrooms: int("bedrooms"),
+  bathrooms: int("bathrooms"),
+  area: int("area"),
+  address: text("address").notNull(),
+  city: varchar("city", { length: 100 }).notNull(),
+  country: varchar("country", { length: 100 }).notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  status: varchar("status", { length: 16 }).default("active"),
+  language: varchar("language", { length: 3 }).notNull().default("en"),
+  agentId: varchar("agent_id", { length: 36 }).references(() => users.id),
+  contactPhone: varchar("contact_phone", { length: 20 }),
+  waveId: varchar("wave_id", { length: 36 }).references(() => waves.id),
+  views: int("views").default(0),
+  isFeatured: boolean("is_featured").default(false),
+  slug: varchar("slug", { length: 255 }).unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+// Property images table (normalized from properties.images JSON)
+export const propertyImages = mysqlTable("property_images", {
+  id: int("id").primaryKey().autoincrement(),
+  propertyId: varchar("property_id", { length: 36 }).notNull().references(() => properties.id, { onDelete: 'cascade' }),
+  imageUrl: text("image_url").notNull(),
+  sortOrder: int("sort_order").default(0),
+  altText: varchar("alt_text", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Property amenities table (normalized from properties.amenities JSON)
+export const propertyAmenities = mysqlTable("property_amenities", {
+  id: int("id").primaryKey().autoincrement(),
+  propertyId: varchar("property_id", { length: 36 }).notNull().references(() => properties.id, { onDelete: 'cascade' }),
+  amenity: varchar("amenity", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  uniquePropertyAmenity: sql`UNIQUE KEY unique_property_amenity (property_id, amenity)`,
+}));
+
+// Property features table (normalized from properties.features JSON)
+export const propertyFeatures = mysqlTable("property_features", {
+  id: int("id").primaryKey().autoincrement(),
+  propertyId: varchar("property_id", { length: 36 }).notNull().references(() => properties.id, { onDelete: 'cascade' }),
+  feature: varchar("feature", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  uniquePropertyFeature: sql`UNIQUE KEY unique_property_feature (property_id, feature)`,
+}));
+
+// Inquiries table
+export const inquiries = mysqlTable("inquiries", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id),
+  name: varchar("name", { length: 200 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  message: text("message").notNull(),
+  status: varchar("status", { length: 16 }).default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Favorites table
+export const favorites = mysqlTable("favorites", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: 'cascade' }),
+  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id, { onDelete: 'cascade' }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  uniqueUserPropertyFavorite: sql`UNIQUE KEY unique_user_property_favorite (user_id, property_id)`,
+}));
+
+// Search history table
+export const searchHistory = mysqlTable("search_history", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id),
+  query: text("query").notNull(),
+  results: int("results").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Search filters table (normalized from search_history.filters JSON)
+export const searchFilters = mysqlTable("search_filters", {
+  id: int("id").primaryKey().autoincrement(),
+  searchId: varchar("search_id", { length: 36 }).notNull().references(() => searchHistory.id, { onDelete: 'cascade' }),
+  filterKey: varchar("filter_key", { length: 50 }).notNull(),
+  filterValue: varchar("filter_value", { length: 200 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Customer activity table
+export const customerActivity = mysqlTable("customer_activity", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
+  activityType: varchar("activity_type", { length: 50 }).notNull(),
+  propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
+  points: int("points").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Activity metadata table (normalized from customer_activity.metadata JSON)
+export const activityMetadata = mysqlTable("activity_metadata", {
+  id: int("id").primaryKey().autoincrement(),
+  activityId: varchar("activity_id", { length: 36 }).notNull().references(() => customerActivity.id, { onDelete: 'cascade' }),
+  metadataKey: varchar("metadata_key", { length: 50 }).notNull(),
+  metadataValue: text("metadata_value"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Customer points table
+export const customerPoints = mysqlTable("customer_points", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  userId: varchar("user_id", { length: 36 }).notNull().unique().references(() => users.id),
+  totalPoints: int("total_points").default(0),
+  currentLevel: varchar("current_level", { length: 20 }).default("Bronze"),
+  pointsThisMonth: int("points_this_month").default(0),
+  lastActivity: timestamp("last_activity").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+// Currency rates table
+export const currencyRates = mysqlTable("currency_rates", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  fromCurrency: varchar("from_currency", { length: 3 }).notNull().default("USD"),
+  toCurrency: varchar("to_currency", { length: 3 }).notNull(),
+  rate: decimal("rate", { precision: 12, scale: 6 }).notNull(),
+  isActive: boolean("is_active").default(true),
+  setBy: varchar("set_by", { length: 36 }).references(() => users.id),
+  effectiveDate: timestamp("effective_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+// Client locations table (no JSON metadata)
+export const clientLocations = mysqlTable("client_locations", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
+  accuracy: int("accuracy"),
+  source: varchar("source", { length: 32 }).default("map_button"),
+  userAgent: text("user_agent"),
+  language: varchar("language", { length: 10 }),
+  permissionStatus: varchar("permission_status", { length: 20 }),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Customer wave permissions table
 export const customerWavePermissions = mysqlTable("customer_wave_permissions", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id).notNull(),
-  waveId: varchar("wave_id", { length: 36 }).references(() => waves.id).notNull(),
-  maxProperties: int("max_properties").notNull().default(1), // How many properties customer can assign to this wave
-  usedProperties: int("used_properties").default(0), // How many properties customer has already assigned
-  grantedBy: varchar("granted_by", { length: 36 }).references(() => users.id), // Super admin who granted permission
+  userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
+  waveId: varchar("wave_id", { length: 36 }).notNull().references(() => waves.id),
+  maxProperties: int("max_properties").notNull().default(1),
+  usedProperties: int("used_properties").default(0),
+  grantedBy: varchar("granted_by", { length: 36 }).references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 
 // Relations
-export const usersRelations = relations(users, ({ one, many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
   properties: many(properties),
   inquiries: many(inquiries),
   favorites: many(favorites),
   searchHistory: many(searchHistory),
   customerActivity: many(customerActivity),
-  customerPoints: one(customerPoints),
+  customerPoints: many(customerPoints),
   wavePermissions: many(customerWavePermissions),
   createdWaves: many(waves),
   clientLocations: many(clientLocations),
+  userLanguages: many(userLanguages),
+}));
+
+export const userLanguagesRelations = relations(userLanguages, ({ one }) => ({
+  user: one(users, {
+    fields: [userLanguages.userId],
+    references: [users.id],
+  }),
 }));
 
 export const propertiesRelations = relations(properties, ({ one, many }) => ({
@@ -246,6 +255,30 @@ export const propertiesRelations = relations(properties, ({ one, many }) => ({
   }),
   inquiries: many(inquiries),
   favorites: many(favorites),
+  images: many(propertyImages),
+  amenities: many(propertyAmenities),
+  features: many(propertyFeatures),
+}));
+
+export const propertyImagesRelations = relations(propertyImages, ({ one }) => ({
+  property: one(properties, {
+    fields: [propertyImages.propertyId],
+    references: [properties.id],
+  }),
+}));
+
+export const propertyAmenitiesRelations = relations(propertyAmenities, ({ one }) => ({
+  property: one(properties, {
+    fields: [propertyAmenities.propertyId],
+    references: [properties.id],
+  }),
+}));
+
+export const propertyFeaturesRelations = relations(propertyFeatures, ({ one }) => ({
+  property: one(properties, {
+    fields: [propertyFeatures.propertyId],
+    references: [properties.id],
+  }),
 }));
 
 export const wavesRelations = relations(waves, ({ one, many }) => ({
@@ -308,14 +341,22 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
   }),
 }));
 
-export const searchHistoryRelations = relations(searchHistory, ({ one }) => ({
+export const searchHistoryRelations = relations(searchHistory, ({ one, many }) => ({
   user: one(users, {
     fields: [searchHistory.userId],
     references: [users.id],
   }),
+  filters: many(searchFilters),
 }));
 
-export const customerActivityRelations = relations(customerActivity, ({ one }) => ({
+export const searchFiltersRelations = relations(searchFilters, ({ one }) => ({
+  search: one(searchHistory, {
+    fields: [searchFilters.searchId],
+    references: [searchHistory.id],
+  }),
+}));
+
+export const customerActivityRelations = relations(customerActivity, ({ one, many }) => ({
   user: one(users, {
     fields: [customerActivity.userId],
     references: [users.id],
@@ -323,6 +364,14 @@ export const customerActivityRelations = relations(customerActivity, ({ one }) =
   property: one(properties, {
     fields: [customerActivity.propertyId],
     references: [properties.id],
+  }),
+  metadata: many(activityMetadata),
+}));
+
+export const activityMetadataRelations = relations(activityMetadata, ({ one }) => ({
+  activity: one(customerActivity, {
+    fields: [activityMetadata.activityId],
+    references: [customerActivity.id],
   }),
 }));
 
@@ -333,13 +382,18 @@ export const customerPointsRelations = relations(customerPoints, ({ one }) => ({
   }),
 }));
 
-// Insert schemas
+// Insert schemas (without JSON validation)
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
-  isExpired: true, // This will be computed based on expiresAt
+  isExpired: true,
+});
+
+export const insertUserLanguageSchema = createInsertSchema(userLanguages).omit({
+  id: true,
+  createdAt: true,
 }).extend({
-  allowedLanguages: z.array(z.enum(SUPPORTED_LANGUAGES)).default(["en"]),
+  language: z.enum(SUPPORTED_LANGUAGES),
 });
 
 export const insertPropertySchema = createInsertSchema(properties).omit({
@@ -347,12 +401,9 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
   createdAt: true,
   updatedAt: true,
   views: true,
-  slug: true, // Slug will be auto-generated
+  slug: true,
 }).extend({
   language: z.enum(SUPPORTED_LANGUAGES).default("en"),
-  images: z.array(z.string()).default([]),
-  amenities: z.array(z.string()).default([]),
-  features: z.array(z.string()).default([]),
 });
 
 export const updatePropertySchema = createInsertSchema(properties).omit({
@@ -360,10 +411,25 @@ export const updatePropertySchema = createInsertSchema(properties).omit({
   createdAt: true,
   updatedAt: true,
   views: true,
-  slug: true, // Slug will be auto-regenerated if needed
+  slug: true,
 }).extend({
-  language: z.enum(SUPPORTED_LANGUAGES).optional(), // No default for updates
+  language: z.enum(SUPPORTED_LANGUAGES).optional(),
 }).partial();
+
+export const insertPropertyImageSchema = createInsertSchema(propertyImages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPropertyAmenitySchema = createInsertSchema(propertyAmenities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPropertyFeatureSchema = createInsertSchema(propertyFeatures).omit({
+  id: true,
+  createdAt: true,
+});
 
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
@@ -379,15 +445,21 @@ export const insertFavoriteSchema = createInsertSchema(favorites).omit({
 export const insertSearchHistorySchema = createInsertSchema(searchHistory).omit({
   id: true,
   createdAt: true,
-}).extend({
-  filters: z.record(z.any()).default({}),
+});
+
+export const insertSearchFilterSchema = createInsertSchema(searchFilters).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertCustomerActivitySchema = createInsertSchema(customerActivity).omit({
   id: true,
   createdAt: true,
-}).extend({
-  metadata: z.record(z.any()).default({}),
+});
+
+export const insertActivityMetadataSchema = createInsertSchema(activityMetadata).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertCustomerPointsSchema = createInsertSchema(customerPoints).omit({
@@ -426,35 +498,39 @@ export const insertClientLocationSchema = createInsertSchema(clientLocations).om
   id: true,
   createdAt: true,
 }).extend({
-  // Coerce numbers to strings for DECIMAL columns
   latitude: z.union([z.number(), z.string()]).transform(v => 
     typeof v === 'number' ? v.toFixed(8) : v
   ),
   longitude: z.union([z.number(), z.string()]).transform(v => 
     typeof v === 'number' ? v.toFixed(8) : v
   ),
-  metadata: z.object({
-    userAgent: z.string().optional(),
-    language: z.string().optional(),
-    permissionStatus: z.string().optional(),
-    city: z.string().optional(),
-    country: z.string().optional(),
-  }).optional(),
 });
 
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UserLanguage = typeof userLanguages.$inferSelect;
+export type InsertUserLanguage = z.infer<typeof insertUserLanguageSchema>;
 export type Property = typeof properties.$inferSelect;
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
+export type PropertyImage = typeof propertyImages.$inferSelect;
+export type InsertPropertyImage = z.infer<typeof insertPropertyImageSchema>;
+export type PropertyAmenity = typeof propertyAmenities.$inferSelect;
+export type InsertPropertyAmenity = z.infer<typeof insertPropertyAmenitySchema>;
+export type PropertyFeature = typeof propertyFeatures.$inferSelect;
+export type InsertPropertyFeature = z.infer<typeof insertPropertyFeatureSchema>;
 export type Inquiry = typeof inquiries.$inferSelect;
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 export type SearchHistory = typeof searchHistory.$inferSelect;
 export type InsertSearchHistory = z.infer<typeof insertSearchHistorySchema>;
+export type SearchFilter = typeof searchFilters.$inferSelect;
+export type InsertSearchFilter = z.infer<typeof insertSearchFilterSchema>;
 export type CustomerActivity = typeof customerActivity.$inferSelect;
 export type InsertCustomerActivity = z.infer<typeof insertCustomerActivitySchema>;
+export type ActivityMetadata = typeof activityMetadata.$inferSelect;
+export type InsertActivityMetadata = z.infer<typeof insertActivityMetadataSchema>;
 export type CustomerPoints = typeof customerPoints.$inferSelect;
 export type InsertCustomerPoints = z.infer<typeof insertCustomerPointsSchema>;
 export type Wave = typeof waves.$inferSelect;
@@ -468,19 +544,19 @@ export type ClientLocation = typeof clientLocations.$inferSelect;
 export type InsertClientLocation = z.infer<typeof insertClientLocationSchema>;
 
 // Property with relations
-export type PropertyWithAgent = Property & {
+export type PropertyWithDetails = Property & {
   agent: User | null;
   wave: Wave | null;
-  customerContact?: {
-    name: string;
-    phone: string | null;
-    email: string;
-  } | null;
-};
-
-export type PropertyWithDetails = PropertyWithAgent & {
+  images: PropertyImage[];
+  amenities: PropertyAmenity[];
+  features: PropertyFeature[];
   inquiries: Inquiry[];
   favorites: Favorite[];
+};
+
+// User with relations
+export type UserWithLanguages = User & {
+  userLanguages: UserLanguage[];
 };
 
 // Wave with permissions
@@ -501,6 +577,7 @@ export interface PropertyFilters {
   country?: string;
   language?: Language;
   features?: string[];
+  amenities?: string[];
   search?: string;
   sortBy?: "price" | "date" | "views";
   sortOrder?: "asc" | "desc";
