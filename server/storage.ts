@@ -22,6 +22,7 @@ import {
   type PropertyFilters
 } from "@shared/schema";
 import { db } from "./db";
+import { MemStorage } from "./memStorage";
 import { eq, and, like, gte, lte, desc, asc, sql, inArray } from "drizzle-orm";
 import { generatePropertySlug, generateUniqueSlug } from "@shared/slug-utils";
 
@@ -136,7 +137,9 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  private dbConn = db();
+  private get dbConn() { 
+    return db(); 
+  }
 
   // Helper method to get property with all related data
   private async getPropertyWithDetails(propertyId: string): Promise<PropertyWithDetails | undefined> {
@@ -868,4 +871,4 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();
