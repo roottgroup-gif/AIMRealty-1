@@ -28,7 +28,10 @@ CREATE TABLE `users` (
   `wave_balance` int(11) DEFAULT 10,
   `expires_at` timestamp NULL DEFAULT NULL,
   `is_expired` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -41,7 +44,9 @@ CREATE TABLE `user_languages` (
   `language` varchar(3) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_user_language` (`user_id`, `language`)
+  UNIQUE KEY `unique_user_language` (`user_id`, `language`),
+  KEY `idx_user_languages_user_id` (`user_id`),
+  KEY `idx_user_languages_language` (`language`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -56,7 +61,10 @@ CREATE TABLE `waves` (
   `is_active` tinyint(1) DEFAULT 1,
   `created_by` varchar(36) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_waves_active` (`is_active`),
+  KEY `idx_waves_created_by` (`created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -88,7 +96,21 @@ CREATE TABLE `properties` (
   `is_featured` tinyint(1) DEFAULT 0,
   `slug` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `idx_properties_city` (`city`),
+  KEY `idx_properties_country` (`country`),
+  KEY `idx_properties_type` (`type`),
+  KEY `idx_properties_listing_type` (`listing_type`),
+  KEY `idx_properties_status` (`status`),
+  KEY `idx_properties_language` (`language`),
+  KEY `idx_properties_price` (`price`),
+  KEY `idx_properties_agent_id` (`agent_id`),
+  KEY `idx_properties_wave_id` (`wave_id`),
+  KEY `idx_properties_is_featured` (`is_featured`),
+  KEY `idx_properties_created_at` (`created_at`),
+  KEY `idx_properties_location` (`latitude`, `longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -102,7 +124,9 @@ CREATE TABLE `property_images` (
   `sort_order` int(11) DEFAULT 0,
   `alt_text` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_property_images_property_id` (`property_id`),
+  KEY `idx_property_images_sort_order` (`sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -115,7 +139,9 @@ CREATE TABLE `property_amenities` (
   `amenity` varchar(100) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_property_amenity` (`property_id`, `amenity`)
+  UNIQUE KEY `unique_property_amenity` (`property_id`, `amenity`),
+  KEY `idx_property_amenities_property_id` (`property_id`),
+  KEY `idx_property_amenities_amenity` (`amenity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -128,7 +154,9 @@ CREATE TABLE `property_features` (
   `feature` varchar(100) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_property_feature` (`property_id`, `feature`)
+  UNIQUE KEY `unique_property_feature` (`property_id`, `feature`),
+  KEY `idx_property_features_property_id` (`property_id`),
+  KEY `idx_property_features_feature` (`feature`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -144,7 +172,12 @@ CREATE TABLE `inquiries` (
   `phone` varchar(20) DEFAULT NULL,
   `message` text NOT NULL,
   `status` varchar(16) DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_inquiries_property_id` (`property_id`),
+  KEY `idx_inquiries_user_id` (`user_id`),
+  KEY `idx_inquiries_status` (`status`),
+  KEY `idx_inquiries_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -156,7 +189,10 @@ CREATE TABLE `favorites` (
   `user_id` varchar(36) DEFAULT NULL,
   `property_id` varchar(36) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY `unique_user_property_favorite` (`user_id`, `property_id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_property_favorite` (`user_id`, `property_id`),
+  KEY `idx_favorites_user_id` (`user_id`),
+  KEY `idx_favorites_property_id` (`property_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -168,7 +204,10 @@ CREATE TABLE `search_history` (
   `user_id` varchar(36) DEFAULT NULL,
   `query` text NOT NULL,
   `results` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_search_history_user_id` (`user_id`),
+  KEY `idx_search_history_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -181,7 +220,9 @@ CREATE TABLE `search_filters` (
   `filter_key` varchar(50) NOT NULL,
   `filter_value` varchar(200) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_search_filters_search_id` (`search_id`),
+  KEY `idx_search_filters_key` (`filter_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -194,7 +235,12 @@ CREATE TABLE `customer_activity` (
   `activity_type` varchar(50) NOT NULL,
   `property_id` varchar(36) DEFAULT NULL,
   `points` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_customer_activity_user_id` (`user_id`),
+  KEY `idx_customer_activity_property_id` (`property_id`),
+  KEY `idx_customer_activity_type` (`activity_type`),
+  KEY `idx_customer_activity_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -207,7 +253,9 @@ CREATE TABLE `activity_metadata` (
   `metadata_key` varchar(50) NOT NULL,
   `metadata_value` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_activity_metadata_activity_id` (`activity_id`),
+  KEY `idx_activity_metadata_key` (`metadata_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -221,7 +269,11 @@ CREATE TABLE `customer_points` (
   `current_level` varchar(20) DEFAULT 'Bronze',
   `points_this_month` int(11) DEFAULT 0,
   `last_activity` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `idx_customer_points_level` (`current_level`),
+  KEY `idx_customer_points_total` (`total_points`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -237,7 +289,11 @@ CREATE TABLE `currency_rates` (
   `set_by` varchar(36) DEFAULT NULL,
   `effective_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_currency_rates_from_to` (`from_currency`, `to_currency`),
+  KEY `idx_currency_rates_active` (`is_active`),
+  KEY `idx_currency_rates_effective_date` (`effective_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -256,7 +312,11 @@ CREATE TABLE `client_locations` (
   `permission_status` varchar(20) DEFAULT NULL,
   `city` varchar(100) DEFAULT NULL,
   `country` varchar(100) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_client_locations_user_id` (`user_id`),
+  KEY `idx_client_locations_created_at` (`created_at`),
+  KEY `idx_client_locations_coords` (`latitude`, `longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -271,154 +331,19 @@ CREATE TABLE `customer_wave_permissions` (
   `used_properties` int(11) DEFAULT 0,
   `granted_by` varchar(36) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_wave_permissions_user_id` (`user_id`),
+  KEY `idx_wave_permissions_wave_id` (`wave_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
--- PRIMARY KEYS
+-- Add indexes for users table
 -- --------------------------------------------------------
 
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`);
-
-ALTER TABLE `waves`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `properties`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `slug` (`slug`);
-
-ALTER TABLE `inquiries`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `favorites`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `search_history`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `customer_activity`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `customer_points`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_id` (`user_id`);
-
-ALTER TABLE `currency_rates`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `client_locations`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `customer_wave_permissions`
-  ADD PRIMARY KEY (`id`);
-
--- --------------------------------------------------------
--- INDEXES for better performance
--- --------------------------------------------------------
-
--- Users table indexes
-ALTER TABLE `users`
-  ADD INDEX `idx_users_role` (`role`),
-  ADD INDEX `idx_users_created_at` (`created_at`);
-
--- Properties table indexes
-ALTER TABLE `properties`
-  ADD INDEX `idx_properties_city` (`city`),
-  ADD INDEX `idx_properties_country` (`country`),
-  ADD INDEX `idx_properties_type` (`type`),
-  ADD INDEX `idx_properties_listing_type` (`listing_type`),
-  ADD INDEX `idx_properties_status` (`status`),
-  ADD INDEX `idx_properties_language` (`language`),
-  ADD INDEX `idx_properties_price` (`price`),
-  ADD INDEX `idx_properties_agent_id` (`agent_id`),
-  ADD INDEX `idx_properties_wave_id` (`wave_id`),
-  ADD INDEX `idx_properties_is_featured` (`is_featured`),
-  ADD INDEX `idx_properties_created_at` (`created_at`),
-  ADD INDEX `idx_properties_location` (`latitude`, `longitude`);
-
--- Property images indexes
-ALTER TABLE `property_images`
-  ADD INDEX `idx_property_images_property_id` (`property_id`),
-  ADD INDEX `idx_property_images_sort_order` (`sort_order`);
-
--- Property amenities indexes
-ALTER TABLE `property_amenities`
-  ADD INDEX `idx_property_amenities_property_id` (`property_id`),
-  ADD INDEX `idx_property_amenities_amenity` (`amenity`);
-
--- Property features indexes
-ALTER TABLE `property_features`
-  ADD INDEX `idx_property_features_property_id` (`property_id`),
-  ADD INDEX `idx_property_features_feature` (`feature`);
-
--- Inquiries table indexes
-ALTER TABLE `inquiries`
-  ADD INDEX `idx_inquiries_property_id` (`property_id`),
-  ADD INDEX `idx_inquiries_user_id` (`user_id`),
-  ADD INDEX `idx_inquiries_status` (`status`),
-  ADD INDEX `idx_inquiries_created_at` (`created_at`);
-
--- Favorites table indexes
-ALTER TABLE `favorites`
-  ADD INDEX `idx_favorites_user_id` (`user_id`),
-  ADD INDEX `idx_favorites_property_id` (`property_id`);
-
--- Search history indexes
-ALTER TABLE `search_history`
-  ADD INDEX `idx_search_history_user_id` (`user_id`),
-  ADD INDEX `idx_search_history_created_at` (`created_at`);
-
--- Search filters indexes
-ALTER TABLE `search_filters`
-  ADD INDEX `idx_search_filters_search_id` (`search_id`),
-  ADD INDEX `idx_search_filters_key` (`filter_key`);
-
--- Customer activity indexes
-ALTER TABLE `customer_activity`
-  ADD INDEX `idx_customer_activity_user_id` (`user_id`),
-  ADD INDEX `idx_customer_activity_property_id` (`property_id`),
-  ADD INDEX `idx_customer_activity_type` (`activity_type`),
-  ADD INDEX `idx_customer_activity_created_at` (`created_at`);
-
--- Activity metadata indexes
-ALTER TABLE `activity_metadata`
-  ADD INDEX `idx_activity_metadata_activity_id` (`activity_id`),
-  ADD INDEX `idx_activity_metadata_key` (`metadata_key`);
-
--- Customer points indexes
-ALTER TABLE `customer_points`
-  ADD INDEX `idx_customer_points_level` (`current_level`),
-  ADD INDEX `idx_customer_points_total` (`total_points`);
-
--- Currency rates indexes
-ALTER TABLE `currency_rates`
-  ADD INDEX `idx_currency_rates_from_to` (`from_currency`, `to_currency`),
-  ADD INDEX `idx_currency_rates_active` (`is_active`),
-  ADD INDEX `idx_currency_rates_effective_date` (`effective_date`);
-
--- Client locations indexes
-ALTER TABLE `client_locations`
-  ADD INDEX `idx_client_locations_user_id` (`user_id`),
-  ADD INDEX `idx_client_locations_created_at` (`created_at`),
-  ADD INDEX `idx_client_locations_coords` (`latitude`, `longitude`);
-
--- Customer wave permissions indexes
-ALTER TABLE `customer_wave_permissions`
-  ADD INDEX `idx_wave_permissions_user_id` (`user_id`),
-  ADD INDEX `idx_wave_permissions_wave_id` (`wave_id`);
-
--- User languages indexes
-ALTER TABLE `user_languages`
-  ADD INDEX `idx_user_languages_user_id` (`user_id`),
-  ADD INDEX `idx_user_languages_language` (`language`);
-
--- Waves indexes
-ALTER TABLE `waves`
-  ADD INDEX `idx_waves_active` (`is_active`),
-  ADD INDEX `idx_waves_created_by` (`created_by`);
+  ADD KEY `idx_users_role` (`role`),
+  ADD KEY `idx_users_created_at` (`created_at`);
 
 -- --------------------------------------------------------
 -- FOREIGN KEY CONSTRAINTS
@@ -517,10 +442,10 @@ ALTER TABLE `customer_wave_permissions`
   FOREIGN KEY (`granted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 -- --------------------------------------------------------
--- Sample Data (Optional - Remove if not needed)
+-- Sample Data (Optional)
 -- --------------------------------------------------------
 
--- Insert default admin user (password: admin123)
+-- Insert default admin user (password: admin123 - $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi)
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `first_name`, `last_name`, `is_verified`, `wave_balance`) VALUES
 ('admin-uuid-1234567890', 'admin', 'admin@mapestate.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'System', 'Administrator', 1, 100);
 
@@ -541,9 +466,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- --------------------------------------------------------
 
 -- USAGE INSTRUCTIONS:
--- 1. Create your MySQL database first
--- 2. Update the database name in the CREATE DATABASE line (currently commented)
--- 3. Import this file: mysql -u username -p database_name < mysql_import.sql
--- 4. The script includes sample data (admin user, default wave, currency rates)
--- 5. Remove the sample data section if you don't need it
--- 6. Make sure to update the admin password hash if you keep the sample data
+-- 1. This script automatically creates the 'mapestate' database
+-- 2. Import using: mysql -u username -p < mysql_import.sql
+-- 3. Login credentials: username=admin, password=admin123
+-- 4. The script includes all tables, indexes, foreign keys, and sample data
