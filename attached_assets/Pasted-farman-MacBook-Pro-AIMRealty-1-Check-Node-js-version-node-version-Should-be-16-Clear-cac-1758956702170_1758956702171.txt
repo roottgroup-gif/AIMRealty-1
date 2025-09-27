@@ -1,0 +1,117 @@
+farman@MacBook-Pro AIMRealty-1 % # Check Node.js version
+node --version  # Should be 16+
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+# Check if port 5000 is available
+netstat -ano | findstr :5001
+zsh: command not found: #
+v20.9.0
+zsh: command not found: #
+npm WARN deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm WARN deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+
+added 567 packages, and audited 568 packages in 1m
+
+82 packages are looking for funding
+  run `npm fund` for details
+
+5 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+zsh: command not found: #
+zsh: command not found: findstr
+netstat: illegal option -- o
+Usage:  netstat [-AaLlnW] [-f address_family | -p protocol]
+        netstat [-gilns] [-f address_family]
+        netstat -i | -I interface [-w wait] [-abdgRtS]
+        netstat -s [-s] [-f address_family | -p protocol] [-w wait]
+        netstat -i | -I interface -s [-f address_family | -p protocol]
+        netstat -m [-m]
+        netstat -r [-Aaln] [-f address_family]
+        netstat -rs [-s]
+
+farman@MacBook-Pro AIMRealty-1 % npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+/Users/farman/Downloads/AIMRealty-1/server/db.ts:58
+    throw new Error("Database not initialized. Call initializeDb() first.");
+          ^
+
+
+Error: Database not initialized. Call initializeDb() first.
+    at getDb (/Users/farman/Downloads/AIMRealty-1/server/db.ts:58:11)
+    at DatabaseStorage.<instance_members_initializer> (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:139:20)
+    at DatabaseStorage (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:138:8)
+    at <anonymous> (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:871:24)
+    at ModuleJob.run (node:internal/modules/esm/module_job:217:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:316:24)
+    at async loadESM (node:internal/process/esm_loader:34:7)
+    at async handleMainPromise (node:internal/modules/run_main:66:12)
+
+Node.js v20.9.0
+farman@MacBook-Pro AIMRealty-1 % npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+/Users/farman/Downloads/AIMRealty-1/server/db.ts:58
+    throw new Error("Database not initialized. Call initializeDb() first.");
+          ^
+
+
+Error: Database not initialized. Call initializeDb() first.
+    at getDb (/Users/farman/Downloads/AIMRealty-1/server/db.ts:58:11)
+    at DatabaseStorage.<instance_members_initializer> (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:139:20)
+    at DatabaseStorage (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:138:8)
+    at <anonymous> (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:871:24)
+    at ModuleJob.run (node:internal/modules/esm/module_job:217:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:316:24)
+    at async loadESM (node:internal/process/esm_loader:34:7)
+    at async handleMainPromise (node:internal/modules/run_main:66:12)
+
+Node.js v20.9.0
+farman@MacBook-Pro AIMRealty-1 % npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+/Users/farman/Downloads/AIMRealty-1/server/db.ts:58
+    throw new Error("Database not initialized. Call initializeDb() first.");
+          ^
+
+
+Error: Database not initialized. Call initializeDb() first.
+    at getDb (/Users/farman/Downloads/AIMRealty-1/server/db.ts:58:11)
+    at DatabaseStorage.<instance_members_initializer> (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:139:20)
+    at DatabaseStorage (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:138:8)
+    at <anonymous> (/Users/farman/Downloads/AIMRealty-1/server/storage.ts:871:24)
+    at ModuleJob.run (node:internal/modules/esm/module_job:217:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:316:24)
+    at async loadESM (node:internal/process/esm_loader:34:7)
+    at async handleMainPromise (node:internal/modules/run_main:66:12)
+
+Node.js v20.9.0
+farman@MacBook-Pro AIMRealty-1 % npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+/Users/farman/Downloads/AIMRealty-1/server/storage.ts:24
+import { db } from "./db";
+         ^
+
+SyntaxError: The requested module './db' does not provide an export named 'db'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:131:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:213:5)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:316:24)
+    at async loadESM (node:internal/process/esm_loader:34:7)
+    at async handleMainPromise (node:internal/modules/run_main:66:12)
+
+Node.js v20.9.0
+farman@MacBook-Pro AIMRealty-1 % 
