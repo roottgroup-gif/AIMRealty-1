@@ -190,7 +190,15 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(user: InsertUser): Promise<User> {
     const id = crypto.randomUUID();
-    await this.dbConn.insert(users).values({ ...user, id });
+    
+    // Hash password before storing if it's not already hashed
+    let hashedPassword = user.password;
+    if (user.password && !user.password.startsWith('$2')) {
+      const { hashPassword } = await import("./auth");
+      hashedPassword = await hashPassword(user.password);
+    }
+    
+    await this.dbConn.insert(users).values({ ...user, id, password: hashedPassword });
     
     // Add default languages if not specified
     if (!user.role || user.role === 'user') {
@@ -201,7 +209,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined> {
-    await this.dbConn.update(users).set(user).where(eq(users.id, id));
+    // Hash password if it's being updated and not already hashed
+    let updatedUser = { ...user };
+    if (user.password && !user.password.startsWith('$2')) {
+      const { hashPassword } = await import("./auth");
+      updatedUser.password = await hashPassword(user.password);
+    }
+    
+    await this.dbConn.update(users).set(updatedUser).where(eq(users.id, id));
     return await this.getUser(id);
   }
 
@@ -229,11 +244,23 @@ export class DatabaseStorage implements IStorage {
     const user = await this.getUserByUsername(username);
     if (!user) return null;
     
-    // Note: In a real app, you'd compare hashed passwords
-    if (user.password === password) {
-      return user;
+    // Handle backward compatibility for existing plaintext passwords
+    const { comparePassword, hashPassword } = await import("./auth");
+    
+    // If password is already hashed (starts with $2), use bcrypt comparison
+    if (user.password.startsWith('$2')) {
+      const isValidPassword = await comparePassword(password, user.password);
+      return isValidPassword ? user : null;
+    } else {
+      // Legacy plaintext comparison - rehash and update if successful
+      if (user.password === password) {
+        // Upgrade to hashed password
+        const hashedPassword = await hashPassword(password);
+        await this.updateUser(user.id, { password: hashedPassword });
+        return user;
+      }
+      return null;
     }
-    return null;
   }
 
   async getAllUsers(): Promise<User[]> {

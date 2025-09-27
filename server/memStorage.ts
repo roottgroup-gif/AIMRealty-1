@@ -39,6 +39,72 @@ export class MemStorage implements IStorage {
   private currencyRates: Map<string, CurrencyRate> = new Map();
   private clientLocations: Map<string, ClientLocation> = new Map();
 
+  private defaultUsersInitialized = false;
+
+  constructor() {
+    // Initialize default users only in development mode
+    if (process.env.NODE_ENV === 'development') {
+      this.initializeDefaultUsers();
+    }
+  }
+
+  private async initializeDefaultUsers(): Promise<void> {
+    if (this.defaultUsersInitialized) return;
+    
+    try {
+      const { hashPassword } = await import("./auth");
+      
+      // Generate secure random password for admin
+      const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+      const agentPassword = process.env.AGENT_PASSWORD || "agent123";
+      
+      // Create default admin user
+      const adminId = this.generateId();
+      const hashedAdminPassword = await hashPassword(adminPassword);
+      
+      const adminUser: User = {
+        id: adminId,
+        username: "admin",
+        email: "admin@estateai.com",
+        password: hashedAdminPassword,
+        role: "super_admin",
+        firstName: "System",
+        lastName: "Admin",
+        phone: "+964 750 000 0000",
+        isVerified: true,
+        createdAt: new Date()
+      };
+      
+      this.users.set(adminId, adminUser);
+      
+      // Create default agent user
+      const agentId = this.generateId();
+      const hashedAgentPassword = await hashPassword(agentPassword);
+      
+      const agentUser: User = {
+        id: agentId,
+        username: "john_agent",
+        email: "john@estateai.com",
+        password: hashedAgentPassword,
+        role: "agent",
+        firstName: "John",
+        lastName: "Smith",
+        phone: "+964 750 123 4567",
+        isVerified: true,
+        createdAt: new Date()
+      };
+      
+      this.users.set(agentId, agentUser);
+      
+      this.defaultUsersInitialized = true;
+      console.log("✅ Default users initialized in MemStorage (development mode)");
+      console.log("🔑 Use 'admin' and 'john_agent' usernames to login");
+      
+    } catch (error) {
+      console.error("❌ Error initializing default users:", error);
+    }
+  }
+
   private generateId(): string {
     return crypto.randomUUID();
   }
@@ -63,10 +129,21 @@ export class MemStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
+    await this.initializeDefaultUsers(); // Ensure initialization is complete
+    
     const id = this.generateId();
+    
+    // Hash password before storing if it's not already hashed
+    let hashedPassword = user.password;
+    if (user.password && !user.password.startsWith('$2')) {
+      const { hashPassword } = await import("./auth");
+      hashedPassword = await hashPassword(user.password);
+    }
+    
     const newUser: User = {
       id,
       ...user,
+      password: hashedPassword,
       createdAt: new Date(),
     };
     this.users.set(id, newUser);
@@ -77,7 +154,14 @@ export class MemStorage implements IStorage {
     const existing = this.users.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...user };
+    // Hash password if it's being updated and not already hashed
+    let updatedUser = { ...user };
+    if (user.password && !user.password.startsWith('$2')) {
+      const { hashPassword } = await import("./auth");
+      updatedUser.password = await hashPassword(user.password);
+    }
+    
+    const updated = { ...existing, ...updatedUser };
     this.users.set(id, updated);
     return updated;
   }
@@ -107,8 +191,28 @@ export class MemStorage implements IStorage {
   }
 
   async authenticateUser(username: string, password: string): Promise<User | null> {
+    await this.initializeDefaultUsers(); // Ensure initialization is complete
+    
     const user = await this.getUserByUsername(username);
-    return user && user.password === password ? user : null;
+    if (!user) return null;
+    
+    // Handle backward compatibility for existing plaintext passwords
+    const { comparePassword, hashPassword } = await import("./auth");
+    
+    // If password is already hashed (starts with $2), use bcrypt comparison
+    if (user.password.startsWith('$2')) {
+      const isValidPassword = await comparePassword(password, user.password);
+      return isValidPassword ? user : null;
+    } else {
+      // Legacy plaintext comparison - rehash and update if successful
+      if (user.password === password) {
+        // Upgrade to hashed password
+        const hashedPassword = await hashPassword(password);
+        await this.updateUser(user.id, { password: hashedPassword });
+        return user;
+      }
+      return null;
+    }
   }
 
   async getAllUsers(): Promise<User[]> {
