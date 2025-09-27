@@ -28,11 +28,13 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot reload with tsx for TypeScript execution
 
 ### Data Storage & Management
-- **Database**: PostgreSQL with Neon serverless hosting
+- **Database**: MySQL VPS (Production) with Neon PostgreSQL (Development)
+- **VPS Connection**: ✅ PERMANENTLY CONFIGURED (Host: 72.60.134.44:3036)
+- **Auto-Connect**: Credentials permanently saved in Replit secrets - no re-entry required
 - **ORM**: Drizzle ORM for type-safe database interactions
 - **Schema**: Centralized schema definitions in shared directory
 - **Migrations**: Drizzle Kit for database schema management
-- **Connection**: Connection pooling with Neon serverless driver
+- **Connection**: Connection pooling with automatic VPS detection
 
 ### Key Data Models
 - **Users**: Authentication, roles (user/agent/admin), profile information
