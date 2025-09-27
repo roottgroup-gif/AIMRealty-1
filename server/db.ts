@@ -23,9 +23,9 @@ async function initializeDb() {
       connectionLimit: 5,           // Reduced for VPS
       waitForConnections: true,     // Queue requests when pool is full
       queueLimit: 0,               // No limit on queued requests
-      connectTimeout: 10000,        // Reduced timeout for faster failure detection
-      acquireTimeout: 10000,        // Time to wait for connection from pool
-      timeout: 10000,               // Query timeout
+      connectTimeout: 8000,         // Reduced timeout for faster failure detection  
+      acquireTimeout: 8000,         // Time to wait for connection from pool
+      queryTimeout: 8000,           // Query timeout (corrected parameter name)
       enableKeepAlive: true,        // Enable TCP keep-alive
       keepAliveInitialDelay: 10000, // 10 seconds before first keep-alive
       reconnect: true,              // Auto-reconnect on connection lost
