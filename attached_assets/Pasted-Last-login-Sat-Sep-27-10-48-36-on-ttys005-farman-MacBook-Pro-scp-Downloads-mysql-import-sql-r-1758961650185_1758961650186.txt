@@ -1,0 +1,250 @@
+Last login: Sat Sep 27 10:48:36 on ttys005
+farman@MacBook-Pro ~ % scp ~/Downloads/mysql_import.sql root@srv1027249:~/
+ssh: Could not resolve hostname srv1027249: nodename nor servname provided, or not known
+scp: Connection closed
+farman@MacBook-Pro ~ % scp ~/Downloads/mysql_import.sql root@srv1027249:~/
+ssh: Could not resolve hostname srv1027249: nodename nor servname provided, or not known
+scp: Connection closed
+farman@MacBook-Pro ~ % ssh root@72.60.134.44
+The authenticity of host '72.60.134.44 (72.60.134.44)' can't be established.
+ED25519 key fingerprint is SHA256:QtQEa5LhPYmhrXNlYu8vUs8JDOcZGdodPZxkr51uzmI.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added '72.60.134.44' (ED25519) to the list of known hosts.
+root@72.60.134.44's password: 
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-79-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sat Sep 27 08:07:49 UTC 2025
+
+  System load:  0.0               Processes:             107
+  Usage of /:   8.0% of 47.39GB   Users logged in:       0
+  Memory usage: 23%               IPv4 address for eth0: 72.60.134.44
+  Swap usage:   0%                IPv6 address for eth0: 2a02:4780:41:695a::1
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+Last login: Sat Sep 27 08:07:49 2025 from 169.254.0.1
+root@srv1027249:~# 
+root@srv1027249:~# exit
+scp ~/Downloads/mysql_import.sql root@72.60.134.44:~/
+logout
+Connection to 72.60.134.44 closed.
+farman@MacBook-Pro ~ % scp ~/Downloads/mysql_import.sql root@72.60.134.44:~/
+root@72.60.134.44's password: 
+mysql_import.sql                              100%   19KB  83.5KB/s   00:00    
+farman@MacBook-Pro ~ % ls -la mysql_import.sql
+ls: mysql_import.sql: No such file or directory
+farman@MacBook-Pro ~ % ssh root@72.60.134.44
+root@72.60.134.44's password: 
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-79-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sat Sep 27 08:09:06 UTC 2025
+
+  System load:  0.0               Processes:             108
+  Usage of /:   8.0% of 47.39GB   Users logged in:       1
+  Memory usage: 23%               IPv4 address for eth0: 72.60.134.44
+  Swap usage:   0%                IPv6 address for eth0: 2a02:4780:41:695a::1
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+Last login: Sat Sep 27 08:08:28 2025 from 130.193.204.228
+root@srv1027249:~# mysql --version
+mysql  Ver 8.0.43-0ubuntu0.24.04.2 for Linux on x86_64 ((Ubuntu))
+root@srv1027249:~# apt update
+apt install mysql-server
+Get:1 http://ftp.uni-stuttgart.de/ubuntu noble-backports InRelease [126 kB]
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease                         
+Hit:3 http://ftp.uni-stuttgart.de/ubuntu noble InRelease                       
+Get:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]        
+Get:5 http://ftp.uni-stuttgart.de/ubuntu noble-security InRelease [126 kB]     
+Get:6 http://ftp.uni-stuttgart.de/ubuntu noble-updates InRelease [126 kB]      
+Get:7 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]      
+Hit:8 http://archive.ubuntu.com/ubuntu noble-security InRelease
+Hit:9 https://deb.nodesource.com/node_20.x nodistro InRelease
+Get:10 http://ftp.uni-stuttgart.de/ubuntu noble-backports/main amd64 Components [7064 B]
+Get:11 http://ftp.uni-stuttgart.de/ubuntu noble-backports/restricted amd64 Components [216 B]
+Get:12 http://ftp.uni-stuttgart.de/ubuntu noble-backports/universe amd64 Packages [28.9 kB]
+Get:13 http://ftp.uni-stuttgart.de/ubuntu noble-backports/universe amd64 Components [19.2 kB]
+Get:14 http://ftp.uni-stuttgart.de/ubuntu noble-backports/multiverse amd64 Components [212 B]
+Get:15 http://ftp.uni-stuttgart.de/ubuntu noble-security/main amd64 Components [21.6 kB]
+Get:16 http://ftp.uni-stuttgart.de/ubuntu noble-security/restricted amd64 Components [212 B]
+Get:17 http://ftp.uni-stuttgart.de/ubuntu noble-security/universe amd64 Components [52.2 kB]
+Get:18 http://ftp.uni-stuttgart.de/ubuntu noble-security/multiverse amd64 Components [212 B]
+Get:19 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1443 kB]
+Get:20 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1485 kB]
+Get:21 http://ftp.uni-stuttgart.de/ubuntu noble-updates/main amd64 Packages [1443 kB]
+Get:22 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [28.9 kB]
+Get:23 http://ftp.uni-stuttgart.de/ubuntu noble-updates/main amd64 Components [175 kB]
+Get:24 http://ftp.uni-stuttgart.de/ubuntu noble-updates/restricted amd64 Components [212 B]
+Get:25 http://ftp.uni-stuttgart.de/ubuntu noble-updates/universe amd64 Packages [1485 kB]
+Get:26 http://ftp.uni-stuttgart.de/ubuntu noble-updates/universe amd64 Components [377 kB]
+Get:27 http://ftp.uni-stuttgart.de/ubuntu noble-updates/multiverse amd64 Components [940 B]
+Fetched 7199 kB in 1s (4830 kB/s)   
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+2 packages can be upgraded. Run 'apt list --upgradable' to see them.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+mysql-server is already the newest version (8.0.43-0ubuntu0.24.04.2).
+0 upgraded, 0 newly installed, 0 to remove and 2 not upgraded.
+root@srv1027249:~# mysql_secure_installation
+
+Securing the MySQL server deployment.
+
+Connecting to MySQL using a blank password.
+The 'validate_password' component is installed on the server.
+The subsequent steps will run with the existing configuration
+of the component.
+
+Skipping password set for root as authentication with auth_socket is used by default.
+If you would like to use password authentication instead, this can be done with the "ALTER_USER" command.
+See https://dev.mysql.com/doc/refman/8.0/en/alter-user.html#alter-user-password-management for more information.
+
+By default, a MySQL installation has an anonymous user,
+allowing anyone to log into MySQL without having to have
+a user account created for them. This is intended only for
+testing, and to make the installation go a bit smoother.
+You should remove them before moving into a production
+environment.
+
+Remove anonymous users? (Press y|Y for Yes, any other key for No) : yes
+Success.
+
+
+Normally, root should only be allowed to connect from
+'localhost'. This ensures that someone cannot guess at
+the root password from the network.
+
+Disallow root login remotely? (Press y|Y for Yes, any other key for No) : yes
+Success.
+
+By default, MySQL comes with a database named 'test' that
+anyone can access. This is also intended only for testing,
+and should be removed before moving into a production
+environment.
+
+
+Remove test database and access to it? (Press y|Y for Yes, any other key for No) : yes
+ - Dropping test database...
+Success.
+
+ - Removing privileges on test database...
+Success.
+
+Reloading the privilege tables will ensure that all changes
+made so far will take effect immediately.
+
+Reload privilege tables now? (Press y|Y for Yes, any other key for No) : 
+
+ ... skipping.
+All done! 
+root@srv1027249:~# 
+root@srv1027249:~# 
+root@srv1027249:~# 
+root@srv1027249:~# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 31
+Server version: 8.0.43-0ubuntu0.24.04.2 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> mysql -u root -p mapestate < mysql_import.sql
+    -> 
+    -> 
+    -> mysql -u root -p -e "USE your_database_name; SHOW TABLES;"
+    -> eexit
+    -> e^C
+mysql> use mapestate
+ERROR 1049 (42000): Unknown database 'mapestate'
+mysql> CREATE DATABASE mapestate;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> EXIT;
+Bye
+root@srv1027249:~# mysql -u root -p mapestate < mysql_import.sql
+Enter password: 
+root@srv1027249:~# mysql -u root -p -e "USE mapestate; SHOW TABLES;"
+Enter password: 
++---------------------------+
+| Tables_in_mapestate       |
++---------------------------+
+| activity_metadata         |
+| client_locations          |
+| currency_rates            |
+| customer_activity         |
+| customer_points           |
+| customer_wave_permissions |
+| favorites                 |
+| inquiries                 |
+| properties                |
+| property_amenities        |
+| property_features         |
+| property_images           |
+| search_filters            |
+| search_history            |
+| user_languages            |
+| users                     |
+| waves                     |
++---------------------------+
+root@srv1027249:~# mysql -u root -p -e "SELECT @@hostname;"
+Enter password: 
++------------+
+| @@hostname |
++------------+
+| srv1027249 |
++------------+
+root@srv1027249:~# mysql -u root -p -e "SHOW VARIABLES LIKE 'port';"
+mysql -u root -p -e "SHOW VARIABLES LIKE 'socket';"
+Enter password: 
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| port          | 3306  |
++---------------+-------+
+Enter password: 
++---------------+-----------------------------+
+| Variable_name | Value                       |
++---------------+-----------------------------+
+| socket        | /var/run/mysqld/mysqld.sock |
++---------------+-----------------------------+
+root@srv1027249:~# 

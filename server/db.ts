@@ -23,10 +23,9 @@ async function initializeDb() {
       connectionLimit: 10,          // Maximum number of connections in pool
       waitForConnections: true,     // Queue requests when pool is full
       queueLimit: 0,               // No limit on queued requests
-      acquireTimeout: 60000,        // 60 seconds to get connection from pool
-      keepAliveInitialDelay: 10000, // 10 seconds before first keep-alive
+      connectTimeout: 60000,        // Initial connection timeout
       enableKeepAlive: true,        // Enable TCP keep-alive
-      reconnect: true,              // Automatically reconnect
+      keepAliveInitialDelay: 10000, // 10 seconds before first keep-alive
     });
     
     db = drizzle(pool, { schema, mode: 'default' });

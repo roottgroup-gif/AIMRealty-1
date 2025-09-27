@@ -58,6 +58,7 @@ function isSocialMediaBot(userAgent: string): boolean {
 
 // Cache HTML template in memory for performance
 let htmlTemplate: string | null = null;
+let storage: any = null; // Storage instance for middleware
 
 function escapeHtml(text: string): string {
   const map: { [key: string]: string } = {
@@ -71,6 +72,10 @@ function escapeHtml(text: string): string {
 }
 
 async function injectPropertyMetaTags(req: Request, res: Response, next: NextFunction) {
+  // Skip if storage is not initialized yet
+  if (!storage) {
+    return next();
+  }
   // Match both legacy and language-prefixed property URLs
   const propertyMatch = req.path.match(/^(?:\/(en|ar|kur))?\/property\/(.+)$/);
   
@@ -220,7 +225,7 @@ app.use(injectPropertyMetaTags);
 
 (async () => {
   // Initialize storage (with automatic MySQL/MemStorage detection)
-  const storage = await StorageFactory.getStorage();
+  storage = await StorageFactory.getStorage();
 
   const server = await registerRoutes(app, storage);
 
