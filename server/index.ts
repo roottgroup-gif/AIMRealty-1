@@ -3,8 +3,7 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite.local";
 import { performanceLogger, requestSizeMonitor } from "./middleware/performance";
-import { storage } from "./storage";
-import { initializeDb } from "./db";
+import { StorageFactory } from "./storageFactory";
 import fs from "fs";
 import path from "path";
 
@@ -220,17 +219,10 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
 app.use(injectPropertyMetaTags);
 
 (async () => {
-  // Initialize database first
-  try {
-    await initializeDb();
-    console.log("✅ Database initialized successfully");
-  } catch (error) {
-    console.error("❌ Failed to initialize database. Exiting...");
-    console.error(error);
-    process.exit(1);
-  }
+  // Initialize storage (with automatic MySQL/MemStorage detection)
+  const storage = await StorageFactory.getStorage();
 
-  const server = await registerRoutes(app);
+  const server = await registerRoutes(app, storage);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

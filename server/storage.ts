@@ -871,4 +871,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Export the storage instance (will be initialized by StorageFactory)
+export let storage: IStorage;

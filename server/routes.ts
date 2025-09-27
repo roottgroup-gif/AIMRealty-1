@@ -4,7 +4,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { storage } from "./storage";
+import { StorageFactory } from "./storageFactory";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { 
@@ -57,7 +57,12 @@ function broadcastToSSEClients(event: string, data: any) {
   });
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
+import type { IStorage } from "./storage";
+
+export async function registerRoutes(app: Express, storageInstance?: IStorage): Promise<Server> {
+  // Use provided storage or get from factory
+  const storage = storageInstance || StorageFactory.getInstance();
+
   // Session configuration
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
