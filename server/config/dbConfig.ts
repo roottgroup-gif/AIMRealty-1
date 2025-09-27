@@ -28,8 +28,23 @@ function getDatabaseConfig(): DatabaseConfig {
   // Try to get MYSQL_URL from environment first
   let connectionUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
   
-  // If no URL provided, use default XAMPP configuration
-  if (!connectionUrl) {
+  // Check if individual MySQL environment variables are provided
+  const mysqlHost = process.env.MYSQL_HOST;
+  const mysqlPort = process.env.MYSQL_PORT;
+  const mysqlUser = process.env.MYSQL_USER;
+  const mysqlPassword = process.env.MYSQL_PASSWORD;
+  const mysqlDatabase = process.env.MYSQL_DATABASE;
+  
+  // If individual MySQL environment variables are provided, use them
+  if (mysqlHost && mysqlUser && mysqlDatabase) {
+    console.log('🔗 Using MySQL VPS configuration from environment variables');
+    const port = parseInt(mysqlPort || '3306');
+    const auth = mysqlPassword ? `${mysqlUser}:${mysqlPassword}` : mysqlUser;
+    connectionUrl = `mysql://${auth}@${mysqlHost}:${port}/${mysqlDatabase}`;
+    console.log(`🔧 MySQL VPS: mysql://${mysqlUser}:***@${mysqlHost}:${port}/${mysqlDatabase}`);
+  }
+  // If no URL provided and no individual vars, use default XAMPP configuration
+  else if (!connectionUrl) {
     console.log('📝 No MYSQL_URL found, using default XAMPP configuration');
     console.log('🔧 Default: mysql://root:@127.0.0.1:3305/mapestate');
     console.log('💡 Tip: Create a .env file with MYSQL_URL to customize');
