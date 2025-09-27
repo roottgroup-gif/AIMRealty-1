@@ -467,6 +467,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- USAGE INSTRUCTIONS:
 -- 1. This script automatically creates the 'mapestate' database
--- 2. Import using: mysql -u username -p < mysql_import.sql
+-- 2. Import using: mysql -u username -p -P 3305 < mysql_import.sql
 -- 3. Login credentials: username=admin, password=admin123
 -- 4. The script includes all tables, indexes, foreign keys, and sample data
+-- 5. Make sure MySQL is running on port 3305
