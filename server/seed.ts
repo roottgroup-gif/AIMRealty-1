@@ -1,27 +1,51 @@
-import { db } from "./db";
+import { db, initializeDb } from "./db";
 import { properties, users } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 async function seedData() {
   try {
     console.log("🌱 Seeding database...");
+    
+    // Initialize database connection first
+    await initializeDb();
+    console.log("✅ Database initialized successfully");
 
-    // Create a sample agent
-    const [agent] = await db().insert(users).values([{
-      username: "john_agent",
-      email: "john@estateai.com",
-      password: "hashedpassword123",
-      role: "agent",
-      firstName: "John",
-      lastName: "Smith",
-      phone: "+964 750 123 4567",
-      isVerified: true
-    }]).returning();
+    // Check if agent already exists, if not create one
+    const existingAgent = await db().select().from(users).where(eq(users.username, "john_agent")).limit(1);
+    let agent;
+    
+    if (existingAgent.length === 0) {
+      const [newAgent] = await db().insert(users).values([{
+        username: "john_agent",
+        email: "john@estateai.com",
+        password: "hashedpassword123",
+        role: "agent",
+        firstName: "John",
+        lastName: "Smith",
+        phone: "+964 750 123 4567",
+        isVerified: true
+      }]).returning();
+      agent = newAgent;
+      console.log("✅ Created sample agent:", agent.username);
+    } else {
+      agent = existingAgent[0];
+      console.log("ℹ️ Using existing agent:", agent.username);
+    }
 
-    console.log("✅ Created sample agent:", agent.username);
+    // Check if properties already exist
+    const existingPropertiesCount = await db().select({ count: sql<number>`count(*)` }).from(properties);
+    const currentCount = existingPropertiesCount[0]?.count || 0;
+    
+    if (currentCount > 0) {
+      console.log(`ℹ️ Database already has ${currentCount} properties. Skipping property seeding.`);
+      return;
+    }
 
-    // Create exactly 10 sample properties, each with exactly 3 photos
-    const sampleProperties = [
+    // Create sample properties with proper UUIDs
+    const propertiesToCreate = [
       {
+        id: randomUUID(),
         title: "Luxury Villa in Erbil",
         description: "A stunning 4-bedroom villa with modern amenities, located in the heart of Erbil. Features include a spacious living area, modern kitchen, garden, and parking.",
         type: "villa",
@@ -36,16 +60,10 @@ async function seedData() {
         country: "Iraq",
         latitude: "36.1911",
         longitude: "44.0093",
-        images: [
-          "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-          "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
-        ],
-        amenities: ["Swimming Pool", "Garden", "Parking", "Security System"],
-        features: ["Central AC", "Modern Kitchen", "Balcony", "Storage Room"],
         agentId: agent.id,
         isFeatured: true,
-        language: "en"
+        language: "en",
+        slug: "luxury-villa-in-erbil"
       },
       {
         title: "Modern Apartment in Baghdad",
