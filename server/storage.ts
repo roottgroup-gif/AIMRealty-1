@@ -21,6 +21,13 @@ import {
   type ClientLocation, type InsertClientLocation,
   type PropertyFilters
 } from "@shared/schema";
+
+// Utility function to sanitize user data for API responses
+function sanitizeUser(user: User | null | undefined): Omit<User, 'password'> | null {
+  if (!user) return null;
+  const { password, ...sanitizedUser } = user;
+  return sanitizedUser;
+}
 import { db } from "./db";
 import { MemStorage } from "./memStorage";
 import { eq, and, like, gte, lte, desc, asc, sql, inArray } from "drizzle-orm";
@@ -160,9 +167,9 @@ export class DatabaseStorage implements IStorage {
       this.dbConn.select().from(favorites).where(eq(favorites.propertyId, propertyId))
     ]);
 
-    return {
+    const sanitizedProperty = {
       ...property.properties,
-      agent: property.users,
+      agent: property.users ? sanitizeUser(property.users) : null,
       wave: property.waves,
       images,
       amenities,
@@ -170,6 +177,9 @@ export class DatabaseStorage implements IStorage {
       inquiries: inquiriesData,
       favorites: favoritesData
     };
+    
+    // Return with type assertion to maintain interface compatibility
+    return sanitizedProperty as PropertyWithDetails;
   }
 
   // Users
