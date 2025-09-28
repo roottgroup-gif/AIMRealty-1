@@ -29,7 +29,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage & Management
 - **Database**: MySQL VPS (Production) with Neon PostgreSQL (Development)
-- **VPS Connection**: ✅ PERMANENTLY CONFIGURED (Host: 72.60.134.44:3036)
+- **VPS Connection**: ✅ PERMANENTLY CONFIGURED (Host: 72.60.134.44:3306)
 - **Auto-Connect**: Credentials permanently saved in Replit secrets - no re-entry required
 - **ORM**: Drizzle ORM for type-safe database interactions
 - **Schema**: Centralized schema definitions in shared directory
