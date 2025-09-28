@@ -682,10 +682,12 @@ export default function PropertyDetailPage() {
                       <h4 className="font-medium mb-2">{t('property.features')}</h4>
                       <div className="space-y-2">
                         {property.features.map((feature, index) => {
+                          // Handle both old string format and new object format from database
+                          const featureValue = typeof feature === 'string' ? feature : feature.feature;
                           // Try to translate the key, fallback to the original value if translation doesn't exist
-                          const translatedFeature = t(`property.features.${feature}`) !== `property.features.${feature}` 
-                            ? t(`property.features.${feature}`) 
-                            : feature;
+                          const translatedFeature = t(`property.features.${featureValue}`) !== `property.features.${featureValue}` 
+                            ? t(`property.features.${featureValue}`) 
+                            : featureValue;
                           return (
                             <div key={index} className="flex items-center space-x-2">
                               <Check className="h-4 w-4 text-green-500" />
@@ -720,10 +722,12 @@ export default function PropertyDetailPage() {
                       <h4 className="font-medium mb-2">{t('property.amenities')}</h4>
                       <div className="space-y-2">
                         {property.amenities.map((amenity, index) => {
+                          // Handle both old string format and new object format from database
+                          const amenityValue = typeof amenity === 'string' ? amenity : amenity.amenity;
                           // Try to translate the key, fallback to the original value if translation doesn't exist
-                          const translatedAmenity = t(`property.amenities.${amenity}`) !== `property.amenities.${amenity}` 
-                            ? t(`property.amenities.${amenity}`) 
-                            : amenity;
+                          const translatedAmenity = t(`property.amenities.${amenityValue}`) !== `property.amenities.${amenityValue}` 
+                            ? t(`property.amenities.${amenityValue}`) 
+                            : amenityValue;
                           return (
                             <div key={index} className="flex items-center space-x-2">
                               <Check className="h-4 w-4 text-green-500" />
