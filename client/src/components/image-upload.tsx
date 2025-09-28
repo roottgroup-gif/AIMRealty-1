@@ -24,13 +24,23 @@ export default function ImageUpload({
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
+  const uploadToServer = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/upload/properties', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Upload failed');
+    }
+
+    const result = await response.json();
+    return result.url; // Returns the server path like /uploads/properties/filename.jpg
   };
 
   const validateFile = (file: File): boolean => {
@@ -72,8 +82,17 @@ export default function ImageUpload({
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (validateFile(file)) {
-          const base64 = await convertToBase64(file);
-          newImages.push(base64);
+          try {
+            const serverUrl = await uploadToServer(file);
+            newImages.push(serverUrl);
+          } catch (uploadError) {
+            console.error('Failed to upload file:', file.name, uploadError);
+            toast({
+              title: 'Upload failed',
+              description: `Failed to upload ${file.name}. Please try again.`,
+              variant: 'destructive',
+            });
+          }
         }
       }
 
@@ -81,10 +100,11 @@ export default function ImageUpload({
         onChange([...value, ...newImages]);
         toast({
           title: 'Images uploaded',
-          description: `Successfully uploaded ${newImages.length} image(s)`,
+          description: `Successfully uploaded ${newImages.length} image(s) to server`,
         });
       }
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: 'Upload failed',
         description: 'Failed to process some images. Please try again.',
@@ -176,7 +196,7 @@ export default function ImageUpload({
                 Drag & drop images here, or click to select files
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                Supports JPG, PNG, GIF up to {maxSize}MB each. Maximum {maxFiles} images.
+                Supports JPG, PNG, WebP up to {maxSize}MB each. Maximum {maxFiles} images.
               </p>
             </div>
             
