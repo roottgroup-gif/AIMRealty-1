@@ -1167,7 +1167,17 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
   app.post("/api/properties", requireAnyRole(["user", "admin"]), validateLanguagePermission, async (req, res) => {
     try {
       const validatedData = insertPropertySchema.parse(req.body);
-      const property = await storage.createProperty(validatedData);
+      
+      // Extract images, amenities, and features from the validated request body
+      const { images = [], amenities = [], features = [] } = req.body;
+      
+      // Create property with validated data and associated arrays
+      const property = await storage.createProperty(
+        validatedData, 
+        images, 
+        amenities, 
+        features
+      );
       
       // Broadcast new property to all SSE clients
       broadcastToSSEClients('property_created', property);
