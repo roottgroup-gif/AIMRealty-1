@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import ImageUpload from '@/components/image-upload';
 import ProfilePhotoUpload from '@/components/profile-photo-upload';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 // Lazy load heavy components for better performance
 const PropertyMap = lazy(() => import('@/components/property-map'));
@@ -26,6 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiRequest } from '@/lib/queryClient';
 import type { PropertyWithDetails, PropertyFilters } from '@shared/schema';
+import type { PropertyWithAgent } from '@shared/sqlite-schema';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, type Language } from '@shared/schema';
 import { 
   Heart, Search, Filter, LogOut, MapPin, DollarSign,
@@ -2554,10 +2556,13 @@ export default function CustomerDashboard() {
                           <CardContent className="p-0">
                             <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-t-lg relative overflow-hidden">
                               {property.images && property.images.length > 0 ? (
-                                <img 
+                                <OptimizedImage 
                                   src={property.images[0]} 
                                   alt={property.title}
                                   className="w-full h-full object-cover"
+                                  aspectRatio="16/9"
+                                  fallbackSrc="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+                                  data-testid={`img-property-${property.id}`}
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
@@ -3053,10 +3058,13 @@ function PropertyCard({
       <CardContent className="p-0">
         <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-t-lg relative overflow-hidden">
           {property.images && property.images.length > 0 ? (
-            <img 
+            <OptimizedImage 
               src={property.images[0]} 
               alt={property.title}
               className="w-full h-full object-cover"
+              aspectRatio="16/9"
+              fallbackSrc="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+              data-testid={`img-property-card-${property.id}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

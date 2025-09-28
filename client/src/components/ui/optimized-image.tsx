@@ -16,6 +16,9 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
 
 // Generate responsive image URLs with different sizes
 const generateResponsiveSrc = (src: string) => {
+  if (!src || typeof src !== 'string') {
+    return null;
+  }
   if (src.includes('unsplash.com')) {
     return {
       webp: {
