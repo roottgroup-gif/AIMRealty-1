@@ -248,8 +248,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         firstName: "System",
         lastName: "Admin",
         phone: "+964 750 000 0000",
-        isVerified: true,
-        allowedLanguages: ["en", "ar", "kur"]
+        isVerified: true
       });
 
       // Create sample agent
@@ -262,8 +261,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         firstName: "John",
         lastName: "Smith",
         phone: "+964 750 123 4567",
-        isVerified: true,
-        allowedLanguages: ["en"]
+        isVerified: true
       });
 
       res.json({
@@ -834,7 +832,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
   });
 
   // Admin route for retrieving client location data
-  app.get("/api/admin/client-locations", adminRateLimit, requireAnyRole("admin", "super_admin"), async (req, res) => {
+  app.get("/api/admin/client-locations", adminRateLimit, requireAnyRole(["admin", "super_admin"]), async (req, res) => {
     try {
       const { userId, from, to, limit, offset } = req.query;
       
@@ -906,7 +904,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
   });
 
   // Admin route for client location analytics/stats
-  app.get("/api/admin/client-locations/stats", adminRateLimit, requireAnyRole("admin", "super_admin"), async (req, res) => {
+  app.get("/api/admin/client-locations/stats", adminRateLimit, requireAnyRole(["admin", "super_admin"]), async (req, res) => {
     try {
       const { from, to } = req.query;
       
@@ -928,7 +926,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         params.to = String(to);
       }
 
-      const stats = await storage.getClientLocationStats(params);
+      const stats = await storage.getClientLocationStats();
       res.json(stats);
     } catch (error) {
       console.error("Get client location stats error:", error);
@@ -1033,7 +1031,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         bathrooms: bathrooms ? parseInt(bathrooms as string) : undefined,
         city: city as string,
         country: country as string,
-        language: language as string,
+        language: language as "en" | "ar" | "kur",
         search: search as string,
         sortBy: sortBy as "price" | "date" | "views",
         sortOrder: sortOrder as "asc" | "desc",
@@ -1485,7 +1483,6 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         await storage.addSearchHistory({
           userId,
           query,
-          filters,
           results: properties.length,
         });
       }
@@ -1529,7 +1526,6 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         userId,
         activityType,
         propertyId: propertyId || null,
-        metadata: metadata || {},
         points: points || 0
       });
       
@@ -1619,8 +1615,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
           firstName: "Super",
           lastName: "Admin",
           phone: "+964-750-123-4567",
-          isVerified: true,
-          allowedLanguages: ["en", "ar", "kur"]
+          isVerified: true
         });
         createdUsers.push({ username: superAdmin.username, role: superAdmin.role });
       } else {
@@ -1638,8 +1633,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
           firstName: "John",
           lastName: "Doe",
           phone: "+964-750-987-6543",
-          isVerified: true,
-          allowedLanguages: ["en"]
+          isVerified: true
         });
         createdUsers.push({ username: regularUser.username, role: regularUser.role });
       } else {

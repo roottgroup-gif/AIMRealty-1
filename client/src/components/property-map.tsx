@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { PropertyWithAgent, PropertyFilters } from "@shared/schema";
+import type { PropertyWithDetails, PropertyFilters } from "@shared/schema";
 import { Search, MapPin, Navigation } from "lucide-react";
 import {
   useAddToFavorites,
@@ -24,11 +24,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 
 interface PropertyMapProps {
-  properties: PropertyWithAgent[];
+  properties: PropertyWithDetails[];
   filters?: PropertyFilters;
   onFilterChange?: (filters: PropertyFilters) => void;
-  onPropertyClick?: (property: PropertyWithAgent) => void;
-  onPropertySelect?: (property: PropertyWithAgent) => void;
+  onPropertyClick?: (property: PropertyWithDetails) => void;
+  onPropertySelect?: (property: PropertyWithDetails) => void;
   userId?: string;
   className?: string;
 }
@@ -55,7 +55,7 @@ export default function PropertyMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
-  const currentPropertiesRef = useRef<PropertyWithAgent[]>([]);
+  const currentPropertiesRef = useRef<PropertyWithDetails[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -652,7 +652,7 @@ export default function PropertyMap({
 
   // Function to create zoom-based clusters
   const createZoomBasedClusters = (
-    propertiesToCluster: PropertyWithAgent[],
+    propertiesToCluster: PropertyWithDetails[],
     zoomLevel: number,
   ) => {
     // Enhanced zoom-based clustering with better grouping when zooming out
@@ -676,9 +676,9 @@ export default function PropertyMap({
 
   // Function to create country-based clusters
   const createCountryBasedClusters = (
-    propertiesToCluster: PropertyWithAgent[],
+    propertiesToCluster: PropertyWithDetails[],
   ) => {
-    const countryGroups: { [key: string]: PropertyWithAgent[] } = {};
+    const countryGroups: { [key: string]: PropertyWithDetails[] } = {};
 
     // Group properties by country
     propertiesToCluster.forEach((property) => {
@@ -715,9 +715,9 @@ export default function PropertyMap({
 
   // Function to create city-based clusters
   const createCityBasedClusters = (
-    propertiesToCluster: PropertyWithAgent[],
+    propertiesToCluster: PropertyWithDetails[],
   ) => {
-    const cityGroups: { [key: string]: PropertyWithAgent[] } = {};
+    const cityGroups: { [key: string]: PropertyWithDetails[] } = {};
 
     // Group properties by city
     propertiesToCluster.forEach((property) => {
@@ -754,7 +754,7 @@ export default function PropertyMap({
 
   // Function to create distance-based clusters
   const createDistanceBasedClusters = (
-    propertiesToCluster: PropertyWithAgent[],
+    propertiesToCluster: PropertyWithDetails[],
     zoomLevel: number,
   ) => {
     const clusters: any[] = [];
@@ -837,7 +837,7 @@ export default function PropertyMap({
   };
 
   // Helper function to analyze cluster property types
-  const analyzeClusterTypes = (properties: PropertyWithAgent[]) => {
+  const analyzeClusterTypes = (properties: PropertyWithDetails[]) => {
     const typeCount: { [key: string]: number } = {};
     properties.forEach((prop) => {
       const type = prop.type || "house";
@@ -1604,7 +1604,7 @@ export default function PropertyMap({
 
   // Update markers function that accepts properties array - always show all markers
   const updateMarkersForProperties = (
-    propertiesToShow: PropertyWithAgent[],
+    propertiesToShow: PropertyWithDetails[],
   ) => {
     if (
       !mapInstanceRef.current ||
