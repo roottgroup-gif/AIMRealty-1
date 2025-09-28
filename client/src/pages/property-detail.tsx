@@ -341,7 +341,10 @@ export default function PropertyDetailPage() {
     );
   }
 
-  const primaryImage = property.images?.[0]?.imageUrl || property.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600';
+  const firstImage = property.images?.[0];
+  const primaryImage = (firstImage && typeof firstImage === 'object' && 'imageUrl' in firstImage) 
+    ? firstImage.imageUrl 
+    : (firstImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600');
   const images = Array.isArray(property.images) && property.images.length > 0 
     ? property.images.map((img: any) => img.imageUrl || img) : [primaryImage];
 
@@ -362,7 +365,7 @@ export default function PropertyDetailPage() {
             currency: property.currency || 'USD',
             area: property.area
           }}
-          ogImage={property.images && property.images.length > 0 ? (property.images[0]?.imageUrl || property.images[0]) : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
+          ogImage={property.images && property.images.length > 0 ? primaryImage : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
           canonicalUrl={undefined}
           structuredData={getPropertyStructuredData(property)}
           breadcrumbs={[

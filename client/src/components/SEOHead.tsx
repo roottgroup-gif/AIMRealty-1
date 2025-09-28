@@ -456,7 +456,7 @@ export function SEOHead({
     updateMetaTag('property', 'og:title', dynamicTitle);
     updateMetaTag('property', 'og:description', dynamicDescription);
     updateMetaTag('property', 'og:image', ogImage);
-    updateMetaTag('property', 'og:image:secure_url', ogImage.replace('http://', 'https://'));
+    updateMetaTag('property', 'og:image:secure_url', ogImage && typeof ogImage === 'string' ? ogImage.replace('http://', 'https://') : ogImage);
     updateMetaTag('property', 'og:image:width', '1200');
     updateMetaTag('property', 'og:image:height', '630');
     updateMetaTag('property', 'og:image:alt', dynamicTitle);
