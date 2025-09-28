@@ -1257,6 +1257,58 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Delete individual property image
+  app.delete("/api/properties/:propertyId/images", requireAnyRole(["agent", "admin", "super_admin"]), async (req, res) => {
+    try {
+      const { propertyId } = req.params;
+      
+      // Validate request body with Zod
+      const imageDeleteSchema = z.object({
+        imageUrl: z.string().min(1, "Image URL is required")
+      });
+      
+      const validatedData = imageDeleteSchema.parse(req.body);
+      const { imageUrl } = validatedData;
+      
+      // Get the property first to check ownership
+      const property = await storage.getProperty(propertyId);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      
+      // Check if user owns the property or is admin
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Allow deletion if user is admin/super_admin or owns the property
+      if (user.role !== 'admin' && user.role !== 'super_admin' && property.agentId !== user.id) {
+        return res.status(403).json({ message: "Forbidden: You can only modify your own properties" });
+      }
+      
+      // Remove the specific image with automatic resequencing (handled atomically in storage)
+      const result = await storage.removePropertyImageWithResequencing(propertyId, imageUrl);
+      
+      if (!result.success) {
+        return res.status(404).json({ message: "Image not found or already removed" });
+      }
+      
+      // Broadcast property update to all SSE clients
+      broadcastToSSEClients('property_updated', { id: propertyId, title: property.title });
+      
+      res.json({ 
+        message: "Image deleted successfully",
+        remainingImages: result.remainingCount
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      console.error('Failed to delete property image:', error);
+      res.status(500).json({ message: "Failed to delete image" });
+    }
+  });
 
   // User's own properties
   app.get("/api/users/:userId/properties", async (req, res) => {

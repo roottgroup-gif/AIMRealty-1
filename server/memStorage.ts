@@ -378,6 +378,28 @@ export class MemStorage implements IStorage {
     return filtered.length < images.length;
   }
 
+  async removePropertyImageWithResequencing(propertyId: string, imageUrl: string): Promise<{ success: boolean; remainingCount: number }> {
+    const images = this.propertyImages.get(propertyId) || [];
+    const initialCount = images.length;
+    
+    // Filter out the specific image
+    const filtered = images.filter(img => img.imageUrl !== imageUrl);
+    
+    if (filtered.length === initialCount) {
+      // Image was not found
+      return { success: false, remainingCount: initialCount };
+    }
+    
+    // Resequence the remaining images
+    filtered.forEach((img, index) => {
+      img.sortOrder = index;
+    });
+    
+    this.propertyImages.set(propertyId, filtered);
+    
+    return { success: true, remainingCount: filtered.length };
+  }
+
   async updatePropertyImageOrder(propertyId: string, imageUpdates: { imageUrl: string; sortOrder: number }[]): Promise<void> {
     const images = this.propertyImages.get(propertyId) || [];
     for (const update of imageUpdates) {

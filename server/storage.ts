@@ -65,6 +65,7 @@ export interface IStorage {
   getPropertyImages(propertyId: string): Promise<PropertyImage[]>;
   addPropertyImage(image: InsertPropertyImage): Promise<PropertyImage>;
   removePropertyImage(propertyId: string, imageUrl: string): Promise<boolean>;
+  removePropertyImageWithResequencing(propertyId: string, imageUrl: string): Promise<{ success: boolean; remainingCount: number }>;
   updatePropertyImageOrder(propertyId: string, imageUpdates: { imageUrl: string; sortOrder: number }[]): Promise<void>;
 
   // Property Amenities
@@ -361,33 +362,119 @@ export class DatabaseStorage implements IStorage {
 
     const results = await query;
 
-    // Get additional data for each property
-    const propertiesWithDetails = await Promise.all(
-      results.map(async (result: any) => {
-        if (!result.properties) return null;
-        
-        const [images, amenities, features, inquiriesData, favoritesData] = await Promise.all([
-          this.getPropertyImages(result.properties.id),
-          this.getPropertyAmenities(result.properties.id),
-          this.getPropertyFeatures(result.properties.id),
-          this.getInquiriesForProperty(result.properties.id),
-          this.dbConn.select().from(favorites).where(eq(favorites.propertyId, result.properties.id))
-        ]);
+    if (results.length === 0) {
+      return [];
+    }
 
+    // Extract property IDs for batch queries
+    const propertyIds = results
+      .filter((result: any) => result.properties)
+      .map((result: any) => result.properties.id);
+
+    if (propertyIds.length === 0) {
+      return [];
+    }
+
+    // Batch fetch all related data at once to avoid N+1 query problem
+    const [allImages, allAmenities, allFeatures, allInquiries, allFavorites] = await Promise.all([
+      // Get all images for all properties in one query
+      this.dbConn
+        .select()
+        .from(propertyImages)
+        .where(inArray(propertyImages.propertyId, propertyIds))
+        .orderBy(asc(propertyImages.sortOrder)),
+      // Get all amenities for all properties in one query
+      this.dbConn
+        .select()
+        .from(propertyAmenities)
+        .where(inArray(propertyAmenities.propertyId, propertyIds)),
+      // Get all features for all properties in one query
+      this.dbConn
+        .select()
+        .from(propertyFeatures)
+        .where(inArray(propertyFeatures.propertyId, propertyIds)),
+      // Get all inquiries for all properties in one query
+      this.dbConn
+        .select()
+        .from(inquiries)
+        .where(inArray(inquiries.propertyId, propertyIds)),
+      // Get all favorites for all properties in one query
+      this.dbConn
+        .select()
+        .from(favorites)
+        .where(inArray(favorites.propertyId, propertyIds))
+    ]);
+
+    // Group related data by property ID for efficient lookup
+    const imagesByProperty = new Map<string, PropertyImage[]>();
+    const amenitiesByProperty = new Map<string, PropertyAmenity[]>();
+    const featuresByProperty = new Map<string, PropertyFeature[]>();
+    const inquiriesByProperty = new Map<string, Inquiry[]>();
+    const favoritesByProperty = new Map<string, Favorite[]>();
+
+    // Group images by property ID
+    allImages.forEach(image => {
+      if (!imagesByProperty.has(image.propertyId)) {
+        imagesByProperty.set(image.propertyId, []);
+      }
+      imagesByProperty.get(image.propertyId)!.push(image);
+    });
+
+    // Group amenities by property ID
+    allAmenities.forEach(amenity => {
+      if (!amenitiesByProperty.has(amenity.propertyId)) {
+        amenitiesByProperty.set(amenity.propertyId, []);
+      }
+      amenitiesByProperty.get(amenity.propertyId)!.push(amenity);
+    });
+
+    // Group features by property ID
+    allFeatures.forEach(feature => {
+      if (!featuresByProperty.has(feature.propertyId)) {
+        featuresByProperty.set(feature.propertyId, []);
+      }
+      featuresByProperty.get(feature.propertyId)!.push(feature);
+    });
+
+    // Group inquiries by property ID
+    allInquiries.forEach(inquiry => {
+      if (inquiry.propertyId) {
+        if (!inquiriesByProperty.has(inquiry.propertyId)) {
+          inquiriesByProperty.set(inquiry.propertyId, []);
+        }
+        inquiriesByProperty.get(inquiry.propertyId)!.push(inquiry);
+      }
+    });
+
+    // Group favorites by property ID
+    allFavorites.forEach(favorite => {
+      if (favorite.propertyId) {
+        if (!favoritesByProperty.has(favorite.propertyId)) {
+          favoritesByProperty.set(favorite.propertyId, []);
+        }
+        favoritesByProperty.get(favorite.propertyId)!.push(favorite);
+      }
+    });
+
+    // Build the final result with efficient lookup
+    const propertiesWithDetails = results
+      .filter((result: any) => result.properties)
+      .map((result: any) => {
+        const propertyId = result.properties.id;
+        
         return {
           ...result.properties,
           agent: result.users,
           wave: result.waves,
-          images,
-          amenities,
-          features,
-          inquiries: inquiriesData,
-          favorites: favoritesData
+          images: imagesByProperty.get(propertyId) || [],
+          amenities: amenitiesByProperty.get(propertyId) || [],
+          features: featuresByProperty.get(propertyId) || [],
+          inquiries: inquiriesByProperty.get(propertyId) || [],
+          favorites: favoritesByProperty.get(propertyId) || []
         };
-      })
-    );
+      });
 
-    return propertiesWithDetails.filter(p => p !== null) as PropertyWithDetails[];
+    return propertiesWithDetails as PropertyWithDetails[];
   }
 
   async getFeaturedProperties(): Promise<PropertyWithDetails[]> {
@@ -480,8 +567,38 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProperty(id: string): Promise<boolean> {
-    await this.dbConn.delete(properties).where(eq(properties.id, id));
-    return true;
+    try {
+      // Get all property images before deletion for file cleanup
+      const propertyImageList = await this.getPropertyImages(id);
+      
+      // Explicitly delete all related data before deleting the property
+      // This ensures proper cleanup even if cascade deletes don't work correctly
+      await Promise.all([
+        // Delete property images
+        this.dbConn.delete(propertyImages).where(eq(propertyImages.propertyId, id)),
+        // Delete property amenities
+        this.dbConn.delete(propertyAmenities).where(eq(propertyAmenities.propertyId, id)),
+        // Delete property features
+        this.dbConn.delete(propertyFeatures).where(eq(propertyFeatures.propertyId, id)),
+        // Delete favorites for this property
+        this.dbConn.delete(favorites).where(eq(favorites.propertyId, id)),
+        // Delete inquiries for this property
+        this.dbConn.delete(inquiries).where(eq(inquiries.propertyId, id))
+      ]);
+
+      // Finally delete the property itself
+      await this.dbConn.delete(properties).where(eq(properties.id, id));
+      
+      // Clean up image files after successful database deletion
+      await Promise.all(
+        propertyImageList.map(image => this.cleanupImageFile(image.imageUrl))
+      );
+      
+      return true;
+    } catch (error) {
+      console.error(`Failed to delete property ${id}:`, error);
+      throw error;
+    }
   }
 
   async incrementPropertyViews(id: string): Promise<void> {
@@ -529,6 +646,100 @@ export class DatabaseStorage implements IStorage {
       .delete(propertyImages)
       .where(and(eq(propertyImages.propertyId, propertyId), eq(propertyImages.imageUrl, imageUrl)));
     return true;
+  }
+
+  async removePropertyImageWithResequencing(propertyId: string, imageUrl: string): Promise<{ success: boolean; remainingCount: number }> {
+    try {
+      // Begin transaction to ensure atomicity
+      const result = await this.dbConn.transaction(async (tx) => {
+        // First, check if the image exists
+        const [existingImage] = await tx
+          .select()
+          .from(propertyImages)
+          .where(and(eq(propertyImages.propertyId, propertyId), eq(propertyImages.imageUrl, imageUrl)));
+
+        if (!existingImage) {
+          return { success: false, remainingCount: 0 };
+        }
+
+        // Delete the specific image
+        await tx
+          .delete(propertyImages)
+          .where(and(eq(propertyImages.propertyId, propertyId), eq(propertyImages.imageUrl, imageUrl)));
+
+        // Get remaining images ordered by current sort order
+        const remainingImages = await tx
+          .select()
+          .from(propertyImages)
+          .where(eq(propertyImages.propertyId, propertyId))
+          .orderBy(asc(propertyImages.sortOrder));
+
+        // Resequence remaining images to be sequential (0, 1, 2, ...)
+        if (remainingImages.length > 0) {
+          await Promise.all(
+            remainingImages.map((img, index) =>
+              tx
+                .update(propertyImages)
+                .set({ sortOrder: index })
+                .where(eq(propertyImages.id, img.id))
+            )
+          );
+        }
+
+        return { success: true, remainingCount: remainingImages.length };
+      });
+
+      // If database operation succeeded, attempt file cleanup
+      if (result.success) {
+        await this.cleanupImageFile(imageUrl);
+      }
+
+      return result;
+    } catch (error) {
+      console.error(`Failed to remove property image ${imageUrl} for property ${propertyId}:`, error);
+      throw error;
+    }
+  }
+
+  private async cleanupImageFile(imageUrl: string): Promise<void> {
+    try {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      
+      // Only clean up files that are in our uploads directory
+      if (imageUrl.startsWith('/uploads/properties/')) {
+        // Extract filename and build safe absolute path
+        const filename = path.basename(imageUrl);
+        const uploadsDir = path.join(__dirname, 'uploads', 'properties');
+        const filePath = path.join(uploadsDir, filename);
+        
+        // Ensure the file path is within our uploads directory (prevent path traversal)
+        const normalizedPath = path.normalize(filePath);
+        const normalizedUploadsDir = path.normalize(uploadsDir);
+        
+        if (normalizedPath.startsWith(normalizedUploadsDir)) {
+          // Check if file exists before attempting deletion
+          try {
+            await fs.access(filePath);
+            await fs.unlink(filePath);
+            console.log(`✅ Cleaned up image file: ${filePath}`);
+          } catch (fileError: any) {
+            // File doesn't exist or can't be deleted - log but don't throw
+            if (fileError.code !== 'ENOENT') {
+              console.warn(`⚠️ Could not delete image file ${filePath}:`, fileError.message);
+            }
+          }
+        } else {
+          console.warn(`⚠️ Attempted to delete file outside uploads directory: ${imageUrl}`);
+        }
+      } else {
+        // External URL (like Unsplash) - no cleanup needed
+        console.log(`ℹ️ External image URL, no file cleanup needed: ${imageUrl}`);
+      }
+    } catch (error) {
+      console.warn(`⚠️ File cleanup failed for ${imageUrl}:`, error);
+      // Don't throw error - file cleanup failure shouldn't break the API response
+    }
   }
 
   async updatePropertyImageOrder(propertyId: string, imageUpdates: { imageUrl: string; sortOrder: number }[]): Promise<void> {
