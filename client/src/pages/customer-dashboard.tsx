@@ -2557,7 +2557,7 @@ export default function CustomerDashboard() {
                             <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-t-lg relative overflow-hidden">
                               {property.images && property.images.length > 0 ? (
                                 <OptimizedImage 
-                                  src={property.images[0]} 
+                                  src={property.images[0].imageUrl || property.images[0]} 
                                   alt={property.title}
                                   className="w-full h-full object-cover"
                                   aspectRatio="16/9"
@@ -3059,7 +3059,7 @@ function PropertyCard({
         <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-t-lg relative overflow-hidden">
           {property.images && property.images.length > 0 ? (
             <OptimizedImage 
-              src={property.images[0]} 
+              src={property.images[0].imageUrl || property.images[0]} 
               alt={property.title}
               className="w-full h-full object-cover"
               aspectRatio="16/9"
