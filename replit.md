@@ -28,13 +28,19 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot reload with tsx for TypeScript execution
 
 ### Data Storage & Management
-- **Database**: MySQL VPS (Production) with Neon PostgreSQL (Development)
-- **VPS Connection**: ✅ PERMANENTLY CONFIGURED (Host: 72.60.134.44:3306)
-- **Auto-Connect**: Credentials permanently saved in Replit secrets - no re-entry required
+- **Database**: MySQL VPS (Production) - PERMANENTLY CONFIGURED ✅
+- **VPS Details**: 
+  - Host: 72.60.134.44:3306
+  - Database: mapestate
+  - User: mapestate 
+  - Status: CONNECTED & VERIFIED ✅
+- **Auto-Connect**: All credentials permanently saved in Replit secrets
+- **Configuration**: Automatically detects and uses VPS MySQL credentials every startup
+- **No Manual Setup**: Environment variables auto-loaded, no re-entry required
 - **ORM**: Drizzle ORM for type-safe database interactions
-- **Schema**: Centralized schema definitions in shared directory
+- **Schema**: Centralized schema definitions in shared directory  
 - **Migrations**: Drizzle Kit for database schema management
-- **Connection**: Connection pooling with automatic VPS detection
+- **Connection**: Optimized connection pooling with health checks
 
 ### Key Data Models
 - **Users**: Authentication, roles (user/agent/admin), profile information
