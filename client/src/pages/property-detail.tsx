@@ -101,7 +101,8 @@ export default function PropertyDetailPage() {
 
   // Generate property structured data
   const getPropertyStructuredData = (property: Property) => {
-    const images = Array.isArray(property.images) && property.images.length > 0 ? property.images : [];
+    const images = Array.isArray(property.images) && property.images.length > 0 
+      ? property.images.map((img: any) => img.imageUrl || img) : [];
     
     return {
       "@context": "https://schema.org",
@@ -340,8 +341,9 @@ export default function PropertyDetailPage() {
     );
   }
 
-  const primaryImage = property.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600';
-  const images = Array.isArray(property.images) && property.images.length > 0 ? property.images : [primaryImage];
+  const primaryImage = property.images?.[0]?.imageUrl || property.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600';
+  const images = Array.isArray(property.images) && property.images.length > 0 
+    ? property.images.map((img: any) => img.imageUrl || img) : [primaryImage];
 
   return (
     <div className="min-h-screen bg-background">
@@ -360,7 +362,7 @@ export default function PropertyDetailPage() {
             currency: property.currency || 'USD',
             area: property.area
           }}
-          ogImage={property.images && property.images.length > 0 ? property.images[0] : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
+          ogImage={property.images && property.images.length > 0 ? (property.images[0]?.imageUrl || property.images[0]) : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
           canonicalUrl={undefined}
           structuredData={getPropertyStructuredData(property)}
           breadcrumbs={[
