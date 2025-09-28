@@ -944,8 +944,8 @@ export default function CustomerDashboard() {
       price: data.price, // Keep as string since backend expects decimal strings
       latitude: data.latitude ? data.latitude.toString() : undefined, // Convert to string if provided
       longitude: data.longitude ? data.longitude.toString() : undefined, // Convert to string if provided
-      // Handle waveId - convert "no-wave" to null for backend
-      waveId: data.waveId === "no-wave" ? null : data.waveId,
+      // Handle waveId - convert "no-wave" or empty string to null for backend
+      waveId: data.waveId === "no-wave" || !data.waveId ? null : data.waveId,
       // Ensure required fields are not empty
       country: data.country || 'Iraq',
       currency: data.currency || 'USD',

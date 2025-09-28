@@ -1,0 +1,27 @@
+rror creating property: Error: Cannot add or update a child row: a foreign key constraint fails (`mapestate`.`properties`, CONSTRAINT `fk_properties_wave_id` FOREIGN KEY (`wave_id`) REFERENCES `waves` (`id`) ON DELETE SET NULL)
+    at PromisePool.query (/home/runner/workspace/node_modules/mysql2/lib/promise/pool.js:36:22)
+    at MySql2PreparedQuery.execute (/home/runner/workspace/node_modules/src/mysql2/session.ts:92:29)
+    at QueryPromise.execute (/home/runner/workspace/node_modules/src/mysql-core/query-builders/insert.ts:315:25)
+    at QueryPromise.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  code: 'ER_NO_REFERENCED_ROW_2',
+  errno: 1452,
+  sql: "insert into `properties` (`id`, `title`, `description`, `type`, `listing_type`, `price`, `currency`, `bedrooms`, `bathrooms`, `area`, `address`, `city`, `country`, `latitude`, `longitude`, `status`, `language`, `agent_id`, `contact_phone`, `wave_id`, `views`, `is_featured`, `slug`, `created_at`, `updated_at`) values ('ed40cbc8-82a6-4475-9cbb-e48b5462604a', 'E home', 'Control whether your property appears on the public map and search results.\\n', 'apartment', 'rent', '3000', 'USD', 1, 1, 1, 'هەنارە', 'هەنارە', 'Iraq', '36.28856319836239', '44.25292968750001', 'active', 'en', 'b9f7b4d8-2c7c-4df8-bc4f-c2047fb93ec7', '07702134455', '', default, default, 'e-home', default, default)",
+  sqlState: '23000',
+  sqlMessage: 'Cannot add or update a child row: a foreign key constraint fails (`mapestate`.`properties`, CONSTRAINT `fk_properties_wave_id` FOREIGN KEY (`wave_id`) REFERENCES `waves` (`id`) ON DELETE SET NULL)'
+}
+POST /api/properties 500 in 632ms :: {"message":"Failed to create property"}
+💓 SSE heartbeat sent and flushed
+Error creating property: Error: Cannot add or update a child row: a foreign key constraint fails (`mapestate`.`properties`, CONSTRAINT `fk_properties_wave_id` FOREIGN KEY (`wave_id`) REFERENCES `waves` (`id`) ON DELETE SET NULL)
+    at PromisePool.query (/home/runner/workspace/node_modules/mysql2/lib/promise/pool.js:36:22)
+    at MySql2PreparedQuery.execute (/home/runner/workspace/node_modules/src/mysql2/session.ts:92:29)
+    at QueryPromise.execute (/home/runner/workspace/node_modules/src/mysql-core/query-builders/insert.ts:315:25)
+    at QueryPromise.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  code: 'ER_NO_REFERENCED_ROW_2',
+  errno: 1452,
+  sql: "insert into `properties` (`id`, `title`, `description`, `type`, `listing_type`, `price`, `currency`, `bedrooms`, `bathrooms`, `area`, `address`, `city`, `country`, `latitude`, `longitude`, `status`, `language`, `agent_id`, `contact_phone`, `wave_id`, `views`, `is_featured`, `slug`, `created_at`, `updated_at`) values ('33fa01c1-c18d-4557-9e70-f06d4cb98f5d', 'E home', 'Control whether your property appears on the public map and search results.\\n', 'apartment', 'rent', '3000', 'USD', 1, 1, 1, 'هەنارە', 'هەنارە', 'Iraq', '36.28856319836239', '44.25292968750001', 'active', 'en', 'b9f7b4d8-2c7c-4df8-bc4f-c2047fb93ec7', '07702134455', '', default, default, 'e-home', default, default)",
+  sqlState: '23000',
+  sqlMessage: 'Cannot add or update a child row: a foreign key constraint fails (`mapestate`.`properties`, CONSTRAINT `fk_properties_wave_id` FOREIGN KEY (`wave_id`) REFERENCES `waves` (`id`) ON DELETE SET NULL)'
+}
+POST /api/properties 500 in 611ms :: {"message":"Failed to create property"}
