@@ -24,18 +24,13 @@ export function useAuth() {
 export function useAuthProvider() {
   const queryClient = useQueryClient();
   
-  // Check if we have session cookie before making auth request
-  const hasSession = typeof document !== 'undefined' && 
-    (document.cookie.includes('connect.sid=') || document.cookie.includes('session='));
-
-  // Check if user is logged in - only fetch if we potentially have a session
+  // Always check auth status - sessions use httpOnly cookies that aren't accessible via document.cookie
   const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ['/api/auth/me'],
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false, // Prevent unnecessary refetches
     refetchOnReconnect: false, // Prevent unnecessary refetches
-    enabled: hasSession, // Only run if we have a session cookie
     // Use custom query function to handle 401s gracefully
     queryFn: async () => {
       try {
@@ -66,8 +61,10 @@ export function useAuthProvider() {
       const response = await apiRequest('POST', '/api/auth/login', { username, password });
       return await response.json();
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['/api/auth/me'], data.user);
+    onSuccess: async (data) => {
+      // Invalidate and refetch auth data to ensure fresh user info from server
+      await queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 
@@ -77,8 +74,9 @@ export function useAuthProvider() {
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.setQueryData(['/api/auth/me'], null);
+      // Clear all cached data to prevent role/data leaks between users
       queryClient.clear();
+      queryClient.setQueryData(['/api/auth/me'], null);
     },
   });
 
