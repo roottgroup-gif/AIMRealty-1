@@ -403,7 +403,24 @@ export class DatabaseStorage implements IStorage {
     const id = crypto.randomUUID();
     const slug = property.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    await this.dbConn.insert(properties).values({ ...property, id, slug });
+    // Validate and fix waveId if invalid
+    let validatedWaveId = property.waveId;
+    if (validatedWaveId && validatedWaveId !== 'no-wave') {
+      const validWaves = await this.dbConn.select({ id: waves.id }).from(waves);
+      const validWaveIds = validWaves.map(w => w.id);
+      
+      if (validatedWaveId === 'premium-wave') {
+        // Map premium-wave to the first available wave or default wave
+        validatedWaveId = validWaveIds.find(id => id.includes('default')) || validWaveIds[0] || null;
+      } else if (!validWaveIds.includes(validatedWaveId)) {
+        // If invalid wave ID, set to null
+        validatedWaveId = null;
+      }
+    } else if (validatedWaveId === 'no-wave') {
+      validatedWaveId = null;
+    }
+
+    await this.dbConn.insert(properties).values({ ...property, id, slug, waveId: validatedWaveId });
 
     // Add images, amenities, and features
     if (images.length > 0) {

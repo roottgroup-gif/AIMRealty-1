@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiRequest } from '@/lib/queryClient';
-import type { PropertyWithAgent, PropertyFilters } from '@shared/schema';
+import type { PropertyWithDetails, PropertyFilters } from '@shared/schema';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, type Language } from '@shared/schema';
 import { 
   Heart, Search, Filter, LogOut, MapPin, DollarSign,
@@ -2209,7 +2209,7 @@ export default function CustomerDashboard() {
                                       <span className="text-muted-foreground">{t.noWave}</span>
                                     </span>
                                   </SelectItem>
-                                  <SelectItem value="premium-wave">
+                                  <SelectItem value="wave-default-12345">
                                     <span className="flex items-center gap-2">
                                       <span className="text-muted-foreground">{t.premiumWave}</span>
                                     </span>
