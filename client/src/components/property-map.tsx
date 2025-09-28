@@ -1283,7 +1283,7 @@ export default function PropertyMap({
     // Add popup with image slider
     const images =
       Array.isArray(property.images) && property.images.length > 0
-        ? property.images
+        ? property.images.map((img: any) => img.imageUrl || img)
         : [
             "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
           ];
