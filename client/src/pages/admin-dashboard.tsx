@@ -953,8 +953,8 @@ export default function AdminDashboard() {
                         )}
                       />
                       
-                      {/* Language Permissions - Super Admin Only */}
-                      {user?.role === 'super_admin' && (
+                      {/* Language Permissions - Admin and Super Admin */}
+                      {(user?.role === 'admin' || user?.role === 'super_admin') && (
                         <FormField
                           control={form.control}
                           name="allowedLanguages"
@@ -1277,8 +1277,8 @@ export default function AdminDashboard() {
                         )}
                       />
                       
-                      {/* Language Permissions - Super Admin Only */}
-                      {user?.role === 'super_admin' && (
+                      {/* Language Permissions - Admin and Super Admin */}
+                      {(user?.role === 'admin' || user?.role === 'super_admin') && (
                         <FormField
                           control={editForm.control}
                           name="allowedLanguages"
