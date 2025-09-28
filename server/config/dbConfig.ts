@@ -9,16 +9,16 @@ interface DatabaseConfig {
   connectionUrl: string;
 }
 
-// Default XAMPP MySQL configuration
-const DEFAULT_XAMPP_CONFIG = {
-  host: '127.0.0.1', // Use IP instead of localhost to force TCP connection
-  port: 3305,
-  user: 'root',
-  password: '', // XAMPP default (no password)
+// Default VPS MySQL configuration
+const DEFAULT_VPS_CONFIG = {
+  host: '72.60.134.44', // VPS MySQL server IP
+  port: 3306,
+  user: 'mapestate',
+  password: '', // Will use environment variable if available
   database: 'mapestate'
 };
 
-function createConnectionUrl(config: typeof DEFAULT_XAMPP_CONFIG): string {
+function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
   const { user, password, host, port, database } = config;
   const auth = password ? `${user}:${password}` : user;
   return `mysql://${auth}@${host}:${port}/${database}`;
@@ -52,13 +52,13 @@ function getDatabaseConfig(): DatabaseConfig {
     connectionUrl = `mysql://${auth}@${mysqlHost}:${port}/${mysqlDatabase}`;
     console.log(`🔧 MySQL VPS: mysql://${mysqlUser}:***@${mysqlHost}:${port}/${mysqlDatabase}`);
   }
-  // If no URL provided and no individual vars, use default XAMPP configuration
+  // If no URL provided and no individual vars, use default VPS configuration
   else if (!connectionUrl) {
-    console.log('📝 No MYSQL_URL found, using default XAMPP configuration');
-    console.log('🔧 Default: mysql://root:@127.0.0.1:3305/mapestate');
-    console.log('💡 Tip: Create a .env file with MYSQL_URL to customize');
+    console.log('📝 No MYSQL_URL found, using default VPS configuration');
+    console.log('🔧 Default: mysql://mapestate:***@72.60.134.44:3306/mapestate');
+    console.log('💡 Tip: Set MYSQL_PASSWORD environment variable for password');
     
-    connectionUrl = createConnectionUrl(DEFAULT_XAMPP_CONFIG);
+    connectionUrl = createConnectionUrl(DEFAULT_VPS_CONFIG);
   }
   
   // Parse the connection URL to get individual components
