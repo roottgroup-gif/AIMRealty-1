@@ -481,7 +481,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleEditUser = (user: User) => {
+  const handleEditUser = async (user: User) => {
     setEditingUser(user);
     
     // Get the current password if available
@@ -496,6 +496,20 @@ export default function AdminDashboard() {
       formattedExpiresAt = date.toISOString().slice(0, 16);
     }
     
+    // Fetch user's current language permissions
+    let userLanguages = ['en']; // Default to English
+    try {
+      const response = await fetch(`/api/users/${user.id}/languages`);
+      if (response.ok) {
+        userLanguages = await response.json();
+        if (!userLanguages || userLanguages.length === 0) {
+          userLanguages = ['en']; // Ensure at least English
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch user languages:', error);
+    }
+    
     editForm.reset({
       username: user.username,
       email: user.email,
@@ -508,7 +522,7 @@ export default function AdminDashboard() {
       waveBalance: user.waveBalance || 0,
       expiresAt: formattedExpiresAt,
       isVerified: user.isVerified || false,
-      allowedLanguages: (user.allowedLanguages as Array<typeof SUPPORTED_LANGUAGES[number]>) || ['en'],
+      allowedLanguages: userLanguages as Array<typeof SUPPORTED_LANGUAGES[number]>,
     });
     setAvatarPreview(user.avatar || '');
     setIsEditUserOpen(true);
@@ -953,8 +967,8 @@ export default function AdminDashboard() {
                         )}
                       />
                       
-                      {/* Language Permissions - Admin and Super Admin */}
-                      {(user?.role === 'admin' || user?.role === 'super_admin') && (
+                      {/* Language Permissions - Super Admin Only */}
+                      {user?.role === 'super_admin' && (
                         <FormField
                           control={form.control}
                           name="allowedLanguages"
@@ -1277,8 +1291,8 @@ export default function AdminDashboard() {
                         )}
                       />
                       
-                      {/* Language Permissions - Admin and Super Admin */}
-                      {(user?.role === 'admin' || user?.role === 'super_admin') && (
+                      {/* Language Permissions - Super Admin Only */}
+                      {user?.role === 'super_admin' && (
                         <FormField
                           control={editForm.control}
                           name="allowedLanguages"

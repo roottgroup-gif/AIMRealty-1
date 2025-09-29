@@ -134,6 +134,17 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Get user's language permissions
+  app.get("/api/users/:id/languages", requireRole("admin"), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userLanguages = await storage.getUserLanguages(id);
+      res.json(userLanguages.map(ul => ul.language));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get user languages" });
+    }
+  });
+
   // Wave balance information
   app.get("/api/auth/wave-balance", requireAuth, async (req, res) => {
     try {
@@ -592,10 +603,9 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         });
       }
 
-      // Set default language permissions if not provided and user is super admin
-      if (!processedBody.allowedLanguages && req.user?.role === 'super_admin') {
-        processedBody.allowedLanguages = ['en']; // Default to English only
-      }
+      // Extract allowedLanguages before validation since it's not in the main schema
+      const allowedLanguages = processedBody.allowedLanguages;
+      delete processedBody.allowedLanguages;
       
       console.log('🔍 DEBUG: Processed body before validation (avatar truncated):', {
         ...processedBody,
@@ -611,6 +621,20 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         ...validatedData,
         password: hashedPassword
       });
+      
+      // Handle language permissions after user creation (only for super admin)
+      if (allowedLanguages && req.user?.role === 'super_admin') {
+        // Remove any existing languages first
+        const existingLanguages = await storage.getUserLanguages(user.id);
+        for (const lang of existingLanguages) {
+          await storage.removeUserLanguage(user.id, lang.language);
+        }
+        
+        // Add the new languages
+        for (const language of allowedLanguages) {
+          await storage.addUserLanguage(user.id, language);
+        }
+      }
       
       const { password: _, ...userWithoutPassword } = user;
       res.status(201).json(userWithoutPassword);
@@ -649,6 +673,10 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
           message: "Only super admins can modify language permissions" 
         });
       }
+
+      // Extract allowedLanguages before validation since it's not in the main schema
+      const allowedLanguages = processedBody.allowedLanguages;
+      delete processedBody.allowedLanguages;
       
       const validatedData = insertUserSchema.partial().parse(processedBody);
       
@@ -661,6 +689,20 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
       
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+
+      // Handle language permissions after user update (only for super admin)
+      if (allowedLanguages && req.user?.role === 'super_admin') {
+        // Remove any existing languages first
+        const existingLanguages = await storage.getUserLanguages(id);
+        for (const lang of existingLanguages) {
+          await storage.removeUserLanguage(id, lang.language);
+        }
+        
+        // Add the new languages
+        for (const language of allowedLanguages) {
+          await storage.addUserLanguage(id, language);
+        }
       }
       
       const { password: _, ...userWithoutPassword } = updatedUser;
