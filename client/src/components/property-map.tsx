@@ -1068,6 +1068,13 @@ export default function PropertyMap({
                 property.images && property.images.length > 0
                   ? property.images[0]
                   : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=250&fit=crop&crop=center";
+              
+              // Extract filename from image path for display
+              const imagePath = propertyImage || '';
+              const imageFileName = (typeof imagePath === 'string' && imagePath.length > 0) 
+                ? imagePath.split('/').pop() || 'default-image'
+                : 'default-image';
+              const imageCount = property.images ? property.images.length : 0;
 
               return `
                 <div style="
@@ -1092,6 +1099,7 @@ export default function PropertyMap({
                     overflow: hidden; 
                     flex-shrink: 0;
                     background: #e2e8f0;
+                    position: relative;
                   ">
                     <img src="${propertyImage}" 
                          alt="${getPropertyTitle(property)}" 
@@ -1101,6 +1109,19 @@ export default function PropertyMap({
                            object-fit: cover;
                          " 
                          onerror="this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=250&fit=crop&crop=center';" />
+                    ${imageCount > 1 ? `
+                      <div style="
+                        position: absolute;
+                        bottom: 2px;
+                        right: 2px;
+                        background: rgba(0,0,0,0.7);
+                        color: white;
+                        font-size: 8px;
+                        padding: 2px 4px;
+                        border-radius: 2px;
+                        font-weight: 600;
+                      ">+${imageCount - 1}</div>
+                    ` : ''}
                   </div>
                   
                   <div style="flex: 1; min-width: 0;">
@@ -1163,6 +1184,43 @@ export default function PropertyMap({
                             ? `<span style="color: #059669;"></span><span>${t("filter.forRent")}</span>`
                             : `<span style="color: #dc2626;"></span><span>${t("filter.forSale")}</span>`
                         }
+                      </div>
+                    </div>
+                    
+                    <!-- Image Properties Section -->
+                    <div style="
+                      margin-top: 6px;
+                      padding: 6px 8px;
+                      background: ${isDark ? "rgba(55, 65, 81, 0.3)" : "rgba(248, 250, 252, 0.8)"};
+                      border-radius: 6px;
+                      border: 1px solid ${isDark ? "rgba(75, 85, 99, 0.3)" : "rgba(226, 232, 240, 0.5)"};
+                    ">
+                      <div style="
+                        font-size: clamp(8px, 2vw, 10px);
+                        font-weight: 600;
+                        color: ${isDark ? "#9CA3AF" : "#6B7280"};
+                        margin-bottom: 3px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                      ">Image Properties</div>
+                      
+                      <div style="
+                        font-size: clamp(9px, 2.2vw, 11px);
+                        color: ${subTextColor};
+                        line-height: 1.4;
+                        word-break: break-all;
+                        margin-bottom: 2px;
+                      ">
+                        <strong style="color: ${textColor};">Path:</strong> ${imagePath}
+                      </div>
+                      
+                      <div style="
+                        font-size: clamp(9px, 2.2vw, 11px);
+                        color: ${subTextColor};
+                        line-height: 1.4;
+                      ">
+                        <strong style="color: ${textColor};">Filename:</strong> ${imageFileName}
+                        ${imageCount > 0 ? `<span style="margin-left: 8px;"><strong style="color: ${textColor};">Total Images:</strong> ${imageCount}</span>` : ''}
                       </div>
                     </div>
                   </div>
