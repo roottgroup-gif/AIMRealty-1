@@ -991,7 +991,7 @@ export default function CustomerDashboard() {
       contactPhone: (property as any).contactPhone || user?.phone || '',
       amenities: property.amenities || [],
       features: property.features || [],
-      images: property.images || [],
+      images: property.images?.map(img => typeof img === 'string' ? img : img.imageUrl) || [],
       status: property.status === 'active' ? 'active' : 'inactive',
       language: propertyLanguage, // Preserve original language
     });
