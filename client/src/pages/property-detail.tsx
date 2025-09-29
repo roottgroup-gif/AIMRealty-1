@@ -766,7 +766,7 @@ export default function PropertyDetailPage() {
                 <h3 className="text-lg font-semibold mb-4">{t('property.propertyInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-left">
                   <div className="text-left">
-                    <span className="text-muted-foreground">{t('property.propertyType')}: </span>
+                    <span className="text-muted-foreground">{t('property.propertyType')} </span>
                     <span className="font-medium capitalize bg-orange-500 text-white dark:bg-orange-600 px-2 py-1 rounded-md text-xs">
                       {t(`filter.${property.type}`) !== `filter.${property.type}` 
                         ? t(`filter.${property.type}`) 
@@ -774,14 +774,14 @@ export default function PropertyDetailPage() {
                     </span>
                   </div>
                   <div className="text-left">
-                    <span className="text-muted-foreground">{t('property.listed')}: </span>
+                    <span className="text-muted-foreground">{t('property.listed')} </span>
                     <span className="font-medium bg-blue-100 dark:bg-blue-700 px-2 py-1 rounded-md text-xs">
                       <Calendar className="inline h-4 w-4 mr-1" />
                       {new Date(property.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="text-left">
-                    <span className="text-muted-foreground">{t('property.status')}: </span>
+                    <span className="text-muted-foreground">{t('property.status')} </span>
                     <Badge variant="secondary" className="capitalize bg-green-500 text-white dark:bg-green-600 text-xs">
                       {t(`property.status.${property.status}`) !== `property.status.${property.status}` 
                         ? t(`property.status.${property.status}`) 
