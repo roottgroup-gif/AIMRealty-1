@@ -35,6 +35,7 @@ import {
   type CreateCurrencyRateForm,
   type UpdateCurrencyRateForm
 } from '@/hooks/use-currency-rates';
+import { normalizePropertyImageUrl } from '@/lib/utils';
 
 const createUserSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -2084,7 +2085,7 @@ export default function AdminDashboard() {
                               <div className="relative">
                                 {property.images && property.images.length > 0 ? (
                                   <img
-                                    src={property.images[0]}
+                                    src={normalizePropertyImageUrl(property.images[0].imageUrl || property.images[0])}
                                     alt={property.title}
                                     className="w-full h-32 object-cover"
                                   />
