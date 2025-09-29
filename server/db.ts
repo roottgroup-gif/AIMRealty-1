@@ -24,8 +24,7 @@ async function initializeDb() {
       waitForConnections: true,     // Queue requests when pool is full
       queueLimit: 0,               // No limit on queued requests
       connectTimeout: 8000,         // Reduced timeout for faster failure detection  
-      acquireTimeout: 8000,         // Time to wait for connection from pool
-      queryTimeout: 8000,           // Query timeout (corrected parameter name)
+      timeout: 8000,               // Query timeout (correct parameter name)
       enableKeepAlive: true,        // Enable TCP keep-alive
       keepAliveInitialDelay: 10000, // 10 seconds before first keep-alive
       reconnect: true,              // Auto-reconnect on connection lost

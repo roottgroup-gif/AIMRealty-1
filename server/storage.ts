@@ -44,6 +44,10 @@ export interface IStorage {
   addUserLanguage(userId: string, language: string): Promise<UserLanguage>;
   removeUserLanguage(userId: string, language: string): Promise<boolean>;
   
+  // Language permissions management
+  grantAllLanguagePermissionsToUser(userId: string): Promise<void>;
+  fixExistingUsersLanguagePermissions(): Promise<void>;
+  
   // Authentication
   authenticateUser(username: string, password: string): Promise<User | null>;
   getAllUsers(): Promise<User[]>;
