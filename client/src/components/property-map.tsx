@@ -71,20 +71,41 @@ export default function PropertyMap({
 
     try {
       const bounds = mapInstanceRef.current.getBounds();
-      const visibleProperties = properties.filter(property => {
-        const lat = parseFloat(property.latitude || '');
-        const lng = parseFloat(property.longitude || '');
-        
-        // Skip properties with invalid coordinates
-        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-          return false;
-        }
-        
-        // Check if property coordinates are within current map bounds (Leaflet uses [lat, lng])
-        return bounds.contains([lat, lng]);
-      });
+      const currentZoom = mapInstanceRef.current.getZoom();
+      const isClusteringEnabled = currentZoom < 10;
       
-      onVisiblePropertiesChange?.(visibleProperties.length);
+      if (isClusteringEnabled) {
+        // When clustering is active, count properties that belong to visible clusters
+        const clusters = createZoomBasedClusters(properties, currentZoom);
+        let totalVisibleProperties = 0;
+        
+        clusters.forEach(cluster => {
+          // Check if cluster center is within current map bounds
+          const clusterCenter = cluster.center;
+          if (bounds.contains([clusterCenter.lat, clusterCenter.lng])) {
+            // Add all properties in this visible cluster to the count
+            totalVisibleProperties += cluster.properties.length;
+          }
+        });
+        
+        onVisiblePropertiesChange?.(totalVisibleProperties);
+      } else {
+        // When clustering is not active, count individual properties within bounds
+        const visibleProperties = properties.filter(property => {
+          const lat = parseFloat(property.latitude || '');
+          const lng = parseFloat(property.longitude || '');
+          
+          // Skip properties with invalid coordinates
+          if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            return false;
+          }
+          
+          // Check if property coordinates are within current map bounds (Leaflet uses [lat, lng])
+          return bounds.contains([lat, lng]);
+        });
+        
+        onVisiblePropertiesChange?.(visibleProperties.length);
+      }
     } catch (error) {
       console.log('Error calculating visible properties:', error);
       onVisiblePropertiesChange?.(0); // Fallback to 0 instead of total count
