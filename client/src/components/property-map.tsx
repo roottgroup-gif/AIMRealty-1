@@ -62,6 +62,9 @@ export default function PropertyMap({
   const [isLocating, setIsLocating] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  // Track last calculated bounds to avoid unnecessary recalculation
+  const lastBoundsRef = useRef<string>('');
+
   // Function to calculate visible properties within map bounds
   const calculateVisibleProperties = () => {
     if (!mapInstanceRef.current || !properties.length) {
@@ -71,6 +74,13 @@ export default function PropertyMap({
 
     try {
       const bounds = mapInstanceRef.current.getBounds();
+      const currentBounds = bounds.toBBoxString();
+      
+      // Skip calculation if bounds haven't changed (optimization)
+      if (currentBounds === lastBoundsRef.current) {
+        return;
+      }
+      lastBoundsRef.current = currentBounds;
       
       // Always count individual properties within bounds regardless of zoom level
       // This ensures consistent count when zooming in and out
@@ -612,18 +622,27 @@ export default function PropertyMap({
             "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
           ).addTo(mapInstanceRef.current);
 
-          // Add zoom event listener to refresh markers on zoom
-          mapInstanceRef.current.on("zoomend", () => {
-            // Re-render markers using the current properties ref
+          // Add multiple event listeners to ensure count is always accurate
+          const updateCountAndMarkers = () => {
             updateMarkersForProperties(currentPropertiesRef.current);
-            // Update visible properties count
             calculateVisibleProperties();
-          });
+          };
 
-          // Add move event listener to update visible properties count when map moves
-          mapInstanceRef.current.on("moveend", () => {
-            calculateVisibleProperties();
-          });
+          // Listen to multiple map events to catch all possible changes
+          mapInstanceRef.current.on("zoomend", updateCountAndMarkers);
+          mapInstanceRef.current.on("moveend", updateCountAndMarkers);
+          mapInstanceRef.current.on("dragend", updateCountAndMarkers);
+          mapInstanceRef.current.on("resize", updateCountAndMarkers);
+
+          // Also set up a periodic check as a fallback
+          const periodicUpdate = setInterval(() => {
+            if (mapInstanceRef.current && properties.length > 0) {
+              calculateVisibleProperties();
+            }
+          }, 1000); // Check every second
+
+          // Store the interval ID for cleanup
+          (mapInstanceRef.current as any)._periodicUpdateId = periodicUpdate;
 
           // Add initial visible properties calculation
           setTimeout(() => {
@@ -668,9 +687,17 @@ export default function PropertyMap({
     return () => {
       if (mapInstanceRef.current) {
         try {
+          // Clean up periodic update interval
+          const periodicUpdateId = (mapInstanceRef.current as any)._periodicUpdateId;
+          if (periodicUpdateId) {
+            clearInterval(periodicUpdateId);
+          }
+
           // Clean up event listeners before removing map
           mapInstanceRef.current.off("zoomend");
           mapInstanceRef.current.off("moveend");
+          mapInstanceRef.current.off("dragend");
+          mapInstanceRef.current.off("resize");
           mapInstanceRef.current.remove();
         } catch (error) {
           console.warn("Error cleaning up map:", error);
