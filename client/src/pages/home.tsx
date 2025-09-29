@@ -416,7 +416,7 @@ export default function HomePage() {
                   className="ml-1 sm:ml-2 text-[10px] sm:text-xs inline-flex light-sweep"
                   style={{ backgroundColor: "#FF7800", color: "#fff" }}
                 >
-                  {visiblePropertiesCount} {t("home.properties")}
+                  {mapProperties?.length || 0} {t("home.properties")}
                 </Badge>
               </div>
               <div className="flex items-center gap-1 sm:gap-2">
