@@ -1278,7 +1278,7 @@ export default function PropertyMap({
             ? "rgba(5, 150, 105, 0.4)"
             : "rgba(5, 150, 105, 0.3)";
 
-      let animationClass = isFeatured ? "premium-marker" : "";
+      let animationClass = (isFeatured || hasWave) ? "premium-marker" : "";
       let iconType =
         type === "apartment"
           ? "fa-building"
@@ -1360,7 +1360,7 @@ export default function PropertyMap({
           onmouseover="this.style.transform='scale(1.15) translateZ(10px) rotateX(10deg) rotateY(10deg)'; this.style.zIndex='1001'; this.style.boxShadow='0 15px 35px ${shadowColor}, 0 8px 15px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.3)';"
           onmouseout="this.style.transform='translateZ(0) rotateX(5deg) rotateY(5deg)'; this.style.zIndex='1000'; this.style.boxShadow='0 8px 25px ${shadowColor}, 0 4px 10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)';">
             <i class="fas ${iconType}" style="color: white; font-size: 16px; pointer-events: none;"></i>
-            ${isFeatured ? '<div class="premium-ring" style="position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; border: 2px solid #fbbf24; animation: pulse 2s infinite;"></div>' : ""}
+            ${(isFeatured || hasWave) ? '<div class="premium-ring" style="position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; border: 2px solid #fbbf24; animation: pulse 2s infinite;"></div>' : ""}
             ${waveAnimation}
           </div>
         `,
