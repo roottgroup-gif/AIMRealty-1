@@ -54,7 +54,7 @@ export interface IStorage {
   getPropertyBySlug(slug: string): Promise<PropertyWithDetails | undefined>;
   getProperties(filters?: PropertyFilters): Promise<PropertyWithDetails[]>;
   getFeaturedProperties(): Promise<PropertyWithDetails[]>;
-  createProperty(property: InsertProperty, images?: string[], amenities?: string[], features?: string[]): Promise<Property>;
+  createProperty(property: InsertProperty, images?: string[], amenities?: string[], features?: string[], userId?: string): Promise<Property>;
   updateProperty(id: string, property: Partial<InsertProperty>, images?: string[], amenities?: string[], features?: string[]): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
   incrementPropertyViews(id: string): Promise<void>;
@@ -126,6 +126,9 @@ export interface IStorage {
   getUserWaveUsage(userId: string): Promise<{ waveId: string; used: number; max: number }[]>;
   getUserRemainingWaves(userId: string): Promise<number>;
   updateUsersWithZeroWaveBalance(): Promise<void>;
+  checkWavePermission(userId: string, waveId: string | null | undefined): Promise<{ allowed: boolean; reason?: string }>;
+  incrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void>;
+  decrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void>;
 
   // Currency Rates
   getCurrencyRates(): Promise<CurrencyRate[]>;
@@ -485,7 +488,8 @@ export class DatabaseStorage implements IStorage {
     property: InsertProperty, 
     images: string[] = [], 
     amenities: string[] = [], 
-    features: string[] = []
+    features: string[] = [],
+    userId?: string
   ): Promise<Property> {
     const id = crypto.randomUUID();
     const slug = property.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -507,7 +511,23 @@ export class DatabaseStorage implements IStorage {
       validatedWaveId = null;
     }
 
+    // Determine which user to check wave permissions for (agent or session user)
+    const waveCheckUserId = property.agentId || userId;
+    
+    // Check wave permissions if property has a wave and we have a user to check
+    if (waveCheckUserId && validatedWaveId) {
+      const permissionCheck = await this.checkWavePermission(waveCheckUserId, validatedWaveId);
+      if (!permissionCheck.allowed) {
+        throw new Error(permissionCheck.reason || 'Wave permission denied');
+      }
+    }
+
     await this.dbConn.insert(properties).values({ ...property, id, slug, waveId: validatedWaveId });
+
+    // Increment wave usage if property was successfully created with a wave
+    if (waveCheckUserId && validatedWaveId) {
+      await this.incrementWaveUsage(waveCheckUserId, validatedWaveId);
+    }
 
     // Add images, amenities, and features
     if (images.length > 0) {
@@ -568,6 +588,9 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProperty(id: string): Promise<boolean> {
     try {
+      // Get property details before deletion for wave usage tracking
+      const property = await this.getProperty(id);
+      
       // Get all property images before deletion for file cleanup
       const propertyImageList = await this.getPropertyImages(id);
       
@@ -588,6 +611,11 @@ export class DatabaseStorage implements IStorage {
 
       // Finally delete the property itself
       await this.dbConn.delete(properties).where(eq(properties.id, id));
+      
+      // Decrement wave usage if the property had a wave and an agent
+      if (property && property.waveId && property.agentId) {
+        await this.decrementWaveUsage(property.agentId, property.waveId);
+      }
       
       // Clean up image files after successful database deletion
       await Promise.all(
@@ -1042,6 +1070,58 @@ export class DatabaseStorage implements IStorage {
   async getUserRemainingWaves(userId: string): Promise<number> {
     const user = await this.getUser(userId);
     return user?.waveBalance || 0;
+  }
+
+  async checkWavePermission(userId: string, waveId: string | null | undefined): Promise<{ allowed: boolean; reason?: string }> {
+    // Allow admin and super admin users unlimited access
+    const user = await this.getUser(userId);
+    if (user?.role === 'admin' || user?.role === 'super_admin') {
+      return { allowed: true };
+    }
+
+    // If no wave specified (waveId is null or 'no-wave'), allow
+    if (!waveId || waveId === 'no-wave') {
+      return { allowed: true };
+    }
+
+    // Check if user has permission for this wave
+    const permission = await this.getWavePermission(userId, waveId);
+    if (!permission) {
+      return { allowed: false, reason: 'User does not have permission to use this wave' };
+    }
+
+    // Check if user has exceeded their property limit for this wave
+    if ((permission.usedProperties || 0) >= permission.maxProperties) {
+      return { allowed: false, reason: `Maximum properties limit reached for this wave (${permission.maxProperties} properties allowed)` };
+    }
+
+    return { allowed: true };
+  }
+
+  async incrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void> {
+    if (!waveId || waveId === 'no-wave') {
+      return; // No tracking needed for non-wave properties
+    }
+
+    const permission = await this.getWavePermission(userId, waveId);
+    if (permission) {
+      await this.updateWavePermission(permission.id, {
+        usedProperties: ((permission.usedProperties || 0) + 1)
+      });
+    }
+  }
+
+  async decrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void> {
+    if (!waveId || waveId === 'no-wave') {
+      return; // No tracking needed for non-wave properties
+    }
+
+    const permission = await this.getWavePermission(userId, waveId);
+    if (permission && (permission.usedProperties || 0) > 0) {
+      await this.updateWavePermission(permission.id, {
+        usedProperties: (permission.usedProperties || 0) - 1
+      });
+    }
   }
 
   async updateUsersWithZeroWaveBalance(): Promise<void> {

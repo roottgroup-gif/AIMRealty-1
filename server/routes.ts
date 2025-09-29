@@ -1169,12 +1169,13 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
       // Extract images, amenities, and features from the validated request body
       const { images = [], amenities = [], features = [] } = req.body;
       
-      // Create property with validated data and associated arrays
+      // Create property with validated data and associated arrays, including userId for wave validation
       const property = await storage.createProperty(
         validatedData, 
         images, 
         amenities, 
-        features
+        features,
+        req.session.userId
       );
       
       // Broadcast new property to all SSE clients
@@ -1185,6 +1186,13 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid property data", errors: error.errors });
       }
+      
+      // Check if it's a wave permission error
+      if (error instanceof Error && error.message.includes('Wave permission denied') || 
+          error instanceof Error && error.message.includes('Maximum properties limit reached')) {
+        return res.status(403).json({ message: error.message });
+      }
+      
       console.error('Error creating property:', error);
       res.status(500).json({ message: "Failed to create property" });
     }
