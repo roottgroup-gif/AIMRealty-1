@@ -1697,7 +1697,7 @@ export default function PropertyMap({
       !conversionNeeded || Object.keys(convertedPrices).length > 0;
 
     if (conversionReady) {
-      updateMarkersForProperties(properties);
+      updateMarkersForProperties(properties, properties.length);
       // Update visible properties count when properties change
       setTimeout(() => {
         calculateVisibleProperties();
@@ -1708,13 +1708,14 @@ export default function PropertyMap({
   // Update markers when language changes to refresh translations
   useEffect(() => {
     if (currentPropertiesRef.current.length > 0) {
-      updateMarkersForProperties(currentPropertiesRef.current);
+      updateMarkersForProperties(currentPropertiesRef.current, properties.length);
     }
   }, [language]);
 
   // Update markers function that accepts properties array - always show all markers
   const updateMarkersForProperties = (
     propertiesToShow: PropertyWithDetails[],
+    totalPropertiesCount?: number,
   ) => {
     if (
       !mapInstanceRef.current ||
@@ -1753,7 +1754,9 @@ export default function PropertyMap({
         createSingleMarker(cluster.properties[0], L);
       } else {
         // Show cluster marker if multiple properties are grouped
-        createClusterMarker(cluster, L, isClusteringEnabled, properties.length);
+        // Use the passed total count or fallback to current properties count
+        const totalCount = totalPropertiesCount || propertiesToShow.length;
+        createClusterMarker(cluster, L, isClusteringEnabled, totalCount);
       }
     });
   };
