@@ -127,8 +127,19 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Fetch user's language permissions
+      const userLanguages = await storage.getUserLanguages(req.session.userId!);
+      const allowedLanguages = userLanguages.map(ul => ul.language);
+      
       const { password: _, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      
+      // Include language permissions in the response
+      const userWithLanguages = {
+        ...userWithoutPassword,
+        allowedLanguages: allowedLanguages.length > 0 ? allowedLanguages : ['en'] // Default to English if no languages assigned
+      };
+      
+      res.json(userWithLanguages);
     } catch (error) {
       res.status(500).json({ message: "Failed to get user" });
     }
