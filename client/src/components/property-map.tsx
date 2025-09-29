@@ -66,8 +66,14 @@ export default function PropertyMap({
   const lastBoundsRef = useRef<string>('');
 
   // Function to calculate visible properties within map bounds
-  const calculateVisibleProperties = () => {
-    if (!mapInstanceRef.current || !properties.length) {
+  const calculateVisibleProperties = (forceUpdate = false) => {
+    if (!mapInstanceRef.current) {
+      onVisiblePropertiesChange?.(0);
+      return;
+    }
+
+    // Always show total count if no properties are loaded yet
+    if (!properties || properties.length === 0) {
       onVisiblePropertiesChange?.(0);
       return;
     }
@@ -75,12 +81,17 @@ export default function PropertyMap({
     try {
       const bounds = mapInstanceRef.current.getBounds();
       const currentBounds = bounds.toBBoxString();
+      const currentZoom = mapInstanceRef.current.getZoom();
       
-      // Skip calculation if bounds haven't changed (optimization)
-      if (currentBounds === lastBoundsRef.current) {
+      // Create a unique key that includes both bounds and zoom to detect changes
+      const boundsAndZoomKey = `${currentBounds}_zoom_${currentZoom}`;
+      
+      // Skip calculation if bounds AND zoom haven't changed (optimization)
+      // But allow force update for important events like map initialization
+      if (!forceUpdate && boundsAndZoomKey === lastBoundsRef.current) {
         return;
       }
-      lastBoundsRef.current = currentBounds;
+      lastBoundsRef.current = boundsAndZoomKey;
       
       // Always count individual properties within bounds regardless of zoom level
       // This ensures consistent count when zooming in and out
@@ -97,10 +108,12 @@ export default function PropertyMap({
         return bounds.contains([lat, lng]);
       });
       
+      console.log(`📍 Visible properties calculation: ${visibleProperties.length} of ${properties.length} total properties, zoom: ${currentZoom}`);
       onVisiblePropertiesChange?.(visibleProperties.length);
     } catch (error) {
       console.log('Error calculating visible properties:', error);
-      onVisiblePropertiesChange?.(0); // Fallback to 0 instead of total count
+      // On error, show total properties count instead of 0
+      onVisiblePropertiesChange?.(properties.length);
     }
   };
 
@@ -289,7 +302,7 @@ export default function PropertyMap({
     if (mapInstanceRef.current && properties.length > 0) {
       // Use a small delay to ensure the map is fully ready
       const timer = setTimeout(() => {
-        calculateVisibleProperties();
+        calculateVisibleProperties(true); // Force update when properties change
       }, 300);
       
       return () => clearTimeout(timer);
@@ -625,7 +638,7 @@ export default function PropertyMap({
           // Add multiple event listeners to ensure count is always accurate
           const updateCountAndMarkers = () => {
             updateMarkersForProperties(currentPropertiesRef.current);
-            calculateVisibleProperties();
+            calculateVisibleProperties(true); // Force update on map events
           };
 
           // Listen to multiple map events to catch all possible changes
@@ -646,7 +659,7 @@ export default function PropertyMap({
 
           // Add initial visible properties calculation
           setTimeout(() => {
-            calculateVisibleProperties();
+            calculateVisibleProperties(true); // Force update on initialization
           }, 200);
 
           // Invalidate size to ensure proper rendering
@@ -1736,7 +1749,7 @@ export default function PropertyMap({
       updateMarkersForProperties(properties, properties.length);
       // Update visible properties count when properties change
       setTimeout(() => {
-        calculateVisibleProperties();
+        calculateVisibleProperties(true); // Force update when properties change
       }, 200);
     }
   }, [properties, convertedPrices, preferredCurrency]);
