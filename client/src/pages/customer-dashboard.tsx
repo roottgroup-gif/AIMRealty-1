@@ -1313,7 +1313,7 @@ export default function CustomerDashboard() {
                           </div>
                           <div className="text-center p-2 sm:p-3 md:p-4 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg">
                             <div className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600 dark:text-orange-300">
-                              {waveBalance.currentUsage || 0}
+                              {Array.isArray(waveBalance.currentUsage) ? waveBalance.currentUsage.reduce((sum, wave) => sum + (wave.used || 0), 0) : 0}
                             </div>
                             <div className="text-xs sm:text-sm text-orange-500 dark:text-orange-400">In Use</div>
                           </div>
@@ -1358,7 +1358,7 @@ export default function CustomerDashboard() {
                           </div>
                           <div className="text-center">
                             <div className="text-2xl font-bold text-orange-600 dark:text-orange-300">
-                              {waveBalance.currentUsage}
+                              {Array.isArray(waveBalance.currentUsage) ? waveBalance.currentUsage.reduce((sum, wave) => sum + (wave.used || 0), 0) : 0}
                             </div>
                             <div className="text-sm text-orange-500 dark:text-orange-400">In Use</div>
                           </div>
@@ -1374,7 +1374,7 @@ export default function CustomerDashboard() {
                           <div className="mt-4">
                             <div className="flex items-center justify-between text-sm mb-2">
                               <span className="text-gray-600 dark:text-gray-400">Wave Usage</span>
-                              <span className="font-medium">{waveBalance.currentUsage} / {waveBalance.totalBalance}</span>
+                              <span className="font-medium">{Array.isArray(waveBalance.currentUsage) ? waveBalance.currentUsage.reduce((sum, wave) => sum + (wave.used || 0), 0) : 0} / {waveBalance.totalBalance}</span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                               <div 
@@ -1382,7 +1382,7 @@ export default function CustomerDashboard() {
                                   waveBalance.remainingWaves <= 0 ? 'bg-red-500' : 
                                   waveBalance.remainingWaves <= 2 ? 'bg-yellow-500' : 'bg-green-500'
                                 }`}
-                                style={{ width: `${Math.min(100, (waveBalance.currentUsage / waveBalance.totalBalance) * 100)}%` }}
+                                style={{ width: `${Math.min(100, ((Array.isArray(waveBalance.currentUsage) ? waveBalance.currentUsage.reduce((sum, wave) => sum + (wave.used || 0), 0) : 0) / waveBalance.totalBalance) * 100)}%` }}
                               ></div>
                             </div>
                             {waveBalance.remainingWaves <= 0 && (
@@ -3004,7 +3004,7 @@ export default function CustomerDashboard() {
                 </div>
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                   <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                    {(waveBalance as any).currentUsage || 0}
+                    {Array.isArray((waveBalance as any).currentUsage) ? (waveBalance as any).currentUsage.reduce((sum: number, wave: any) => sum + (wave.used || 0), 0) : 0}
                   </div>
                   <div className="text-xs text-orange-600 dark:text-orange-400">In Use</div>
                 </div>
