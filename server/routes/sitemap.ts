@@ -3,6 +3,31 @@ import { storage } from '../storage';
 
 const router = Router();
 
+// Generate robots.txt content with sitemap reference
+function generateRobotsTxt(baseUrl: string): string {
+  return `User-agent: *
+Allow: /
+
+# Language-specific content
+Allow: /en/
+Allow: /ar/
+Allow: /kur/
+
+# Sitemap
+Sitemap: ${baseUrl}/sitemap.xml
+
+# Block admin areas
+Disallow: /admin/
+Disallow: /api/
+
+# Block temporary files
+Disallow: /*.tmp$
+Disallow: /*.temp$
+
+# Allow search engines to index language-specific pages
+Crawl-delay: 1`;
+}
+
 router.get('/sitemap.xml', async (req, res) => {
   try {
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
@@ -61,6 +86,20 @@ router.get('/sitemap.xml', async (req, res) => {
   } catch (error) {
     console.error('Error generating sitemap:', error);
     res.status(500).send('Error generating sitemap');
+  }
+});
+
+// Robots.txt endpoint
+router.get('/robots.txt', async (req, res) => {
+  try {
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const robotsContent = generateRobotsTxt(baseUrl);
+    
+    res.set('Content-Type', 'text/plain');
+    res.send(robotsContent);
+  } catch (error) {
+    console.error('Error generating robots.txt:', error);
+    res.status(500).send('Error generating robots.txt');
   }
 });
 

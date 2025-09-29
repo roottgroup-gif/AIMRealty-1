@@ -1394,8 +1394,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         validatedData,
         images,
         amenities,
-        features,
-        req.session.userId
+        features
       );
       
       if (!property) {
