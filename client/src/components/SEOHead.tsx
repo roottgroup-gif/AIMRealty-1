@@ -196,6 +196,33 @@ function generateDynamicKeywords(
   return baseKeywords;
 }
 
+// Generate appropriate robots directive based on page type and context
+function generateRobotsDirective(
+  pageType?: string,
+  customRobots?: string,
+  propertyData?: any
+): string {
+  if (customRobots) return customRobots;
+  
+  switch (pageType) {
+    case 'settings':
+    case 'favorites':
+      // Private user pages should not be indexed
+      return 'noindex,nofollow';
+    
+    case 'home':
+    case 'properties':
+    case 'property-detail':
+    case 'about':
+      // Public content pages should be indexed
+      return 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+    
+    default:
+      // Default to indexable but conservative
+      return 'index,follow';
+  }
+}
+
 interface SEOProps {
   title?: string;
   description?: string;
@@ -217,6 +244,7 @@ interface SEOProps {
     area?: number;
   };
   pageType?: 'home' | 'properties' | 'property-detail' | 'favorites' | 'about' | 'settings';
+  robots?: 'index,follow' | 'noindex,follow' | 'index,nofollow' | 'noindex,nofollow' | string;
 }
 
 function generateCanonicalUrl(location: string, language: Language): string {
@@ -569,7 +597,8 @@ export function SEOHead({
   structuredData,
   breadcrumbs,
   propertyData,
-  pageType = 'home'
+  pageType = 'home',
+  robots
 }: SEOProps) {
   const [location] = useLocation();
   const { language } = useLanguage();
@@ -588,6 +617,7 @@ export function SEOHead({
     const dynamicTitle = generateDynamicTitle(pageType, propertyData, seoLanguage, title);
     const dynamicDescription = generateDynamicDescription(pageType, propertyData, seoLanguage, description);
     const dynamicKeywords = generateDynamicKeywords(seoLanguage, keywords, pageType, propertyData);
+    const robotsDirective = generateRobotsDirective(pageType, robots, propertyData);
     
     // Update document title
     document.title = dynamicTitle;
@@ -605,7 +635,8 @@ export function SEOHead({
     updateMetaTag('property', 'og:image:height', '630');
     updateMetaTag('property', 'og:image:alt', dynamicTitle);
     // Derive image type from file extension instead of hardcoding
-    const imageType = ogImage?.includes('.png') ? 'image/png' : ogImage?.includes('.jpg') || ogImage?.includes('.jpeg') ? 'image/jpeg' : 'image/png';
+    const imageType = (typeof ogImage === 'string' && ogImage.includes('.png')) ? 'image/png' : 
+                      (typeof ogImage === 'string' && (ogImage.includes('.jpg') || ogImage.includes('.jpeg'))) ? 'image/jpeg' : 'image/png';
     updateMetaTag('property', 'og:image:type', imageType);
     
     const properCanonicalUrl = canonicalUrl || generateCanonicalUrl(location, currentLanguage);
@@ -643,9 +674,11 @@ export function SEOHead({
     // Remove nonstandard og:language and twitter:language tags
     
     // Meta robots tags for better SEO control
-    updateMetaTag('name', 'robots', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1');
-    updateMetaTag('name', 'googlebot', 'index,follow');
-    updateMetaTag('name', 'bingbot', 'index,follow');
+    updateMetaTag('name', 'robots', robotsDirective);
+    // Use same directive for specific bots unless they need special handling
+    const botDirective = robotsDirective.includes('noindex') ? 'noindex,nofollow' : 'index,follow';
+    updateMetaTag('name', 'googlebot', botDirective);
+    updateMetaTag('name', 'bingbot', botDirective);
     
     // Author and publisher information
     updateMetaTag('name', 'author', 'MapEstate');
@@ -730,8 +763,7 @@ export function SEOHead({
     updateMetaTag('name', 'pinterest', 'nopin'); // Prevent pinning if not desired
     updateMetaTag('name', 'pinterest-rich-pin', 'true');
     
-    // Additional meta tags for better SEO and social sharing
-    updateMetaTag('name', 'robots', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
+    // Additional meta tags for better SEO and social sharing (robots tag already handled above)
     updateMetaTag('name', 'author', 'MapEstate');
     updateMetaTag('name', 'generator', 'MapEstate Real Estate Platform');
     updateMetaTag('property', 'article:publisher', `${window.location.protocol}//${window.location.host}`);
@@ -785,7 +817,7 @@ export function SEOHead({
       pageType
     );
     updateStructuredData(combinedStructuredData);
-  }, [title, description, keywords, ogImage, canonicalUrl, structuredData, location, language]);
+  }, [title, description, keywords, ogImage, canonicalUrl, structuredData, location, language, robots, pageType, propertyData]);
 
   return null;
 }
