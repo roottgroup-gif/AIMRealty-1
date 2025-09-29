@@ -1790,9 +1790,9 @@ export default function PropertyMap({
         createSingleMarker(cluster.properties[0], L);
       } else {
         // Show cluster marker if multiple properties are grouped
-        // Use the passed total count or fallback to current properties count
-        const totalCount = totalPropertiesCount || propertiesToShow.length;
-        createClusterMarker(cluster, L, isClusteringEnabled, totalCount);
+        // Use the actual count of properties in this specific cluster
+        const clusterCount = cluster.count || cluster.properties.length;
+        createClusterMarker(cluster, L, isClusteringEnabled, clusterCount);
       }
     });
   };
