@@ -3,6 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from 'url';
 import { StorageFactory } from "./storageFactory";
 
@@ -286,11 +287,22 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
   });
 
   // Multer configuration for file uploads
+  // Use environment variable for uploads path or default to relative path
+  const baseUploadsPath = process.env.UPLOADS_PATH || path.join(__dirname, 'uploads');
+  
   const ALLOWED_UPLOAD_TYPES = {
-    'avatar': path.join(__dirname, 'uploads', 'avatar'),
-    'customer': path.join(__dirname, 'uploads', 'customer'), 
-    'properties': path.join(__dirname, 'uploads', 'properties')
+    'avatar': path.join(baseUploadsPath, 'avatar'),
+    'customer': path.join(baseUploadsPath, 'customer'), 
+    'properties': path.join(baseUploadsPath, 'properties')
   } as const;
+  
+  // Ensure upload directories exist
+  Object.values(ALLOWED_UPLOAD_TYPES).forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`📁 Created upload directory: ${dir}`);
+    }
+  });
 
   const storage_multer = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -353,8 +365,9 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  // Serve static files
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  // Serve static files - use same base path as multer
+  app.use('/uploads', express.static(baseUploadsPath));
+  console.log(`📁 Serving uploads from: ${baseUploadsPath}`);
 
   // Database initialization route (temporary for setup)
   app.post("/api/init-db", async (req, res) => {
