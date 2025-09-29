@@ -29,6 +29,7 @@ interface PropertyMapProps {
   onFilterChange?: (filters: PropertyFilters) => void;
   onPropertyClick?: (property: PropertyWithDetails) => void;
   onPropertySelect?: (property: PropertyWithDetails) => void;
+  onVisiblePropertiesChange?: (count: number) => void;
   userId?: string;
   className?: string;
 }
@@ -39,6 +40,7 @@ export default function PropertyMap({
   onFilterChange,
   onPropertyClick,
   onPropertySelect,
+  onVisiblePropertiesChange,
   userId,
   className,
 }: PropertyMapProps) {
@@ -58,6 +60,30 @@ export default function PropertyMap({
   const currentPropertiesRef = useRef<PropertyWithDetails[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Function to calculate visible properties within map bounds
+  const calculateVisibleProperties = () => {
+    if (!mapInstanceRef.current || !properties.length) {
+      onVisiblePropertiesChange?.(0);
+      return;
+    }
+
+    try {
+      const bounds = mapInstanceRef.current.getBounds();
+      const visibleProperties = properties.filter(property => {
+        const lat = parseFloat(property.latitude || '0');
+        const lng = parseFloat(property.longitude || '0');
+        
+        // Check if property coordinates are within current map bounds
+        return bounds.contains([lat, lng]);
+      });
+      
+      onVisiblePropertiesChange?.(visibleProperties.length);
+    } catch (error) {
+      console.log('Error calculating visible properties:', error);
+      onVisiblePropertiesChange?.(properties.length); // Fallback to total count
+    }
+  };
 
   // Favorites hooks
   const addToFavorites = useAddToFavorites();
@@ -566,7 +592,19 @@ export default function PropertyMap({
           mapInstanceRef.current.on("zoomend", () => {
             // Re-render markers using the current properties ref
             updateMarkersForProperties(currentPropertiesRef.current);
+            // Update visible properties count
+            calculateVisibleProperties();
           });
+
+          // Add move event listener to update visible properties count when map moves
+          mapInstanceRef.current.on("moveend", () => {
+            calculateVisibleProperties();
+          });
+
+          // Add initial visible properties calculation
+          setTimeout(() => {
+            calculateVisibleProperties();
+          }, 200);
 
           // Invalidate size to ensure proper rendering
           setTimeout(() => {
@@ -1592,6 +1630,10 @@ export default function PropertyMap({
 
     if (conversionReady) {
       updateMarkersForProperties(properties);
+      // Update visible properties count when properties change
+      setTimeout(() => {
+        calculateVisibleProperties();
+      }, 100);
     }
   }, [properties, convertedPrices, preferredCurrency]);
 

@@ -87,6 +87,7 @@ export default function HomePage() {
   const [highlightedPropertyId, setHighlightedPropertyId] = useState<
     string | null
   >(null);
+  const [visiblePropertiesCount, setVisiblePropertiesCount] = useState<number>(0);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
@@ -325,6 +326,7 @@ export default function HomePage() {
               // Handle property selection for highlighting
               setHighlightedPropertyId(property.id);
             }}
+            onVisiblePropertiesChange={setVisiblePropertiesCount}
             userId={user?.id}
             className="h-full w-full"
           />
@@ -411,7 +413,7 @@ export default function HomePage() {
                   className="ml-1 sm:ml-2 text-[10px] sm:text-xs inline-flex light-sweep"
                   style={{ backgroundColor: "#FF7800", color: "#fff" }}
                 >
-                  {(mapProperties || []).length} {t("home.properties")}
+                  {visiblePropertiesCount} {t("home.properties")}
                 </Badge>
               </div>
               <div className="flex items-center gap-1 sm:gap-2">
