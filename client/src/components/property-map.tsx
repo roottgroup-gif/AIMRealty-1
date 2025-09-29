@@ -735,22 +735,25 @@ export default function PropertyMap({
     propertiesToCluster: PropertyWithDetails[],
     zoomLevel: number,
   ) => {
-    // Enhanced zoom-based clustering with better grouping when zooming out
-    // If zoomed very far out (zoom < 7), group by country
-    if (zoomLevel < 7) {
+    // Simplified clustering: only country-based clusters when zoomed out
+    // If zoomed out (zoom < 10), group by country only
+    if (zoomLevel < 10) {
       return createCountryBasedClusters(propertiesToCluster);
     }
-    // If zoomed out (zoom < 9), group by city
-    else if (zoomLevel < 9) {
-      return createCityBasedClusters(propertiesToCluster);
-    }
-    // If moderately zoomed out (zoom < 12), use larger distance clustering
-    else if (zoomLevel < 12) {
-      return createDistanceBasedClusters(propertiesToCluster, zoomLevel);
-    }
-    // If zoomed in more, use precise distance-based clustering
+    // If zoomed in (zoom >= 10), show individual properties (no clustering)
     else {
-      return createDistanceBasedClusters(propertiesToCluster, zoomLevel);
+      // Return individual properties as single-item clusters to maintain consistency
+      return propertiesToCluster
+        .filter(property => property.latitude && property.longitude)
+        .map(property => ({
+          properties: [property],
+          center: {
+            lat: parseFloat(property.latitude || "0"),
+            lng: parseFloat(property.longitude || "0"),
+          },
+          clusterType: "individual",
+          count: 1,
+        }));
     }
   };
 
