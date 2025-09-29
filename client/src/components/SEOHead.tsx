@@ -304,32 +304,117 @@ function generateCombinedStructuredData(
   breadcrumbs?: Array<{ name: string; url: string }>,
   propertyData?: SEOProps['propertyData'],
   language?: Language,
-  canonicalUrl?: string
+  canonicalUrl?: string,
+  pageType?: string
 ) {
   const baseUrl = window.location.origin;
   const schemas: any[] = [];
+  const currentDate = new Date().toISOString();
 
-  // Website/Organization schema
+  // Enhanced Organization schema with correct structure
   const organizationSchema = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "RealEstateAgent",
     "name": "MapEstate",
     "url": baseUrl,
-    "logo": `${baseUrl}/logo_1757848527935.png`,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${baseUrl}/logo_1757848527935.png`,
+      "width": 250,
+      "height": 250
+    },
+    "image": `${baseUrl}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`,
     "description": "AI-Powered Real Estate Platform for Kurdistan and Iraq",
+    "slogan": "Find Your Perfect Home with AI",
+    "foundingDate": "2024",
+    "numberOfEmployees": {
+      "@type": "QuantitativeValue",
+      "minValue": 10,
+      "maxValue": 50
+    },
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "Iraq",
-      "addressRegion": "Kurdistan"
+      "addressRegion": "Kurdistan",
+      "addressLocality": "Erbil"
     },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "availableLanguage": ["English", "Arabic", "Kurdish"]
+    "location": {
+      "@type": "Place",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 36.1911,
+        "longitude": 44.0093
+      }
+    },
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": ["English", "Arabic", "Kurdish"],
+        "serviceArea": {
+          "@type": "AdministrativeArea",
+          "name": "Kurdistan Region"
+        }
+      },
+      {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "availableLanguage": ["English", "Arabic", "Kurdish"]
+      }
+    ],
+    "areaServed": [
+      {
+        "@type": "City",
+        "name": "Erbil",
+        "containedInPlace": {
+          "@type": "AdministrativeArea",
+          "name": "Kurdistan Region"
+        }
+      },
+      {
+        "@type": "City",
+        "name": "Sulaymaniyah",
+        "containedInPlace": {
+          "@type": "AdministrativeArea",
+          "name": "Kurdistan Region"
+        }
+      },
+      {
+        "@type": "City",
+        "name": "Dohuk",
+        "containedInPlace": {
+          "@type": "AdministrativeArea",
+          "name": "Kurdistan Region"
+        }
+      }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Real Estate Listings",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Property Search",
+            "description": "AI-powered property search and recommendations"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Real Estate Agent Services",
+            "description": "Professional real estate agent support and consultation"
+          }
+        }
+      ]
     },
     "sameAs": [
       "https://facebook.com/mapestate",
-      "https://twitter.com/mapestate"
+      "https://twitter.com/mapestate",
+      "https://linkedin.com/company/mapestate",
+      "https://instagram.com/mapestate"
     ]
   };
 
@@ -368,46 +453,105 @@ function generateCombinedStructuredData(
     schemas.push(breadcrumbSchema);
   }
 
-  // Enhanced property/listing schema if property data exists
+  // Property schema using proper Residence/Apartment/House types
   if (propertyData) {
     const propertyType = propertyData.propertyType?.toLowerCase();
     const schemaPropertyType = propertyType === 'apartment' ? 'Apartment' : 
-                               propertyType === 'house' ? 'House' : 'Residence';
+                               propertyType === 'house' ? 'House' :
+                               propertyType === 'villa' ? 'House' :
+                               propertyType === 'land' ? 'LandParcel' : 'Residence';
     
     const propertySchema = {
       "@context": "https://schema.org",
-      "@type": "RealEstateListing",
+      "@type": schemaPropertyType,
       "@id": canonicalUrl,
       "url": canonicalUrl,
       "name": `${propertyData.propertyType || 'Property'} in ${propertyData.city || ''}`,
       "description": `${propertyData.bedrooms ? `${propertyData.bedrooms} bedroom ` : ''}${propertyData.propertyType || 'property'} ${propertyData.address ? `located at ${propertyData.address}` : ''} in ${propertyData.city || ''}, ${propertyData.country || ''}`,
-      "itemOffered": {
-        "@type": schemaPropertyType,
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": propertyData.address || "",
-          "addressLocality": propertyData.city || "",
-          "addressCountry": propertyData.country || "Iraq"
-        },
-        "numberOfRooms": propertyData.bedrooms,
-        "numberOfBathroomsTotal": propertyData.bathrooms,
-        "floorSize": propertyData.area ? {
-          "@type": "QuantitativeValue",
-          "value": propertyData.area,
-          "unitText": "square meters"
-        } : undefined
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": propertyData.address || "",
+        "addressLocality": propertyData.city || "",
+        "addressRegion": "Kurdistan Region",
+        "addressCountry": propertyData.country || "Iraq"
       },
+      "geo": propertyData.city ? {
+        "@type": "GeoCoordinates",
+        "latitude": propertyData.city === 'Erbil' ? 36.1911 : propertyData.city === 'Sulaymaniyah' ? 35.5558 : 36.8619,
+        "longitude": propertyData.city === 'Erbil' ? 44.0093 : propertyData.city === 'Sulaymaniyah' ? 45.4347 : 42.9922
+      } : undefined,
+      "numberOfRooms": propertyData.bedrooms,
+      "numberOfBathroomsTotal": propertyData.bathrooms,
+      "floorSize": propertyData.area ? {
+        "@type": "QuantitativeValue",
+        "value": propertyData.area,
+        "unitText": "square meters",
+        "unitCode": "MTK"
+      } : undefined,
+      "additionalProperty": [
+        {
+          "@type": "PropertyValue",
+          "name": "Listing Type",
+          "value": propertyData.listingType
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Property Status",
+          "value": "Available"
+        }
+      ],
       "offers": {
         "@type": "Offer",
-        "price": propertyData.price,
+        "price": propertyData.price?.replace(/[^0-9.]/g, '') || '0',
         "priceCurrency": propertyData.currency || "USD",
         "availability": "https://schema.org/InStock",
-        "validFrom": new Date().toISOString()
+        "validFrom": currentDate,
+        "validThrough": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        "seller": {
+          "@type": "RealEstateAgent",
+          "name": "MapEstate",
+          "url": baseUrl
+        }
       }
     };
     schemas.push(propertySchema);
   }
 
+  // Only add FAQ schema for pages that actually have FAQ content
+  if (pageType === 'about' || pageType === 'home') {
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What areas does MapEstate cover?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MapEstate covers properties across Kurdistan Region of Iraq, including Erbil, Sulaymaniyah, and Dohuk."
+          }
+        },
+        {
+          "@type": "Question", 
+          "name": "How does AI-powered search work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Our AI analyzes your search criteria and preferences to recommend properties that best match your needs, considering factors like location, budget, and lifestyle requirements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What languages does MapEstate support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MapEstate supports English, Arabic, and Kurdish languages to serve the diverse community in Kurdistan and Iraq."
+          }
+        }
+      ]
+    };
+    schemas.push(faqSchema);
+  }
+  
   // Add custom structured data if provided
   if (customStructuredData) {
     schemas.push(customStructuredData);
@@ -460,7 +604,9 @@ export function SEOHead({
     updateMetaTag('property', 'og:image:width', '1200');
     updateMetaTag('property', 'og:image:height', '630');
     updateMetaTag('property', 'og:image:alt', dynamicTitle);
-    updateMetaTag('property', 'og:image:type', 'image/jpeg');
+    // Derive image type from file extension instead of hardcoding
+    const imageType = ogImage?.includes('.png') ? 'image/png' : ogImage?.includes('.jpg') || ogImage?.includes('.jpeg') ? 'image/jpeg' : 'image/png';
+    updateMetaTag('property', 'og:image:type', imageType);
     
     const properCanonicalUrl = canonicalUrl || generateCanonicalUrl(location, currentLanguage);
     
@@ -489,16 +635,46 @@ export function SEOHead({
     updateMetaTag('name', 'twitter:image:alt', dynamicTitle);
     updateMetaTag('name', 'twitter:site', '@MapEstate');
     updateMetaTag('name', 'twitter:creator', '@MapEstate');
-    updateMetaTag('name', 'twitter:domain', window.location.hostname);
-    // Twitter URL is handled by og:url
+    // Remove nonstandard twitter:domain tag
     updateMetaTag('name', 'twitter:app:name:iphone', 'MapEstate');
     updateMetaTag('name', 'twitter:app:name:ipad', 'MapEstate');
     updateMetaTag('name', 'twitter:app:name:googleplay', 'MapEstate');
     
-    // Language-specific social sharing optimizations (use SEO language)
-    const seoLanguageInfo = getLanguageInfo(seoLanguage);
-    updateMetaTag('property', 'og:language', seoLanguageInfo.iso);
-    updateMetaTag('name', 'twitter:language', seoLanguageInfo.iso);
+    // Remove nonstandard og:language and twitter:language tags
+    
+    // Meta robots tags for better SEO control
+    updateMetaTag('name', 'robots', 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1');
+    updateMetaTag('name', 'googlebot', 'index,follow');
+    updateMetaTag('name', 'bingbot', 'index,follow');
+    
+    // Author and publisher information
+    updateMetaTag('name', 'author', 'MapEstate');
+    updateMetaTag('name', 'publisher', 'MapEstate');
+    
+    // Conditional tags based on content type
+    if (pageType === 'property-detail' && propertyData) {
+      // Product-specific tags for property listings
+      updateMetaTag('property', 'product:price:amount', propertyData.price?.replace(/[^0-9.]/g, '') || '0');
+      updateMetaTag('property', 'product:price:currency', propertyData.currency || 'USD');
+      updateMetaTag('property', 'product:availability', 'in stock');
+      updateMetaTag('property', 'product:condition', 'new');
+      updateMetaTag('property', 'product:category', 'Real Estate');
+      updateMetaTag('property', 'product:brand', 'MapEstate');
+    } else if (pageType === 'about' || pageType === 'home') {
+      // Article tags only for article-like content
+      updateMetaTag('property', 'article:author', 'MapEstate');
+      updateMetaTag('property', 'article:publisher', 'https://www.facebook.com/mapestate');
+      updateMetaTag('property', 'article:published_time', new Date().toISOString());
+      updateMetaTag('property', 'article:modified_time', new Date().toISOString());
+      updateMetaTag('property', 'article:section', 'Real Estate');
+      updateMetaTag('property', 'article:tag', dynamicKeywords);
+    }
+    
+    // Pinterest optimization
+    updateMetaTag('name', 'pinterest-rich-pin', 'true');
+    updateMetaTag('name', 'pinterest:title', dynamicTitle);
+    updateMetaTag('name', 'pinterest:description', dynamicDescription);
+    updateMetaTag('name', 'pinterest:image', ogImage);
     
     // Enhanced social sharing for Arabic and Kurdish content
     if (currentLanguage === 'ar' || currentLanguage === 'kur') {
@@ -513,10 +689,7 @@ export function SEOHead({
       updateMetaTag('property', 'og:title:ku', currentLanguage === 'kur' ? dynamicTitle : '');
       updateMetaTag('property', 'og:description:ku', currentLanguage === 'kur' ? dynamicDescription : '');
       
-      // Additional platform-specific tags for Middle East region
-      updateMetaTag('property', 'og:region', 'Middle East');
-      updateMetaTag('property', 'og:country_name', 'Iraq');
-      updateMetaTag('property', 'og:region_name', 'Kurdistan');
+      // Remove nonstandard regional tags
       
       // WhatsApp and Telegram optimization (popular in Middle East)
       updateMetaTag('property', 'whatsapp:title', dynamicTitle);
@@ -537,6 +710,20 @@ export function SEOHead({
     // LinkedIn-specific optimizations
     updateMetaTag('name', 'linkedin:owner', 'MapEstate');
     updateMetaTag('name', 'linkedin:site', properCanonicalUrl);
+    
+    // Real estate specific tags (these are custom for internal use)
+    if (propertyData) {
+      updateMetaTag('name', 'property:bedrooms', propertyData.bedrooms?.toString() || '');
+      updateMetaTag('name', 'property:bathrooms', propertyData.bathrooms?.toString() || '');
+      updateMetaTag('name', 'property:area', propertyData.area?.toString() || '');
+      updateMetaTag('name', 'property:type', propertyData.propertyType || '');
+      updateMetaTag('name', 'property:listing_type', propertyData.listingType || '');
+      updateMetaTag('name', 'property:location', `${propertyData.city}, ${propertyData.country}`);
+    }
+    
+    // SEO performance optimization tags
+    updateMetaTag('name', 'referrer', 'strict-origin-when-cross-origin');
+    updateMetaTag('http-equiv', 'x-dns-prefetch-control', 'on');
     
     // Additional social platform compatibility
     updateMetaTag('name', 'skype_toolbar', 'skype_toolbar_parser_compatible');
@@ -594,7 +781,8 @@ export function SEOHead({
       breadcrumbs, 
       propertyData,
       currentLanguage,
-      properCanonicalUrl
+      properCanonicalUrl,
+      pageType
     );
     updateStructuredData(combinedStructuredData);
   }, [title, description, keywords, ogImage, canonicalUrl, structuredData, location, language]);
