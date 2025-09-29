@@ -134,9 +134,11 @@ export const validateLanguagePermission = async (req: Request, res: Response, ne
     const userLanguages = await storage.getUserLanguages(req.user.id);
     const userAllowedLanguages = userLanguages.map(ul => ul.language);
     
-    // If user has no language permissions assigned, default to English only
+    // If user has no language permissions assigned, deny all access
     if (userAllowedLanguages.length === 0) {
-      userAllowedLanguages.push('en');
+      return res.status(403).json({ 
+        message: 'You have no language permissions assigned. Contact an administrator to get language access.' 
+      });
     }
     
     if (!userAllowedLanguages.includes(requestedLanguage)) {

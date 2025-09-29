@@ -382,6 +382,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+
   // Admin routes with rate limiting
   app.get("/api/admin/users", adminRateLimit, requireRole("admin"), async (req, res) => {
     try {
