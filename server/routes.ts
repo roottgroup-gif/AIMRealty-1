@@ -1368,7 +1368,18 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
       }
       
       const validatedData = updatePropertySchema.parse(processedBody);
-      const property = await storage.updateProperty(id, validatedData);
+      
+      // Extract images, amenities, and features from the validated request body like we do in POST
+      const { images, amenities = [], features = [] } = req.body;
+      
+      const property = await storage.updateProperty(
+        id, 
+        validatedData,
+        images,
+        amenities,
+        features,
+        req.session.userId
+      );
       
       if (!property) {
         return res.status(404).json({ message: "Property not found" });

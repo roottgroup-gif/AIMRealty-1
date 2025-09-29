@@ -180,8 +180,9 @@ export class DatabaseStorage implements IStorage {
       agent: property.users ? sanitizeUser(property.users) : null,
       wave: property.waves,
       images,
-      amenities,
-      features,
+      // Convert amenities and features from database objects to string arrays for frontend
+      amenities: amenities.map(a => a.amenity),
+      features: features.map(f => f.feature),
       inquiries: inquiriesData,
       favorites: favoritesData
     };
@@ -861,12 +862,16 @@ export class DatabaseStorage implements IStorage {
     try {
       const fs = await import('fs/promises');
       const path = await import('path');
+      const { fileURLToPath } = await import('url');
       
       // Only clean up files that are in our uploads directory
       if (imageUrl.startsWith('/uploads/properties/')) {
         // Extract filename and build safe absolute path
         const filename = path.basename(imageUrl);
-        const uploadsDir = path.join(__dirname, 'uploads', 'properties');
+        // Fix __dirname issue in ES modules
+        const currentFileUrl = import.meta.url;
+        const currentDir = path.dirname(fileURLToPath(currentFileUrl));
+        const uploadsDir = path.join(currentDir, 'uploads', 'properties');
         const filePath = path.join(uploadsDir, filename);
         
         // Ensure the file path is within our uploads directory (prevent path traversal)
