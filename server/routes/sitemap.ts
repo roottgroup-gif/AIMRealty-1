@@ -3,6 +3,79 @@ import { storage } from '../storage';
 
 const router = Router();
 
+// Supported languages for multilingual SEO
+const SUPPORTED_LANGUAGES = ['en', 'ar', 'kur'] as const;
+type Language = typeof SUPPORTED_LANGUAGES[number];
+
+// Language mapping for hreflang
+const LANGUAGE_MAPPING = {
+  en: { hreflang: 'en-US', name: 'English' },
+  ar: { hreflang: 'ar-IQ', name: 'Arabic' },
+  kur: { hreflang: 'ku-IQ', name: 'Kurdish' }
+} as const;
+
+// Static routes configuration
+const STATIC_ROUTES = [
+  { path: '/', changefreq: 'daily', priority: 1.0 },
+  { path: '/properties', changefreq: 'hourly', priority: 0.9 },
+  { path: '/about', changefreq: 'monthly', priority: 0.5 },
+  { path: '/agents', changefreq: 'weekly', priority: 0.7 },
+  { path: '/favorites', changefreq: 'daily', priority: 0.6 },
+  { path: '/settings', changefreq: 'monthly', priority: 0.3 }
+] as const;
+
+// Helper function to normalize base URL
+function normalizeBaseUrl(baseUrl: string): string {
+  return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+}
+
+// Helper function to get localized path
+function getLocalizedPath(path: string, language: Language): string {
+  let cleanPath = path.startsWith('/') ? path : `/${path}`;
+  cleanPath = cleanPath.replace(/^\/(en|ar|kur)(?=\/|$)/, '') || '/';
+  return `/${language}${cleanPath}`;
+}
+
+// Helper function to ensure absolute image URLs
+function ensureAbsoluteImageUrl(imageUrl: string, baseUrl: string): string {
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+  if (imageUrl.startsWith('/')) {
+    return `${normalizeBaseUrl(baseUrl)}${imageUrl}`;
+  }
+  return `${normalizeBaseUrl(baseUrl)}/${imageUrl}`;
+}
+
+// Helper function to escape XML special characters
+function escapeXML(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+// Generate hreflang alternates for a given path
+function generateAlternates(path: string, baseUrl: string): string {
+  const alternates: string[] = [];
+  
+  SUPPORTED_LANGUAGES.forEach(lang => {
+    const localizedPath = getLocalizedPath(path, lang);
+    const hreflang = LANGUAGE_MAPPING[lang].hreflang;
+    const absoluteUrl = `${baseUrl}${localizedPath}`;
+    alternates.push(`    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${escapeXML(absoluteUrl)}"/>`);
+  });
+  
+  // Add x-default (defaulting to English)
+  const xDefaultUrl = `${baseUrl}${getLocalizedPath(path, 'en')}`;
+  alternates.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXML(xDefaultUrl)}"/>`);
+  
+  return alternates.join('\n');
+}
+
 // Generate robots.txt content with sitemap reference
 function generateRobotsTxt(baseUrl: string): string {
   return `User-agent: *
@@ -30,55 +103,67 @@ Crawl-delay: 1`;
 
 router.get('/sitemap.xml', async (req, res) => {
   try {
-    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const rawBaseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const baseUrl = normalizeBaseUrl(rawBaseUrl);
+    const currentDate = new Date().toISOString().split('T')[0];
     
     // Get all properties for sitemap
     const properties = await storage.getProperties({ limit: 1000 });
     
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <!-- Main pages -->
-  <url>
-    <loc>${baseUrl}/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-  </url>
-  <url>
-    <loc>${baseUrl}/properties</loc>
-    <changefreq>hourly</changefreq>
-    <priority>0.9</priority>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-  </url>
-  <url>
-    <loc>${baseUrl}/favorites</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/settings</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <!-- Property pages -->
-  ${properties.map(property => {
-    const identifier = property.slug || property.id;
-    return `
-  <url>
-    <loc>${baseUrl}/property/${identifier}</loc>
+    const urlEntries: string[] = [];
+    
+    // Generate entries for static routes in all languages
+    STATIC_ROUTES.forEach(route => {
+      SUPPORTED_LANGUAGES.forEach(lang => {
+        const localizedPath = getLocalizedPath(route.path, lang);
+        const alternates = generateAlternates(route.path, baseUrl);
+        const absoluteUrl = `${baseUrl}${localizedPath}`;
+        
+        urlEntries.push(`  <url>
+    <loc>${escapeXML(absoluteUrl)}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>${route.changefreq}</changefreq>
+    <priority>${route.priority}</priority>
+${alternates}
+  </url>`);
+      });
+    });
+    
+    // Generate entries for property pages in all languages
+    properties.forEach(property => {
+      const identifier = property.slug || property.id;
+      const encodedIdentifier = encodeURIComponent(identifier);
+      const propertyPath = `/property/${encodedIdentifier}`;
+      const lastmod = property.updatedAt ? new Date(property.updatedAt).toISOString().split('T')[0] : currentDate;
+      
+      SUPPORTED_LANGUAGES.forEach(lang => {
+        const localizedPath = getLocalizedPath(propertyPath, lang);
+        const alternates = generateAlternates(propertyPath, baseUrl);
+        const absoluteUrl = `${baseUrl}${localizedPath}`;
+        
+        // Add image sitemap data if property has images
+        const imageData = property.images && property.images.length > 0 ? `
+    <image:image>
+      <image:loc>${escapeXML(ensureAbsoluteImageUrl(property.images[0].imageUrl, baseUrl))}</image:loc>
+      <image:title>${escapeXML(property.title)}</image:title>
+      <image:caption>${escapeXML(property.description || property.title)}</image:caption>
+    </image:image>` : '';
+        
+        urlEntries.push(`  <url>
+    <loc>${escapeXML(absoluteUrl)}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>${property.updatedAt ? new Date(property.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
-    ${property.images && property.images.length > 0 ? `
-    <image:image>
-      <image:loc>${property.images[0]}</image:loc>
-      <image:title>${property.title}</image:title>
-      <image:caption>${property.description || property.title}</image:caption>
-    </image:image>` : ''}
-  </url>`;
-  }).join('')}
+${alternates}${imageData}
+  </url>`);
+      });
+    });
+    
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${urlEntries.join('\n')}
 </urlset>`;
 
     res.set('Content-Type', 'application/xml');
@@ -92,7 +177,8 @@ router.get('/sitemap.xml', async (req, res) => {
 // Robots.txt endpoint
 router.get('/robots.txt', async (req, res) => {
   try {
-    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const rawBaseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const baseUrl = normalizeBaseUrl(rawBaseUrl);
     const robotsContent = generateRobotsTxt(baseUrl);
     
     res.set('Content-Type', 'text/plain');
