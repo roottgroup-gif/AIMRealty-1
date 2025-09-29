@@ -1,0 +1,111 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-79-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Mon Sep 29 17:22:12 UTC 2025
+
+  System load:  0.04               Processes:             109
+  Usage of /:   12.4% of 47.39GB   Users logged in:       0
+  Memory usage: 28%                IPv4 address for eth0: 72.60.134.44
+  Swap usage:   0%                 IPv6 address for eth0: 2a02:4780:41:695a::1
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+Last login: Mon Sep 29 17:19:50 2025 from 169.254.0.1
+root@srv1027249:~# sudo nano /etc/nginx/sites-available/aimrealty
+root@srv1027249:~# # Enable site
+sudo ln -s /etc/nginx/sites-available/aimrealty /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+ln: failed to create symbolic link '/etc/nginx/sites-enabled/aimrealty': File exists
+2025/09/29 17:24:20 [warn] 46102#46102: conflicting server name "dailynewscrypto.net" on 0.0.0.0:80, ignored
+2025/09/29 17:24:20 [warn] 46102#46102: conflicting server name "www.dailynewscrypto.net" on 0.0.0.0:80, ignored
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@srv1027249:~# # Get SSL certificate for your domain
+sudo certbot --nginx -d dailynewscrypto.net -d www.dailynewscrypto.net
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Certificate not yet due for renewal
+
+You have an existing certificate that has exactly the same domains or certificate name you requested and isn't close to expiry.
+(ref: /etc/letsencrypt/renewal/dailynewscrypto.net.conf)
+
+What would you like to do?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: Attempt to reinstall this existing certificate
+2: Renew & replace the certificate (may be subject to CA rate limits)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): `
+
+** Invalid input **
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 1
+Deploying certificate
+Successfully deployed certificate for dailynewscrypto.net to /etc/nginx/sites-enabled/dailynewscrypto.net
+Successfully deployed certificate for www.dailynewscrypto.net to /etc/nginx/sites-enabled/dailynewscrypto.net
+Congratulations! You have successfully enabled HTTPS on https://dailynewscrypto.net and https://www.dailynewscrypto.net
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+root@srv1027249:~# # Get SSL certificate for your domain
+sudo certbot --nginx -d dailynewscrypto.net -d www.dailynewscrypto.net
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Certificate not yet due for renewal
+
+You have an existing certificate that has exactly the same domains or certificate name you requested and isn't close to expiry.
+(ref: /etc/letsencrypt/renewal/dailynewscrypto.net.conf)
+
+What would you like to do?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: Attempt to reinstall this existing certificate
+2: Renew & replace the certificate (may be subject to CA rate limits)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 1
+Deploying certificate
+Successfully deployed certificate for dailynewscrypto.net to /etc/nginx/sites-enabled/dailynewscrypto.net
+Successfully deployed certificate for www.dailynewscrypto.net to /etc/nginx/sites-enabled/dailynewscrypto.net
+Congratulations! You have successfully enabled HTTPS on https://dailynewscrypto.net and https://www.dailynewscrypto.net
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+root@srv1027249:~# # Test if domain points to your VPS
+nslookup dailynewscrypto.net
+ping dailynewscrypto.net
+Server:         127.0.0.53
+Address:        127.0.0.53#53
+
+Non-authoritative answer:
+Name:   dailynewscrypto.net
+Address: 72.60.134.44
+
+PING dailynewscrypto.net (72.60.134.44) 56(84) bytes of data.
+64 bytes from srv1027249.hstgr.cloud (72.60.134.44): icmp_seq=1 ttl=64 time=0.040 ms
+64 bytes from srv1027249.hstgr.cloud (72.60.134.44): icmp_seq=2 ttl=64 time=0.041 ms
+64 bytes from srv1027249.hstgr.cloud (72.60.134.44): icmp_seq=3 ttl=64 time=0.045 ms
+^C
+--- dailynewscrypto.net ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2053ms
+rtt min/avg/max/mdev = 0.040/0.042/0.045/0.002 ms
+root@srv1027249:~# 
