@@ -797,6 +797,7 @@ export default function PropertyMap({
       properties,
       country, // This will be the normalized country name
       clusterType: "country",
+      count: properties.length, // Add count property for cluster marker
       center: {
         lat:
           properties.reduce(
@@ -836,6 +837,7 @@ export default function PropertyMap({
       properties,
       city,
       clusterType: "city",
+      count: properties.length, // Add count property for cluster marker
       center: {
         lat:
           properties.reduce(
