@@ -9,13 +9,13 @@ interface DatabaseConfig {
   connectionUrl: string;
 }
 
-// Default VPS MySQL configuration
+// Default VPS MySQL configuration (without hardcoded credentials)
 const DEFAULT_VPS_CONFIG = {
-  host: "72.60.134.44", // VPS MySQL server IP
-  port: 3306,
-  user: "mapestate",
-  password: "MapEstate2024!", // Will use environment variable if available
-  database: "mapestate",
+  host: process.env.MYSQL_HOST || "localhost",
+  port: parseInt(process.env.MYSQL_PORT || "3306"),
+  user: process.env.MYSQL_USER || "root",
+  password: process.env.MYSQL_PASSWORD || "",
+  database: process.env.MYSQL_DATABASE || "mapestate",
 };
 
 function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
@@ -54,13 +54,10 @@ function getDatabaseConfig(): DatabaseConfig {
       `🔧 MySQL VPS: mysql://${mysqlUser}:***@${mysqlHost}:${port}/${mysqlDatabase}`,
     );
   }
-  // If no URL provided and no individual vars, use default VPS configuration
+  // If no URL provided and no individual vars, use default configuration
   else if (!connectionUrl) {
-    console.log("📝 No MYSQL_URL found, using default VPS configuration");
-    console.log(
-      "🔧 Default: mysql://mapestate:***@72.60.134.44:3306/mapestate",
-    );
-    console.log("💡 Tip: Set MYSQL_PASSWORD environment variable for password");
+    console.log("📝 No MYSQL_URL found, using default configuration from environment variables");
+    console.log("💡 Tip: Set environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE");
 
     connectionUrl = createConnectionUrl(DEFAULT_VPS_CONFIG);
   }
