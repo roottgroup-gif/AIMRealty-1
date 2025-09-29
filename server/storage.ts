@@ -518,7 +518,9 @@ export class DatabaseStorage implements IStorage {
     if (waveCheckUserId && validatedWaveId) {
       const permissionCheck = await this.checkWavePermission(waveCheckUserId, validatedWaveId);
       if (!permissionCheck.allowed) {
-        throw new Error(permissionCheck.reason || 'Wave permission denied');
+        // Instead of throwing an error, fallback to no-wave for customers without permissions
+        console.log(`User ${waveCheckUserId} lacks permission for wave ${validatedWaveId}, falling back to no-wave`);
+        validatedWaveId = null;
       }
     }
 
@@ -554,8 +556,65 @@ export class DatabaseStorage implements IStorage {
     property: Partial<InsertProperty>, 
     images?: string[], 
     amenities?: string[], 
-    features?: string[]
+    features?: string[],
+    userId?: string
   ): Promise<Property | undefined> {
+    // Get existing property to check for wave changes
+    const existingProperty = await this.getProperty(id);
+    if (!existingProperty) {
+      throw new Error('Property not found');
+    }
+
+    // Handle wave permission checking if waveId is being updated
+    let validatedWaveId = property.waveId;
+    if (property.waveId !== undefined) {
+      // Validate and fix waveId if invalid (same logic as createProperty)
+      if (validatedWaveId && validatedWaveId !== 'no-wave') {
+        const validWaves = await this.dbConn.select({ id: waves.id }).from(waves);
+        const validWaveIds = validWaves.map(w => w.id);
+        
+        if (validatedWaveId === 'premium-wave') {
+          // Map premium-wave to the first available wave or default wave
+          validatedWaveId = validWaveIds.find(id => id.includes('default')) || validWaveIds[0] || null;
+        } else if (!validWaveIds.includes(validatedWaveId)) {
+          // If invalid wave ID, set to null
+          validatedWaveId = null;
+        }
+      } else if (validatedWaveId === 'no-wave') {
+        validatedWaveId = null;
+      }
+
+      // Determine which user to check wave permissions for (agent or session user)
+      const waveCheckUserId = existingProperty.agentId || userId;
+      
+      // Check wave permissions if property has a wave and we have a user to check
+      if (waveCheckUserId && validatedWaveId) {
+        const permissionCheck = await this.checkWavePermission(waveCheckUserId, validatedWaveId);
+        if (!permissionCheck.allowed) {
+          // Instead of throwing an error, fallback to no-wave for customers without permissions
+          console.log(`User ${waveCheckUserId} lacks permission for wave ${validatedWaveId}, falling back to no-wave`);
+          validatedWaveId = null;
+        }
+      }
+
+      // Handle wave usage tracking if wave is changing
+      const oldWaveId = existingProperty.waveId;
+      if (oldWaveId !== validatedWaveId) {
+        // Decrement usage from old wave if it exists
+        if (waveCheckUserId && oldWaveId) {
+          await this.decrementWaveUsage(waveCheckUserId, oldWaveId);
+        }
+        
+        // Increment usage for new wave if it exists
+        if (waveCheckUserId && validatedWaveId) {
+          await this.incrementWaveUsage(waveCheckUserId, validatedWaveId);
+        }
+      }
+
+      // Update the property object with validated waveId
+      property = { ...property, waveId: validatedWaveId };
+    }
+
     await this.dbConn.update(properties).set(property).where(eq(properties.id, id));
 
     // Update images if provided
