@@ -989,8 +989,8 @@ export default function CustomerDashboard() {
       city: property.city,
       country: property.country,
       contactPhone: (property as any).contactPhone || user?.phone || '',
-      amenities: property.amenities || [],
-      features: property.features || [],
+      amenities: property.amenities?.map(a => typeof a === 'string' ? a : a.amenity) || [],
+      features: property.features?.map(f => typeof f === 'string' ? f : f.feature) || [],
       images: property.images?.map(img => typeof img === 'string' ? img : img.imageUrl) || [],
       status: property.status === 'active' ? 'active' : 'inactive',
       language: propertyLanguage, // Preserve original language
