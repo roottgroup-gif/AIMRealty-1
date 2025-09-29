@@ -129,16 +129,21 @@ export const validateLanguagePermission = async (req: Request, res: Response, ne
       return next();
     }
 
-    // Check if user has permission for this language (simplified for now)
-    // TODO: Implement proper language permissions
-    // const userAllowedLanguages = req.user.allowedLanguages || ['en'];
+    // Check if user has permission for this language
+    const storage = StorageFactory.getInstance();
+    const userLanguages = await storage.getUserLanguages(req.user.id);
+    const userAllowedLanguages = userLanguages.map(ul => ul.language);
     
-    // For now, allow all languages for authenticated users
-    // if (!userAllowedLanguages.includes(requestedLanguage)) {
-    //   return res.status(403).json({ 
-    //     message: `You don't have permission to add data in language '${requestedLanguage}'. Allowed languages: ${userAllowedLanguages.join(', ')}` 
-    //   });
-    // }
+    // If user has no language permissions assigned, default to English only
+    if (userAllowedLanguages.length === 0) {
+      userAllowedLanguages.push('en');
+    }
+    
+    if (!userAllowedLanguages.includes(requestedLanguage)) {
+      return res.status(403).json({ 
+        message: `You don't have permission to post in language '${requestedLanguage}'. Allowed languages: ${userAllowedLanguages.join(', ')}` 
+      });
+    }
     
     next();
   } catch (error) {

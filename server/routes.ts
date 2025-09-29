@@ -145,6 +145,100 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Add language permission to user (super admin only)
+  app.post("/api/users/:id/languages", requireRole("super_admin"), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { language } = req.body;
+      
+      if (!language) {
+        return res.status(400).json({ message: "Language is required" });
+      }
+      
+      // Check if language is supported
+      const supportedLanguages = ["en", "ar", "kur"];
+      if (!supportedLanguages.includes(language)) {
+        return res.status(400).json({ 
+          message: `Unsupported language '${language}'. Supported languages: ${supportedLanguages.join(', ')}` 
+        });
+      }
+      
+      // Check if user exists
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      await storage.addUserLanguage(id, language);
+      res.json({ message: `Language '${language}' added to user successfully` });
+    } catch (error) {
+      console.error("Failed to add user language:", error);
+      res.status(500).json({ message: "Failed to add user language" });
+    }
+  });
+
+  // Remove language permission from user (super admin only)
+  app.delete("/api/users/:id/languages/:language", requireRole("super_admin"), async (req, res) => {
+    try {
+      const { id, language } = req.params;
+      
+      // Check if user exists
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      await storage.removeUserLanguage(id, language);
+      res.json({ message: `Language '${language}' removed from user successfully` });
+    } catch (error) {
+      console.error("Failed to remove user language:", error);
+      res.status(500).json({ message: "Failed to remove user language" });
+    }
+  });
+
+  // Set all language permissions for user (super admin only)
+  app.put("/api/users/:id/languages", requireRole("super_admin"), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { languages } = req.body;
+      
+      if (!Array.isArray(languages)) {
+        return res.status(400).json({ message: "Languages must be an array" });
+      }
+      
+      // Check if all languages are supported
+      const supportedLanguages = ["en", "ar", "kur"];
+      const invalidLanguages = languages.filter(lang => !supportedLanguages.includes(lang));
+      if (invalidLanguages.length > 0) {
+        return res.status(400).json({ 
+          message: `Unsupported languages: ${invalidLanguages.join(', ')}. Supported languages: ${supportedLanguages.join(', ')}` 
+        });
+      }
+      
+      // Check if user exists
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove all existing languages
+      const currentLanguages = await storage.getUserLanguages(id);
+      for (const userLang of currentLanguages) {
+        await storage.removeUserLanguage(id, userLang.language);
+      }
+      
+      // Add new languages
+      for (const language of languages) {
+        await storage.addUserLanguage(id, language);
+      }
+      
+      res.json({ message: `User language permissions updated successfully. Languages: ${languages.join(', ')}` });
+    } catch (error) {
+      console.error("Failed to update user languages:", error);
+      res.status(500).json({ message: "Failed to update user languages" });
+    }
+  });
+
   // Wave balance information
   app.get("/api/auth/wave-balance", requireAuth, async (req, res) => {
     try {
