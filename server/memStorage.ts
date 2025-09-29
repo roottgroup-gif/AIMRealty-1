@@ -531,6 +531,8 @@ export class MemStorage implements IStorage {
   async getUserWaveUsage(userId: string): Promise<{ waveId: string; used: number; max: number }[]> { return []; }
   async getUserRemainingWaves(userId: string): Promise<number> { return 10; }
   async updateUsersWithZeroWaveBalance(): Promise<void> {}
+  async deductWaveBalance(userId: string, amount: number): Promise<boolean> { return true; }
+  async addWaveBalance(userId: string, amount: number): Promise<boolean> { return true; }
   async getCurrencyRates(): Promise<CurrencyRate[]> { return []; }
   async getActiveCurrencyRates(): Promise<CurrencyRate[]> { return []; }
   async getCurrencyRate(fromCurrency: string, toCurrency: string): Promise<CurrencyRate | undefined> { return undefined; }

@@ -130,6 +130,8 @@ export interface IStorage {
   getUserWaveUsage(userId: string): Promise<{ waveId: string; used: number; max: number }[]>;
   getUserRemainingWaves(userId: string): Promise<number>;
   updateUsersWithZeroWaveBalance(): Promise<void>;
+  deductWaveBalance(userId: string, amount: number): Promise<boolean>;
+  addWaveBalance(userId: string, amount: number): Promise<boolean>;
   checkWavePermission(userId: string, waveId: string | null | undefined): Promise<{ allowed: boolean; reason?: string }>;
   incrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void>;
   decrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void>;
@@ -1220,12 +1222,24 @@ export class DatabaseStorage implements IStorage {
     // Check if user has permission for this wave
     const permission = await this.getWavePermission(userId, waveId);
     if (!permission) {
-      return { allowed: false, reason: 'User does not have permission to use this wave' };
+      // If no permission, check if user has balance to use the wave
+      const userBalance = user?.waveBalance || 0;
+      if (userBalance > 0) {
+        // Allow usage but mark that balance will be deducted
+        return { allowed: true, reason: 'Will use balance for wave property' };
+      }
+      return { allowed: false, reason: 'User does not have permission to use this wave and insufficient balance' };
     }
 
     // Check if user has exceeded their property limit for this wave
     if ((permission.usedProperties || 0) >= permission.maxProperties) {
-      return { allowed: false, reason: `Maximum properties limit reached for this wave (${permission.maxProperties} properties allowed)` };
+      // If limit reached, check if user has balance to extend usage
+      const userBalance = user?.waveBalance || 0;
+      if (userBalance > 0) {
+        // Allow usage but mark that balance will be deducted
+        return { allowed: true, reason: 'Will use balance for additional wave property' };
+      }
+      return { allowed: false, reason: `Maximum properties limit reached for this wave (${permission.maxProperties} properties allowed) and insufficient balance` };
     }
 
     return { allowed: true };
@@ -1236,11 +1250,51 @@ export class DatabaseStorage implements IStorage {
       return; // No tracking needed for non-wave properties
     }
 
+    const user = await this.getUser(userId);
+    // Allow admin and super admin users unlimited access without balance deduction
+    if (user?.role === 'admin' || user?.role === 'super_admin') {
+      const permission = await this.getWavePermission(userId, waveId);
+      if (permission) {
+        await this.updateWavePermission(permission.id, {
+          usedProperties: ((permission.usedProperties || 0) + 1)
+        });
+      }
+      return;
+    }
+
     const permission = await this.getWavePermission(userId, waveId);
     if (permission) {
-      await this.updateWavePermission(permission.id, {
-        usedProperties: ((permission.usedProperties || 0) + 1)
-      });
+      // Normal permission usage - just increment
+      if ((permission.usedProperties || 0) < permission.maxProperties) {
+        await this.updateWavePermission(permission.id, {
+          usedProperties: ((permission.usedProperties || 0) + 1)
+        });
+      } else {
+        // Over limit - deduct from balance and increment
+        const balanceDeducted = await this.deductWaveBalance(userId, 1);
+        if (balanceDeducted) {
+          await this.updateWavePermission(permission.id, {
+            usedProperties: ((permission.usedProperties || 0) + 1)
+          });
+        } else {
+          throw new Error('Insufficient wave balance to set wave property');
+        }
+      }
+    } else {
+      // No permission - deduct from balance and create basic permission
+      const balanceDeducted = await this.deductWaveBalance(userId, 1);
+      if (balanceDeducted) {
+        // Grant basic permission (1 property) and use it
+        const newPermission = await this.grantWavePermission({
+          userId,
+          waveId,
+          maxProperties: 1,
+          usedProperties: 1,
+          grantedBy: userId // Self-granted via balance
+        });
+      } else {
+        throw new Error('Insufficient wave balance to set wave property');
+      }
     }
   }
 
@@ -1259,6 +1313,28 @@ export class DatabaseStorage implements IStorage {
 
   async updateUsersWithZeroWaveBalance(): Promise<void> {
     await this.dbConn.update(users).set({ waveBalance: 0 }).where(lte(users.waveBalance, 0));
+  }
+
+  async deductWaveBalance(userId: string, amount: number): Promise<boolean> {
+    const user = await this.getUser(userId);
+    if (!user || (user.waveBalance || 0) < amount) {
+      return false; // Insufficient balance
+    }
+    
+    const newBalance = (user.waveBalance || 0) - amount;
+    await this.dbConn.update(users).set({ waveBalance: newBalance }).where(eq(users.id, userId));
+    return true;
+  }
+
+  async addWaveBalance(userId: string, amount: number): Promise<boolean> {
+    const user = await this.getUser(userId);
+    if (!user) {
+      return false; // User not found
+    }
+    
+    const newBalance = (user.waveBalance || 0) + amount;
+    await this.dbConn.update(users).set({ waveBalance: newBalance }).where(eq(users.id, userId));
+    return true;
   }
 
   // Currency Rates
