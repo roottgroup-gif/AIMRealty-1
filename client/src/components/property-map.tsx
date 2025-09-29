@@ -22,6 +22,7 @@ import { useCurrency } from "@/lib/currency-context";
 import { formatPrice } from "@/lib/currency";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { normalizePropertyImageUrl } from "@/lib/utils";
 
 interface PropertyMapProps {
   properties: PropertyWithDetails[];
@@ -1064,10 +1065,13 @@ export default function PropertyMap({
           </style>
           ${cluster.properties
             .map((property: any) => {
-              const propertyImage =
-                property.images && property.images.length > 0
-                  ? property.images[0]
-                  : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=250&fit=crop&crop=center";
+              const rawImageUrl = property.images && property.images.length > 0
+                ? (property.images[0].imageUrl || property.images[0])
+                : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=250&fit=crop&crop=center";
+              
+              const propertyImage = rawImageUrl.startsWith('http') 
+                ? rawImageUrl
+                : normalizePropertyImageUrl(rawImageUrl);
 
               return `
                 <div style="
@@ -1329,7 +1333,10 @@ export default function PropertyMap({
     // Add popup with image slider
     const images =
       Array.isArray(property.images) && property.images.length > 0
-        ? property.images.map((img: any) => img.imageUrl || img)
+        ? property.images.map((img: any) => {
+            const imageUrl = img.imageUrl || img;
+            return normalizePropertyImageUrl(imageUrl);
+          })
         : [
             "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
           ];
