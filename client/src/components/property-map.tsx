@@ -697,6 +697,36 @@ export default function PropertyMap({
     };
   }, []);
 
+  // Country normalization mapping to handle multilingual country names
+  const normalizeCountryName = (country: string): string => {
+    const countryNormalizationMap: { [key: string]: string } = {
+      // Iraq variations
+      "Iraq": "Iraq",
+      "العراق": "Iraq",
+      "عێراق": "Iraq",
+      // Add more country mappings as needed
+      "Kurdistan": "Kurdistan",
+      "كوردستان": "Kurdistan",
+      "کوردستان": "Kurdistan",
+      // Turkey variations
+      "Turkey": "Turkey",
+      "تركيا": "Turkey",
+      "تورکیا": "Turkey",
+      // Iran variations
+      "Iran": "Iran",
+      "إيران": "Iran",
+      "ئێران": "Iran",
+      // Syria variations
+      "Syria": "Syria",
+      "سوريا": "Syria",
+      "سووریا": "Syria",
+      // Default cases
+      "Unknown Country": "Unknown Country",
+    };
+
+    return countryNormalizationMap[country] || country;
+  };
+
   // Function to create zoom-based clusters
   const createZoomBasedClusters = (
     propertiesToCluster: PropertyWithDetails[],
@@ -721,29 +751,30 @@ export default function PropertyMap({
     }
   };
 
-  // Function to create country-based clusters
+  // Function to create country-based clusters with multilingual support
   const createCountryBasedClusters = (
     propertiesToCluster: PropertyWithDetails[],
   ) => {
     const countryGroups: { [key: string]: PropertyWithDetails[] } = {};
 
-    // Group properties by country
+    // Group properties by normalized country name
     propertiesToCluster.forEach((property) => {
       if (!property.latitude || !property.longitude) return;
 
-      // Use country as grouping key, fallback to 'Unknown Country'
-      const country = property.country || "Unknown Country";
+      // Normalize country name to handle multilingual variations
+      const rawCountry = property.country || "Unknown Country";
+      const normalizedCountry = normalizeCountryName(rawCountry);
 
-      if (!countryGroups[country]) {
-        countryGroups[country] = [];
+      if (!countryGroups[normalizedCountry]) {
+        countryGroups[normalizedCountry] = [];
       }
-      countryGroups[country].push(property);
+      countryGroups[normalizedCountry].push(property);
     });
 
     // Convert country groups to clusters
     return Object.entries(countryGroups).map(([country, properties]) => ({
       properties,
-      country,
+      country, // This will be the normalized country name
       clusterType: "country",
       center: {
         lat:
