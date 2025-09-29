@@ -72,16 +72,14 @@ export default function PropertyMap({
     console.log(`🔍 calculateVisibleProperties called with forceUpdate=${forceUpdate}, properties count: ${properties?.length || 0}`);
     
     if (!mapInstanceRef.current) {
-      console.log(`❌ No map instance available`);
-      onVisiblePropertiesChange?.(0);
-      return;
+      console.log(`❌ No map instance available - skipping count update`);
+      return; // Don't reset count to 0 during initialization
     }
 
-    // Always show total count if no properties are loaded yet
+    // Don't update count if no properties are loaded yet - wait for properties to load
     if (!properties || properties.length === 0) {
-      console.log(`❌ No properties available to calculate`);
-      onVisiblePropertiesChange?.(0);
-      return;
+      console.log(`❌ No properties available to calculate - skipping count update`);
+      return; // Don't reset count to 0 during loading
     }
 
     try {
@@ -337,17 +335,16 @@ export default function PropertyMap({
 
   // Recalculate visible properties count when properties change
   useEffect(() => {
-    if (mapInstanceRef.current && properties.length > 0) {
+    if (mapInstanceRef.current && properties && properties.length > 0) {
       // Use a small delay to ensure the map is fully ready
       const timer = setTimeout(() => {
         calculateVisibleProperties(true); // Force update when properties change
       }, 300);
       
       return () => clearTimeout(timer);
-    } else if (properties.length === 0) {
-      // If no properties, set count to 0 immediately
-      onVisiblePropertiesChange?.(0);
     }
+    // Don't immediately set to 0 when properties.length === 0 
+    // because this happens during loading phase
   }, [properties]);
 
   // Sync local filters with prop changes, but don't overwrite local updates
