@@ -274,6 +274,21 @@ export default function PropertyMap({
     }
   }, [preferredCurrency, convertedPrices]);
 
+  // Recalculate visible properties count when properties change
+  useEffect(() => {
+    if (mapInstanceRef.current && properties.length > 0) {
+      // Use a small delay to ensure the map is fully ready
+      const timer = setTimeout(() => {
+        calculateVisibleProperties();
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    } else if (properties.length === 0) {
+      // If no properties, set count to 0 immediately
+      onVisiblePropertiesChange?.(0);
+    }
+  }, [properties]);
+
   // Sync local filters with prop changes, but don't overwrite local updates
   useEffect(() => {
     if (isLocalUpdate.current) {
