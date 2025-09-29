@@ -950,8 +950,9 @@ export default function PropertyMap({
     cluster: any,
     L: any,
     isCityCluster: boolean = false,
+    totalCount?: number,
   ) => {
-    const count = cluster.properties.length;
+    const count = totalCount || cluster.properties.length;
     const { lat, lng } = cluster.center;
 
     // Always use orange background for cluster markers regardless of theme
@@ -1752,7 +1753,7 @@ export default function PropertyMap({
         createSingleMarker(cluster.properties[0], L);
       } else {
         // Show cluster marker if multiple properties are grouped
-        createClusterMarker(cluster, L, isClusteringEnabled);
+        createClusterMarker(cluster, L, isClusteringEnabled, propertiesToShow.length);
       }
     });
   };
