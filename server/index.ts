@@ -227,6 +227,16 @@ app.use(injectPropertyMetaTags);
   // Initialize storage (with automatic MySQL/MemStorage detection)
   storage = await StorageFactory.getStorage();
 
+  // Fix existing users' language permissions on startup
+  try {
+    console.log('🔧 Running startup fix for user language permissions...');
+    if (typeof storage.fixExistingUsersLanguagePermissions === 'function') {
+      await storage.fixExistingUsersLanguagePermissions();
+    }
+  } catch (error) {
+    console.warn('⚠️ Failed to run startup language permissions fix:', error);
+  }
+
   const server = await registerRoutes(app, storage);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

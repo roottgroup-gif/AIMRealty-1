@@ -250,6 +250,17 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Fix existing users language permissions (super admin only)
+  app.post("/api/users/fix-language-permissions", requireRole("super_admin"), async (req, res) => {
+    try {
+      await storage.fixExistingUsersLanguagePermissions();
+      res.json({ message: "Successfully fixed language permissions for all existing users" });
+    } catch (error) {
+      console.error("Failed to fix user language permissions:", error);
+      res.status(500).json({ message: "Failed to fix user language permissions" });
+    }
+  });
+
   // Wave balance information
   app.get("/api/auth/wave-balance", requireAuth, async (req, res) => {
     try {

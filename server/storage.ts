@@ -214,9 +214,17 @@ export class DatabaseStorage implements IStorage {
     
     await this.dbConn.insert(users).values({ ...user, id, password: hashedPassword });
     
-    // Add default languages if not specified
+    // Add all supported languages by default for regular users to allow multilingual posting
     if (!user.role || user.role === 'user') {
-      await this.addUserLanguage(id, 'en');
+      const supportedLanguages = ['en', 'ar', 'kur'];
+      for (const language of supportedLanguages) {
+        try {
+          await this.addUserLanguage(id, language);
+        } catch (error) {
+          // Log error but don't fail user creation if language already exists
+          console.warn(`Failed to add language ${language} to user ${id}:`, error);
+        }
+      }
     }
     
     return await this.getUser(id) as User;
@@ -252,6 +260,47 @@ export class DatabaseStorage implements IStorage {
       .delete(userLanguages)
       .where(and(eq(userLanguages.userId, userId), eq(userLanguages.language, language)));
     return true; // MySQL doesn't return affectedRows in the same way
+  }
+
+  // Helper function to grant all supported language permissions to existing users
+  async grantAllLanguagePermissionsToUser(userId: string): Promise<void> {
+    const supportedLanguages = ['en', 'ar', 'kur'];
+    const userLanguages = await this.getUserLanguages(userId);
+    const existingLanguages = userLanguages.map(ul => ul.language);
+    
+    for (const language of supportedLanguages) {
+      if (!existingLanguages.includes(language)) {
+        try {
+          await this.addUserLanguage(userId, language);
+          console.log(`✅ Added language permission: ${language} for user ${userId}`);
+        } catch (error) {
+          console.warn(`Failed to add language ${language} to user ${userId}:`, error);
+        }
+      }
+    }
+  }
+
+  // Function to fix all existing users to have all language permissions
+  async fixExistingUsersLanguagePermissions(): Promise<void> {
+    try {
+      console.log('🔧 Fixing existing users language permissions...');
+      
+      // Get all regular users (non-admin users)
+      const allUsers = await this.dbConn
+        .select({ id: users.id, role: users.role, username: users.username })
+        .from(users)
+        .where(sql`role IS NULL OR role = 'user'`);
+      
+      console.log(`Found ${allUsers.length} regular users to fix`);
+      
+      for (const user of allUsers) {
+        await this.grantAllLanguagePermissionsToUser(user.id);
+      }
+      
+      console.log('✅ Finished fixing existing users language permissions');
+    } catch (error) {
+      console.error('❌ Error fixing existing users language permissions:', error);
+    }
   }
 
   async authenticateUser(username: string, password: string): Promise<User | null> {
