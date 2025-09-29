@@ -71,17 +71,22 @@ export default function PropertyMap({
     try {
       const bounds = mapInstanceRef.current.getBounds();
       const visibleProperties = properties.filter(property => {
-        const lat = parseFloat(property.latitude || '0');
-        const lng = parseFloat(property.longitude || '0');
+        const lat = parseFloat(property.latitude || '');
+        const lng = parseFloat(property.longitude || '');
         
-        // Check if property coordinates are within current map bounds
+        // Skip properties with invalid coordinates
+        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          return false;
+        }
+        
+        // Check if property coordinates are within current map bounds (Leaflet uses [lat, lng])
         return bounds.contains([lat, lng]);
       });
       
       onVisiblePropertiesChange?.(visibleProperties.length);
     } catch (error) {
       console.log('Error calculating visible properties:', error);
-      onVisiblePropertiesChange?.(properties.length); // Fallback to total count
+      onVisiblePropertiesChange?.(0); // Fallback to 0 instead of total count
     }
   };
 
@@ -644,6 +649,9 @@ export default function PropertyMap({
     return () => {
       if (mapInstanceRef.current) {
         try {
+          // Clean up event listeners before removing map
+          mapInstanceRef.current.off("zoomend");
+          mapInstanceRef.current.off("moveend");
           mapInstanceRef.current.remove();
         } catch (error) {
           console.warn("Error cleaning up map:", error);
@@ -1633,7 +1641,7 @@ export default function PropertyMap({
       // Update visible properties count when properties change
       setTimeout(() => {
         calculateVisibleProperties();
-      }, 100);
+      }, 200);
     }
   }, [properties, convertedPrices, preferredCurrency]);
 
