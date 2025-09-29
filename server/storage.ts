@@ -492,7 +492,23 @@ export class DatabaseStorage implements IStorage {
     userId?: string
   ): Promise<Property> {
     const id = crypto.randomUUID();
-    const slug = property.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    
+    // Generate proper multilingual slug that handles Arabic/Kurdish text
+    const baseSlug = generatePropertySlug(property);
+    
+    // Generate unique slug by checking database
+    let slug = baseSlug;
+    let counter = 1;
+    while (true) {
+      const existingProperty = await this.dbConn.select().from(properties).where(eq(properties.slug, slug));
+      if (existingProperty.length === 0) break;
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+      if (counter > 1000) {
+        slug = `${baseSlug}-${Date.now()}`;
+        break;
+      }
+    }
 
     // Validate and fix waveId if invalid
     let validatedWaveId = property.waveId;
