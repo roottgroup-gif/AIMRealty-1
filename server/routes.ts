@@ -1361,6 +1361,23 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     try {
       const { id } = req.params;
       
+      // Get the property first to check ownership
+      const existingProperty = await storage.getProperty(id);
+      if (!existingProperty) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      
+      // Check if user owns the property or is admin
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      // Allow update if user is admin or owns the property
+      if (user.role !== 'admin' && user.role !== 'super_admin' && existingProperty.agentId !== user.id) {
+        return res.status(403).json({ message: "Forbidden: You can only update your own properties" });
+      }
+      
       // Preprocess request body to handle null images
       const processedBody = { ...req.body };
       if (processedBody.images === null) {
