@@ -64,16 +64,22 @@ export default function PropertyMap({
 
   // Track last calculated bounds to avoid unnecessary recalculation
   const lastBoundsRef = useRef<string>('');
+  const lastValidCountRef = useRef<number>(0);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Function to calculate visible properties within map bounds
   const calculateVisibleProperties = (forceUpdate = false) => {
+    console.log(`🔍 calculateVisibleProperties called with forceUpdate=${forceUpdate}, properties count: ${properties?.length || 0}`);
+    
     if (!mapInstanceRef.current) {
+      console.log(`❌ No map instance available`);
       onVisiblePropertiesChange?.(0);
       return;
     }
 
     // Always show total count if no properties are loaded yet
     if (!properties || properties.length === 0) {
+      console.log(`❌ No properties available to calculate`);
       onVisiblePropertiesChange?.(0);
       return;
     }
@@ -89,6 +95,7 @@ export default function PropertyMap({
       // Skip calculation if bounds AND zoom haven't changed (optimization)
       // But allow force update for important events like map initialization
       if (!forceUpdate && boundsAndZoomKey === lastBoundsRef.current) {
+        console.log(`⏭️ Skipping calculation - bounds and zoom unchanged: ${boundsAndZoomKey}`);
         return;
       }
       lastBoundsRef.current = boundsAndZoomKey;
@@ -109,6 +116,37 @@ export default function PropertyMap({
       });
       
       console.log(`📍 Visible properties calculation: ${visibleProperties.length} of ${properties.length} total properties, zoom: ${currentZoom}`);
+      
+      // Store the last valid non-zero count
+      if (visibleProperties.length > 0) {
+        lastValidCountRef.current = visibleProperties.length;
+      }
+      
+      // If count is 0 and we're during a potential zoom operation, debounce the update
+      if (visibleProperties.length === 0 && lastValidCountRef.current > 0) {
+        console.log(`⏳ Count is 0 but last valid was ${lastValidCountRef.current} - debouncing update`);
+        
+        // Clear existing timeout
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+        
+        // Set timeout to confirm 0 count after a delay
+        debounceTimeoutRef.current = setTimeout(() => {
+          console.log(`✅ Confirming 0 count after debounce delay`);
+          onVisiblePropertiesChange?.(0);
+        }, 500); // 500ms delay
+        
+        return; // Don't update immediately
+      }
+      
+      // Clear any pending timeout if we have a valid count
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = null;
+      }
+      
+      console.log(`📲 Calling onVisiblePropertiesChange with count: ${visibleProperties.length}`);
       onVisiblePropertiesChange?.(visibleProperties.length);
     } catch (error) {
       console.log('Error calculating visible properties:', error);

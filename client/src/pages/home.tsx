@@ -326,7 +326,10 @@ export default function HomePage() {
               // Handle property selection for highlighting
               setHighlightedPropertyId(property.id);
             }}
-            onVisiblePropertiesChange={setVisiblePropertiesCount}
+            onVisiblePropertiesChange={(count) => {
+              console.log(`🏠 HOME: Setting visible properties count to: ${count} at ${new Date().toISOString()}`);
+              setVisiblePropertiesCount(count);
+            }}
             userId={user?.id}
             className="h-full w-full"
           />
