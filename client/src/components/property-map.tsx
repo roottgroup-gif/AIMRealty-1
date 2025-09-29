@@ -1753,7 +1753,7 @@ export default function PropertyMap({
         createSingleMarker(cluster.properties[0], L);
       } else {
         // Show cluster marker if multiple properties are grouped
-        createClusterMarker(cluster, L, isClusteringEnabled, propertiesToShow.length);
+        createClusterMarker(cluster, L, isClusteringEnabled, properties.length);
       }
     });
   };
