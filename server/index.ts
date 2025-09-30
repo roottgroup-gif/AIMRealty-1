@@ -39,9 +39,10 @@ app.use(requestSizeMonitor(10)); // 10MB limit with warnings
 // Use enhanced performance logging
 app.use(performanceLogger);
 
-// Social media meta tag injection middleware for property pages
-function isSocialMediaBot(userAgent: string): boolean {
+// Social media and search engine bot detection middleware for property pages
+function isCrawlerBot(userAgent: string): boolean {
   const botPatterns = [
+    // Social media bots
     'facebookexternalhit',
     'twitterbot',
     'linkedinbot',
@@ -49,7 +50,13 @@ function isSocialMediaBot(userAgent: string): boolean {
     'skypeuripreview',
     'discordbot',
     'slackbot',
-    'telegrambot'
+    'telegrambot',
+    // Search engine bots
+    'googlebot',
+    'bingbot',
+    'yandexbot',
+    'baiduspider',
+    'duckduckbot'
   ];
   
   const lowerUserAgent = userAgent.toLowerCase();
@@ -85,8 +92,8 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
   
   const userAgent = req.get('User-Agent') || '';
   
-  // Only inject for social media bots to avoid affecting normal users
-  if (!isSocialMediaBot(userAgent)) {
+  // Only inject for crawler bots (social media and search engines) to avoid affecting normal users
+  if (!isCrawlerBot(userAgent)) {
     return next();
   }
   
@@ -131,9 +138,37 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
       ? (property.images[0].startsWith('http') ? property.images[0] : `${protocol}://${req.get('host')}${property.images[0]}`)
       : `${protocol}://${req.get('host')}/logo_1757848527935.png`;
     // Generate property URL with language prefix if present
-    const languagePrefix = propertyMatch[1] ? `/${propertyMatch[1]}` : '';
+    const language = propertyMatch[1] || 'en';
+    const languagePrefix = language !== 'en' ? `/${language}` : '';
     const propertyUrl = `${protocol}://${req.get('host')}${languagePrefix}/property/${property.slug || property.id}`;
     const secureImageUrl = propertyImage.replace('http://', 'https://');
+    
+    // Map language to OG locale
+    const localeMap: { [key: string]: string } = {
+      'en': 'en_US',
+      'ar': 'ar_IQ',
+      'kur': 'ckb_IQ'  // Kurdish Sorani
+    };
+    const ogLocale = localeMap[language] || 'en_US';
+    
+    // Get alternate locales and generate hreflang links
+    const allLanguages = ['en', 'ar', 'kur'];
+    const hreflangMap: { [key: string]: string } = {
+      'en': 'en',
+      'ar': 'ar-IQ',
+      'kur': 'ku-IQ'  // Kurdish Sorani - ISO 639-1 compliant
+    };
+    const alternateLocales = allLanguages
+      .filter(lang => lang !== language)
+      .map(lang => localeMap[lang]);
+    
+    const hreflangLinks = allLanguages
+      .map(lang => {
+        const prefix = lang !== 'en' ? `/${lang}` : '';
+        const url = `${protocol}://${req.get('host')}${prefix}/property/${property.slug || property.id}`;
+        return `<link rel="alternate" hreflang="${hreflangMap[lang]}" href="${url}" />`;
+      })
+      .join('\n    ') + '\n    ' + `<link rel="alternate" hreflang="x-default" href="${protocol}://${req.get('host')}/property/${property.slug || property.id}" />`;
     
     // Build comprehensive meta tags for social media
     const socialMetaTags = `
@@ -142,6 +177,7 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     <meta name="title" content="${propertyTitle}" />
     <meta name="description" content="${propertyDescription}" />
     <link rel="canonical" href="${propertyUrl}" />
+    ${hreflangLinks}
     
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="product" />
@@ -154,7 +190,8 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     <meta property="og:image:alt" content="${escapeHtml(property.title)}" />
     <meta property="og:url" content="${propertyUrl}" />
     <meta property="og:site_name" content="MapEstate" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content="${ogLocale}" />
+    ${alternateLocales.map(locale => `<meta property="og:locale:alternate" content="${locale}" />`).join('\n    ')}
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
