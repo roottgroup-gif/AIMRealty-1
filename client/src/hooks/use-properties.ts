@@ -152,7 +152,7 @@ export function useUpdateInquiryStatus() {
   });
 }
 
-export function useFavorites(userId: string) {
+export function useFavorites(userId: string | undefined) {
   return useQuery<Property[]>({
     queryKey: ["/api/users", userId, "favorites"],
     enabled: !!userId,
@@ -207,7 +207,7 @@ export function useRemoveFromFavorites() {
   });
 }
 
-export function useIsFavorite(userId: string, propertyId: string) {
+export function useIsFavorite(userId: string | undefined, propertyId: string) {
   return useQuery<{ isFavorite: boolean }>({
     queryKey: ["/api/favorites/check", { userId, propertyId }],
     enabled: !!userId && !!propertyId,

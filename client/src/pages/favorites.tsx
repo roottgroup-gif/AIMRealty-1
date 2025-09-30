@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
 import { useFavorites } from "@/hooks/use-properties";
+import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/lib/i18n";
 import { ArrowLeft, Heart, Home as HomeIcon } from "lucide-react";
 import type { Property } from "@/types";
 
 export default function FavoritesPage() {
-  const [userId] = useState("demo-user-id"); // In real app, get from auth context
+  const { user } = useAuth();
+  const userId = user?.id;
   const { data: favorites, isLoading, error } = useFavorites(userId);
   const [, setLocation] = useLocation();
   const { t } = useTranslation();

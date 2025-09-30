@@ -1592,8 +1592,10 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
       res.status(201).json(favorite);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("❌ POST /api/favorites - Validation error:", error.errors);
         return res.status(400).json({ message: "Invalid favorite data", errors: error.errors });
       }
+      console.error("❌ POST /api/favorites - Server error:", error);
       res.status(500).json({ message: "Failed to add to favorites" });
     }
   });

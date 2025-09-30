@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/lib/i18n";
 import { useProperty, useAddToFavorites, useRemoveFromFavorites, useIsFavorite } from "@/hooks/use-properties";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { SEOHead } from "@/components/SEOHead";
 import type { Property } from "@/types";
 import { extractPropertyIdentifier } from "@shared/slug-utils";
@@ -25,10 +26,11 @@ export default function PropertyDetailPage() {
   const { id } = useParams();
   const { t, changeLanguage, language: currentLanguage } = useTranslation();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isAutoSliding, setIsAutoSliding] = useState(true);
-  const [userId] = useState("demo-user-id"); // In real app, get from auth context
+  const userId = user?.id;
   const [originalLanguage, setOriginalLanguage] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
@@ -164,7 +166,14 @@ export default function PropertyDetailPage() {
   };
 
   const handleFavoriteClick = async () => {
-    if (!property) return;
+    if (!property || !userId) {
+      toast({
+        title: t('property.loginRequired'),
+        description: t('property.loginRequiredDescription'),
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       if (isFavorite) {
