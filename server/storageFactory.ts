@@ -48,7 +48,7 @@ class StorageFactory {
     if (!this.instance || !this.isInitialized) {
       throw new Error("Storage not initialized. Call getStorage() first.");
     }
-    return this.instance;
+    return this.instance!;
   }
 }
 
