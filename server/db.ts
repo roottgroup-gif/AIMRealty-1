@@ -1,36 +1,39 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2/promise';
 import * as schema from "@shared/schema";
+import { getValidatedDatabaseConfig } from './config/dbConfig';
 
-let queryClient: postgres.Sql;
+let queryClient: mysql.Pool;
 let db: ReturnType<typeof drizzle>;
-const dbType = 'postgres';
+const dbType = 'mysql';
 
 async function initializeDb() {
   try {
-    const connectionString = process.env.DATABASE_URL;
+    const config = getValidatedDatabaseConfig();
     
-    if (!connectionString) {
-      throw new Error("DATABASE_URL environment variable is not set");
-    }
+    console.log("🔄 Connecting to MySQL VPS database...");
     
-    console.log("🔄 Connecting to PostgreSQL database...");
-    
-    // Create connection with proper postgres.js configuration
-    queryClient = postgres(connectionString, {
-      max: 10,                      // Connection pool size
-      idle_timeout: 20,             // Close idle connections after 20s
-      connect_timeout: 10,          // Connection timeout in seconds
-      prepare: false,               // Disable prepared statements for compatibility
+    // Create connection pool with proper mysql2 configuration
+    queryClient = mysql.createPool({
+      host: config.host,
+      port: config.port,
+      user: config.user,
+      password: config.password,
+      database: config.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
     });
     
-    db = drizzle(queryClient, { schema });
-    console.log("✅ PostgreSQL connection established successfully");
+    db = drizzle(queryClient, { schema, mode: 'default' });
+    console.log("✅ MySQL VPS connection established successfully");
     
     // Test the connection
     try {
       console.log("🔍 Testing database connection...");
-      await queryClient`SELECT 1`;
+      await queryClient.query('SELECT 1');
       console.log("💓 Database connection is healthy");
     } catch (pingError) {
       console.warn("⚠️ Connection test failed:", pingError);
@@ -39,9 +42,9 @@ async function initializeDb() {
     
     return db;
   } catch (error) {
-    console.error("❌ Failed to connect to PostgreSQL database:");
+    console.error("❌ Failed to connect to MySQL VPS database:");
     console.error(`   Error: ${error}`);
-    throw new Error(`PostgreSQL connection failed: ${error}`);
+    throw new Error(`MySQL connection failed: ${error}`);
   }
 }
 
@@ -56,7 +59,7 @@ function getDb() {
 // Health check function
 async function checkDatabaseHealth() {
   try {
-    await queryClient`SELECT 1`;
+    await queryClient.query('SELECT 1');
     return true;
   } catch (error) {
     console.warn("⚠️ Database health check failed:", error);
@@ -78,7 +81,7 @@ async function recoverConnection() {
   }
 }
 
-function getDbType(): 'postgres' {
+function getDbType(): 'mysql' {
   return dbType;
 }
 
