@@ -543,9 +543,9 @@ const translations: Translations = {
 
   // Settings Page
   "settings.title": {
-    en: "Settings - MapEstate",
-    ar: "الإعدادات - MapEstate",
-    kur: "ڕێکخستنەکان - MapEstate",
+    en: "Settings",
+    ar: "الإعدادات",
+    kur: "ڕێکخستنەکان",
   },
   "settings.backToHome": {
     en: "Back to Home",
