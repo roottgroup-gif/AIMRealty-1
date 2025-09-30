@@ -9,13 +9,13 @@ interface DatabaseConfig {
   connectionUrl: string;
 }
 
-// Default VPS MySQL configuration
+// VPS MySQL configuration - MUST be set via environment variables
 const DEFAULT_VPS_CONFIG = {
-  host: process.env.MYSQL_HOST || "72.60.134.44",
+  host: process.env.MYSQL_HOST || "",
   port: parseInt(process.env.MYSQL_PORT || "3306"),
-  user: process.env.MYSQL_USER || "mapestate",
-  password: process.env.MYSQL_PASSWORD || "MapEstate2024!",
-  database: process.env.MYSQL_DATABASE || "mapestate",
+  user: process.env.MYSQL_USER || "",
+  password: process.env.MYSQL_PASSWORD || "",
+  database: process.env.MYSQL_DATABASE || "",
 };
 
 function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
