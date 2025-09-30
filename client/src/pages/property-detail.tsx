@@ -342,9 +342,10 @@ export default function PropertyDetailPage() {
   }
 
   const firstImage = property.images?.[0];
+  const defaultSocialImage = `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`;
   const primaryImage = (firstImage && typeof firstImage === 'object' && 'imageUrl' in firstImage) 
     ? firstImage.imageUrl 
-    : (firstImage || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600');
+    : (firstImage || defaultSocialImage);
   const images = Array.isArray(property.images) && property.images.length > 0 
     ? property.images.map((img: any) => img.imageUrl || img) : [primaryImage];
 
@@ -363,8 +364,7 @@ export default function PropertyDetailPage() {
             address: property.address,
             country: property.country,
             currency: property.currency || 'USD',
-            area: property.area,
-            description: property.description || property.title
+            area: property.area
           }}
           ogImage={primaryImage}
           canonicalUrl={undefined}
