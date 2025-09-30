@@ -404,7 +404,6 @@ const translations: Translations = {
 
   // Favorites Page
   "favorites.title": {
-    en: "My Favorite Properties - MapEstate | Saved Property Listings",
     ar: "خصائصي المفضلة - MapEstate | قوائم العقارات المحفوظة",
     kur: "خانووبەرە بەرگریکراوەکانم - MapEstate | لیستی خانووبەرە پاشەکەوتکراوەکان",
   },
