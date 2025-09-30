@@ -28,12 +28,12 @@ function getDatabaseConfig(): DatabaseConfig {
   // Try to get MYSQL_URL from environment first
   let connectionUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
-  // Check if individual MySQL environment variables are provided
-  const mysqlHost = process.env.MYSQL_HOST;
-  const mysqlPort = process.env.MYSQL_PORT;
-  const mysqlUser = process.env.MYSQL_USER;
-  const mysqlPassword = process.env.MYSQL_PASSWORD;
-  const mysqlDatabase = process.env.MYSQL_DATABASE;
+  // Check if individual MySQL environment variables are provided (trim whitespace)
+  const mysqlHost = process.env.MYSQL_HOST?.trim();
+  const mysqlPort = process.env.MYSQL_PORT?.trim();
+  const mysqlUser = process.env.MYSQL_USER?.trim();
+  const mysqlPassword = process.env.MYSQL_PASSWORD?.trim();
+  const mysqlDatabase = process.env.MYSQL_DATABASE?.trim();
 
   // Debug logging for environment variables
   console.log("🔍 Environment Variables Debug:");
