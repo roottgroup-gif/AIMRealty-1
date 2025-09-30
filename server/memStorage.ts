@@ -472,7 +472,23 @@ export class MemStorage implements IStorage {
     }
   }
 
-  // Stub implementations for other required methods
+  // Language permissions
+  async grantAllLanguagePermissionsToUser(userId: string): Promise<void> {
+    const languages = ['en', 'ar', 'tr', 'ku'];
+    for (const lang of languages) {
+      await this.addUserLanguage(userId, lang);
+    }
+  }
+
+  async fixExistingUsersLanguagePermissions(): Promise<void> {
+    for (const user of this.users.values()) {
+      if (user.role === 'user') {
+        await this.grantAllLanguagePermissionsToUser(user.id);
+      }
+    }
+  }
+
+  // Inquiries
   async getInquiry(id: string): Promise<Inquiry | undefined> {
     return this.inquiries.get(id);
   }
@@ -488,32 +504,158 @@ export class MemStorage implements IStorage {
     return newInquiry;
   }
 
+  async updateInquiryStatus(id: string, status: string): Promise<Inquiry | undefined> {
+    const inquiry = this.inquiries.get(id);
+    if (!inquiry) return undefined;
+    const updated = { ...inquiry, status };
+    this.inquiries.set(id, updated);
+    return updated;
+  }
+
+  // Favorites
+  async getFavoritesByUser(userId: string): Promise<PropertyWithDetails[]> {
+    const userFavorites = this.favorites.get(userId) || [];
+    const properties: PropertyWithDetails[] = [];
+    for (const fav of userFavorites) {
+      const property = await this.getProperty(fav.propertyId);
+      if (property) properties.push(property);
+    }
+    return properties;
+  }
+
+  async addToFavorites(favorite: InsertFavorite): Promise<Favorite> {
+    const userFavs = this.favorites.get(favorite.userId) || [];
+    const newFavorite: Favorite = {
+      id: userFavs.length + 1,
+      ...favorite,
+      createdAt: new Date(),
+    };
+    userFavs.push(newFavorite);
+    this.favorites.set(favorite.userId, userFavs);
+    return newFavorite;
+  }
+
+  async removeFromFavorites(userId: string, propertyId: string): Promise<boolean> {
+    const userFavs = this.favorites.get(userId) || [];
+    const filtered = userFavs.filter(f => f.propertyId !== propertyId);
+    this.favorites.set(userId, filtered);
+    return filtered.length < userFavs.length;
+  }
+
+  async isFavorite(userId: string, propertyId: string): Promise<boolean> {
+    const userFavs = this.favorites.get(userId) || [];
+    return userFavs.some(f => f.propertyId === propertyId);
+  }
+
+  // Search History
+  async addSearchHistory(search: InsertSearchHistory): Promise<SearchHistory> {
+    const userHistory = this.searchHistory.get(search.userId) || [];
+    const newSearch: SearchHistory = {
+      id: this.generateId(),
+      ...search,
+      createdAt: new Date(),
+    };
+    userHistory.push(newSearch);
+    this.searchHistory.set(search.userId, userHistory);
+    return newSearch;
+  }
+
+  async getSearchHistoryByUser(userId: string): Promise<SearchHistory[]> {
+    return this.searchHistory.get(userId) || [];
+  }
+
+  async addSearchFilter(filter: InsertSearchFilter): Promise<SearchFilter> {
+    const userFilters = this.searchFilters.get(filter.userId) || [];
+    const newFilter: SearchFilter = {
+      id: this.generateId(),
+      ...filter,
+      createdAt: new Date(),
+    };
+    userFilters.push(newFilter);
+    this.searchFilters.set(filter.userId, userFilters);
+    return newFilter;
+  }
+
+  // Customer Analytics
+  async addCustomerActivity(activity: InsertCustomerActivity): Promise<CustomerActivity> {
+    const userActivities = this.customerActivity.get(activity.userId) || [];
+    const newActivity: CustomerActivity = {
+      id: this.generateId(),
+      ...activity,
+      createdAt: new Date(),
+    };
+    userActivities.push(newActivity);
+    this.customerActivity.set(activity.userId, userActivities);
+    return newActivity;
+  }
+
+  async getCustomerActivities(userId: string, limit?: number): Promise<CustomerActivity[]> {
+    const activities = this.customerActivity.get(userId) || [];
+    return limit ? activities.slice(0, limit) : activities;
+  }
+
+  async getCustomerPoints(userId: string): Promise<CustomerPoints | undefined> {
+    const points = this.customerPoints.get(userId) || [];
+    return points[points.length - 1];
+  }
+
+  async updateCustomerPoints(userId: string, points: Partial<InsertCustomerPoints>): Promise<CustomerPoints> {
+    const existing = await this.getCustomerPoints(userId);
+    const updated: CustomerPoints = {
+      id: existing?.id || this.generateId(),
+      userId,
+      totalPoints: points.totalPoints ?? existing?.totalPoints ?? 0,
+      createdAt: existing?.createdAt || new Date(),
+      updatedAt: new Date(),
+    };
+    
+    const userPoints = this.customerPoints.get(userId) || [];
+    if (existing) {
+      const index = userPoints.findIndex(p => p.id === existing.id);
+      if (index >= 0) userPoints[index] = updated;
+    } else {
+      userPoints.push(updated);
+    }
+    this.customerPoints.set(userId, userPoints);
+    return updated;
+  }
+
+  async getCustomerAnalytics(userId: string): Promise<{
+    totalActivities: number;
+    activitiesByType: { activityType: string; count: number; points: number }[];
+    pointsHistory: { date: string; points: number }[];
+    monthlyActivity: { month: string; activities: number }[];
+  }> {
+    const activities = this.customerActivity.get(userId) || [];
+    const points = this.customerPoints.get(userId) || [];
+    
+    return {
+      totalActivities: activities.length,
+      activitiesByType: [],
+      pointsHistory: points.map(p => ({
+        date: p.createdAt?.toISOString() || '',
+        points: p.totalPoints || 0
+      })),
+      monthlyActivity: []
+    };
+  }
+
+  // Waves
+  async getWaves(): Promise<Wave[]> {
+    return Array.from(this.waves.values());
+  }
+
   async getWave(id: string): Promise<Wave | undefined> {
     return this.waves.get(id);
   }
 
-  // Add minimal implementations for all other required interface methods
-  async getFavorites(userId: string): Promise<Favorite[]> { return []; }
-  async addFavorite(favorite: InsertFavorite): Promise<Favorite> { return {} as Favorite; }
-  async removeFavorite(userId: string, propertyId: string): Promise<boolean> { return false; }
-  async getSearchHistory(userId: string): Promise<SearchHistory[]> { return []; }
-  async addSearchHistory(search: InsertSearchHistory): Promise<SearchHistory> { return {} as SearchHistory; }
-  async getSearchFilters(userId: string): Promise<SearchFilter[]> { return []; }
-  async saveSearchFilter(filter: InsertSearchFilter): Promise<SearchFilter> { return {} as SearchFilter; }
-  async deleteSearchFilter(id: string): Promise<boolean> { return false; }
-  async getCustomerActivity(userId: string): Promise<CustomerActivity[]> { return []; }
-  async createCustomerActivity(activity: InsertCustomerActivity): Promise<CustomerActivity> { return {} as CustomerActivity; }
-  async getActivityMetadata(activityId: string): Promise<ActivityMetadata[]> { return []; }
-  async addActivityMetadata(metadata: InsertActivityMetadata): Promise<ActivityMetadata> { return {} as ActivityMetadata; }
-  async getCustomerPoints(userId: string): Promise<CustomerPoints[]> { return []; }
-  async addCustomerPoints(points: InsertCustomerPoints): Promise<CustomerPoints> { return {} as CustomerPoints; }
-  async getAllWaves(): Promise<Wave[]> { return Array.from(this.waves.values()); }
   async createWave(wave: InsertWave): Promise<Wave> { 
     const id = this.generateId();
     const newWave: Wave = { id, ...wave, createdAt: new Date(), updatedAt: new Date() };
     this.waves.set(id, newWave);
     return newWave;
   }
+
   async updateWave(id: string, wave: Partial<InsertWave>): Promise<Wave | undefined> {
     const existing = this.waves.get(id);
     if (!existing) return undefined;
@@ -521,33 +663,147 @@ export class MemStorage implements IStorage {
     this.waves.set(id, updated);
     return updated;
   }
-  async deleteWave(id: string): Promise<boolean> { return this.waves.delete(id); }
-  async getPropertiesByWave(waveId: string): Promise<Property[]> { return []; }
-  async getCustomerWavePermissions(userId: string): Promise<CustomerWavePermission[]> { return []; }
-  async grantWavePermission(permission: InsertCustomerWavePermission): Promise<CustomerWavePermission> { return {} as CustomerWavePermission; }
-  async revokeWavePermission(userId: string, waveId: string): Promise<boolean> { return false; }
-  async getWavePermission(userId: string, waveId: string): Promise<CustomerWavePermission | undefined> { return undefined; }
-  async updateWavePermission(id: string, permission: Partial<InsertCustomerWavePermission>): Promise<CustomerWavePermission | undefined> { return undefined; }
-  async getUserWaveUsage(userId: string): Promise<{ waveId: string; used: number; max: number }[]> { return []; }
-  async getUserRemainingWaves(userId: string): Promise<number> { return 10; }
+
+  async deleteWave(id: string): Promise<boolean> {
+    return this.waves.delete(id);
+  }
+
+  async getPropertiesByWave(waveId: string): Promise<Property[]> {
+    return Array.from(this.properties.values()).filter(p => p.waveId === waveId);
+  }
+
+  // Wave Permissions
+  async getCustomerWavePermissions(userId: string): Promise<CustomerWavePermission[]> {
+    return this.customerWavePermissions.get(userId) || [];
+  }
+
+  async grantWavePermission(permission: InsertCustomerWavePermission): Promise<CustomerWavePermission> {
+    const userPerms = this.customerWavePermissions.get(permission.userId) || [];
+    const newPerm: CustomerWavePermission = {
+      id: this.generateId(),
+      ...permission,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    userPerms.push(newPerm);
+    this.customerWavePermissions.set(permission.userId, userPerms);
+    return newPerm;
+  }
+
+  async revokeWavePermission(userId: string, waveId: string): Promise<boolean> {
+    const userPerms = this.customerWavePermissions.get(userId) || [];
+    const filtered = userPerms.filter(p => p.waveId !== waveId);
+    this.customerWavePermissions.set(userId, filtered);
+    return filtered.length < userPerms.length;
+  }
+
+  async getWavePermission(userId: string, waveId: string): Promise<CustomerWavePermission | undefined> {
+    const userPerms = this.customerWavePermissions.get(userId) || [];
+    return userPerms.find(p => p.waveId === waveId);
+  }
+
+  async updateWavePermission(id: string, permission: Partial<InsertCustomerWavePermission>): Promise<CustomerWavePermission | undefined> {
+    for (const [userId, perms] of this.customerWavePermissions.entries()) {
+      const index = perms.findIndex(p => p.id === id);
+      if (index >= 0) {
+        const updated = { ...perms[index], ...permission, updatedAt: new Date() };
+        perms[index] = updated;
+        return updated;
+      }
+    }
+    return undefined;
+  }
+
+  async getUserWaveUsage(userId: string): Promise<{ waveId: string; used: number; max: number }[]> {
+    return [];
+  }
+
+  async getUserRemainingWaves(userId: string): Promise<number> {
+    return 10;
+  }
+
   async updateUsersWithZeroWaveBalance(): Promise<void> {}
-  async deductWaveBalance(userId: string, amount: number): Promise<boolean> { return true; }
-  async addWaveBalance(userId: string, amount: number): Promise<boolean> { return true; }
-  async getCurrencyRates(): Promise<CurrencyRate[]> { return []; }
-  async getActiveCurrencyRates(): Promise<CurrencyRate[]> { return []; }
-  async getCurrencyRate(fromCurrency: string, toCurrency: string): Promise<CurrencyRate | undefined> { return undefined; }
-  async createCurrencyRate(rate: InsertCurrencyRate): Promise<CurrencyRate> { return {} as CurrencyRate; }
-  async updateCurrencyRate(id: string, rate: UpdateCurrencyRate): Promise<CurrencyRate | undefined> { return undefined; }
-  async deactivateCurrencyRate(id: string): Promise<boolean> { return false; }
-  async convertPrice(amount: number, fromCurrency: string, toCurrency: string): Promise<number> { return amount; }
-  async createClientLocation(location: InsertClientLocation): Promise<ClientLocation> { return this.addClientLocation(location); }
+
+  async deductWaveBalance(userId: string, amount: number): Promise<boolean> {
+    return true;
+  }
+
+  async addWaveBalance(userId: string, amount: number): Promise<boolean> {
+    return true;
+  }
+
+  async checkWavePermission(userId: string, waveId: string | null | undefined): Promise<{ allowed: boolean; reason?: string }> {
+    return { allowed: true };
+  }
+
+  async incrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void> {}
+
+  async decrementWaveUsage(userId: string, waveId: string | null | undefined): Promise<void> {}
+
+  // Currency
+  async getCurrencyRates(): Promise<CurrencyRate[]> {
+    return Array.from(this.currencyRates.values());
+  }
+
+  async getActiveCurrencyRates(): Promise<CurrencyRate[]> {
+    return Array.from(this.currencyRates.values()).filter(r => r.isActive);
+  }
+
+  async getCurrencyRate(fromCurrency: string, toCurrency: string): Promise<CurrencyRate | undefined> {
+    return Array.from(this.currencyRates.values()).find(
+      r => r.fromCurrency === fromCurrency && r.toCurrency === toCurrency && r.isActive
+    );
+  }
+
+  async createCurrencyRate(rate: InsertCurrencyRate): Promise<CurrencyRate> {
+    const id = this.generateId();
+    const newRate: CurrencyRate = { id, ...rate, createdAt: new Date(), updatedAt: new Date() };
+    this.currencyRates.set(id, newRate);
+    return newRate;
+  }
+
+  async updateCurrencyRate(id: string, rate: UpdateCurrencyRate): Promise<CurrencyRate | undefined> {
+    const existing = this.currencyRates.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...rate, updatedAt: new Date() };
+    this.currencyRates.set(id, updated);
+    return updated;
+  }
+
+  async deactivateCurrencyRate(id: string): Promise<boolean> {
+    const rate = this.currencyRates.get(id);
+    if (!rate) return false;
+    rate.isActive = false;
+    rate.updatedAt = new Date();
+    return true;
+  }
+
+  async convertPrice(amount: number, fromCurrency: string, toCurrency: string): Promise<number> {
+    const rate = await this.getCurrencyRate(fromCurrency, toCurrency);
+    return rate ? amount * rate.rate : amount;
+  }
+
+  // Client Locations
+  async createClientLocation(location: InsertClientLocation): Promise<ClientLocation> {
+    return this.addClientLocation(location);
+  }
+
   async addClientLocation(location: InsertClientLocation): Promise<ClientLocation> {
     const id = this.generateId();
     const newLocation: ClientLocation = { id, ...location, createdAt: new Date() };
     this.clientLocations.set(id, newLocation);
     return newLocation;
   }
-  async getClientLocations(filters?: any, limit?: number): Promise<ClientLocation[]> { return Array.from(this.clientLocations.values()); }
-  async countClientLocations(filters?: any): Promise<number> { return this.clientLocations.size; }
-  async getClientLocationStats(): Promise<any> { return { total: this.clientLocations.size, byCountry: [], byCity: [] }; }
+
+  async getClientLocations(filters?: any, limit?: number): Promise<ClientLocation[]> {
+    return Array.from(this.clientLocations.values());
+  }
+
+  async countClientLocations(filters?: any): Promise<number> {
+    return this.clientLocations.size;
+  }
+
+  async getClientLocationStats(): Promise<any> {
+    return { total: this.clientLocations.size, byCountry: [], byCity: [] };
+  }
 }
