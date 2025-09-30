@@ -145,6 +145,9 @@ export default function SettingsPage() {
                 {t("settings.backToHome")}
               </Button>
             </Link>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              {t("settings.title")}
+            </h1>
           </div>
         </div>
 
@@ -174,6 +177,10 @@ export default function SettingsPage() {
                           <img 
                             src={usFlag} 
                             alt="English"
+                            title="English Language Flag"
+                            width="16"
+                            height="16"
+                            loading="lazy"
                             className="w-4 h-4 object-contain rounded-sm flex-shrink-0"
                           />
                           <span>English</span>
@@ -184,6 +191,10 @@ export default function SettingsPage() {
                           <img 
                             src={saudiFlag} 
                             alt="Arabic"
+                            title="Arabic Language Flag"
+                            width="16"
+                            height="16"
+                            loading="lazy"
                             className="w-4 h-4 object-contain rounded-sm flex-shrink-0"
                           />
                           <span>العربية (Arabic)</span>
@@ -194,6 +205,10 @@ export default function SettingsPage() {
                           <img 
                             src={kurdishFlag} 
                             alt="Kurdish"
+                            title="Kurdish Language Flag"
+                            width="16"
+                            height="16"
+                            loading="lazy"
                             className="w-4 h-4 object-contain rounded-sm flex-shrink-0"
                           />
                           <span>کوردی (Kurdish)</span>

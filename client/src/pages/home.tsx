@@ -406,6 +406,10 @@ export default function HomePage() {
                 <img
                   src={logoImage}
                   alt="MapEstate Logo"
+                  title="MapEstate - AI-Powered Real Estate Platform"
+                  width="32"
+                  height="32"
+                  loading="eager"
                   className="h-6 w-6 sm:h-8 sm:w-8"
                 />
                 <h1 className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white company-name">

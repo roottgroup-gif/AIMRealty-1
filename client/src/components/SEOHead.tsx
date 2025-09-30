@@ -69,6 +69,36 @@ const translations: { [key: string]: { en: string; ar: string; kur: string } } =
     en: "Rent", 
     ar: "الإيجار",
     kur: "کرێ",
+  },
+  "seo.favoritesTitle": {
+    en: "My Favorite Properties | MapEstate - Save Your Dream Home",
+    ar: "عقاراتي المفضلة | MapEstate - احفظ منزل أحلامك",
+    kur: "خانووبەرە دڵخوازەکانم | MapEstate - ماڵی خەونەکانت پاشەکەوت بکە",
+  },
+  "seo.favoritesDescription": {
+    en: "View and manage your saved properties. Access your favorite real estate listings in Kurdistan, Iraq with MapEstate's AI-powered platform.",
+    ar: "عرض وإدارة العقارات المحفوظة الخاصة بك. الوصول إلى قوائم العقارات المفضلة لديك في كردستان، العراق مع منصة MapEstate المدعومة بالذكاء الاصطناعي.",
+    kur: "خانووبەرە پاشەکەوتکراوەکانت ببینە و بەڕێوەبەرە. دەستگەیشتن بە لیستی خانووبەرە دڵخوازەکانت لە کوردستان، عێراق لەگەڵ پلاتفۆرمی MapEstate پاڵپشتیکراو بە AI.",
+  },
+  "seo.aboutTitle": {
+    en: "About MapEstate | AI-Powered Real Estate Platform in Kurdistan",
+    ar: "عن MapEstate | منصة عقارية مدعومة بالذكاء الاصطناعي في كردستان",
+    kur: "دەربارەی MapEstate | پلاتفۆرمی خانووبەرەی پاڵپشتیکراو بە AI لە کوردستان",
+  },
+  "seo.aboutDescription": {
+    en: "Learn about MapEstate - your trusted AI-powered real estate platform. Discover our mission to transform property search in Kurdistan, Iraq with innovative technology and expert service.",
+    ar: "تعرف على MapEstate - منصتك العقارية الموثوقة المدعومة بالذكاء الاصطناعي. اكتشف مهمتنا لتحويل البحث عن العقارات في كردستان، العراق بالتكنولوجيا المبتكرة والخدمة الخبيرة.",
+    kur: "زانیاری دەربارەی MapEstate - پلاتفۆرمی خانووبەرەی متمانەپێکراوی پاڵپشتیکراو بە AI. ئامانجمان بدۆزەرەوە بۆ گۆڕینی گەڕانی خانووبەرە لە کوردستان، عێراق لەگەڵ تەکنەلۆژیای نوێ و خزمەتگوزاری شارەزا.",
+  },
+  "seo.settingsTitle": {
+    en: "Account Settings | Customize Your MapEstate Experience",
+    ar: "إعدادات الحساب | تخصيص تجربة MapEstate الخاصة بك",
+    kur: "ڕێکخستنەکانی ئەکاونت | ئەزموونی MapEstate خۆت کەسیکەرەوە",
+  },
+  "seo.settingsDescription": {
+    en: "Manage your MapEstate account settings. Customize language, currency, notifications, and display preferences for the best property search experience in Kurdistan, Iraq.",
+    ar: "إدارة إعدادات حساب MapEstate الخاص بك. تخصيص اللغة والعملة والإشعارات وتفضيلات العرض للحصول على أفضل تجربة بحث عن العقارات في كردستان، العراق.",
+    kur: "ڕێکخستنەکانی ئەکاونتی MapEstate خۆت بەڕێوەبەرە. زمان، دراو، ئاگادارکردنەوەکان، و هەڵبژاردنەکانی پیشاندان کەسیکەرەوە بۆ باشترین ئەزموونی گەڕانی خانووبەرە لە کوردستان، عێراق.",
   }
 };
 
@@ -156,11 +186,11 @@ function generateDynamicDescription(
       }
       return seoTranslate('seo.homeDescription', language);
     case 'favorites':
-      return 'Your favorite properties saved for later viewing and quick access.';
+      return seoTranslate('seo.favoritesDescription', language);
     case 'about':
-      return 'Learn about MapEstate - your trusted real estate platform in Kurdistan, Iraq.';
+      return seoTranslate('seo.aboutDescription', language);
     case 'settings':
-      return 'Customize your MapEstate experience with language, currency, and notification preferences.';
+      return seoTranslate('seo.settingsDescription', language);
     default:
       return seoTranslate('seo.homeDescription', language);
   }

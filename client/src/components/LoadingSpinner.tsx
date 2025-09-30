@@ -12,6 +12,10 @@ export function LoadingSpinner() {
           <img 
             src={logoImage} 
             alt="MapEstate Logo" 
+            title="MapEstate Loading"
+            width="48"
+            height="48"
+            loading="eager"
             className="absolute inset-2 h-12 w-12 object-contain"
           />
         </div>

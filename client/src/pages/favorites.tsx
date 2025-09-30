@@ -68,10 +68,7 @@ export default function FavoritesPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <SEOHead
-        title={`${t('favorites.title')} | MapEstate - AI-Powered Real Estate Finder`}
-        description={`${t('favorites.description')} View and manage your saved properties with MapEstate's AI-powered real estate platform in Kurdistan, Iraq.`}
-        keywords="favorite properties, saved listings, property bookmarks, real estate favorites, Kurdistan Iraq properties, MapEstate favorites, saved property search"
-        canonicalUrl={undefined}
+        pageType="favorites"
         ogImage={`${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
         structuredData={getFavoritesStructuredData()}
         breadcrumbs={[
@@ -89,8 +86,9 @@ export default function FavoritesPage() {
                 {t('property.backToHome')}
               </Button>
             </Link>
-            <div>
-            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              {t('favorites.title')}
+            </h1>
           </div>
         </div>
 

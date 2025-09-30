@@ -39,6 +39,10 @@ export function GlobalLoader({ isLoading, message }: GlobalLoaderProps) {
             <img 
               src={logoImage} 
               alt="MapEstate Logo" 
+              title="MapEstate Loading"
+              width="24"
+              height="24"
+              loading="eager"
               className="absolute inset-1 h-6 w-6 object-contain"
             />
           </div>
