@@ -372,14 +372,6 @@ export default function HomePage() {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="flex items-center gap-2 cursor-pointer"
-                      onClick={() => setLocation("/settings")}
-                      data-testid="settings-menu"
-                    >
-                      <Settings className="h-4 w-4" style={{ color: "#FF7800" }} />
-                      <span>{t("menu.settings")}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex items-center gap-2 cursor-pointer"
                       onClick={() => setLocation("/about")}
                       data-testid="about-menu"
                     >
