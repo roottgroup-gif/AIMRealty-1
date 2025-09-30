@@ -307,9 +307,14 @@ app.use(injectPropertyMetaTags);
   
   // Use the specified port (5000 for Replit)
   const actualPort = port;
+  
+  // Use 0.0.0.0 on Replit, localhost on local Mac/Windows
+  // macOS doesn't support 0.0.0.0 binding in some Node versions
+  const host = process.env.REPL_ID ? "0.0.0.0" : "localhost";
+  
   server.listen({
     port: actualPort,
-    host: "0.0.0.0",
+    host: host,
     reusePort: true,
   }, () => {
     log(`serving on port ${actualPort}`);
