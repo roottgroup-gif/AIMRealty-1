@@ -145,9 +145,6 @@ export default function SettingsPage() {
                 {t("settings.backToHome")}
               </Button>
             </Link>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              {t("settings.title")}
-            </h1>
           </div>
         </div>
 
