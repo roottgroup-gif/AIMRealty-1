@@ -188,7 +188,7 @@ export default function PropertiesPage() {
         ogImage={seoContent.ogImage || (
           properties && properties.length > 0
             ? properties[0].images?.[0]
-            : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`
+            : `/uploads/properties/1759082074149-xrejrtvx6.jpg`
         )}
         canonicalUrl={undefined}
         structuredData={getPropertiesStructuredData()}

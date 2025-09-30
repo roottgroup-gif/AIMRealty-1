@@ -294,7 +294,7 @@ export default function HomePage() {
         ogImage={
           featuredProperties && featuredProperties.length > 0
             ? featuredProperties[0].images?.[0]
-            : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`
+            : `/uploads/properties/1759082074149-xrejrtvx6.jpg`
         }
         canonicalUrl={undefined}
         structuredData={[getHomepageStructuredData(), generateFAQStructuredData(language)]}

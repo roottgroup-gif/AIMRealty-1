@@ -342,7 +342,7 @@ export default function PropertyDetailPage() {
   }
 
   const firstImage = property.images?.[0];
-  const defaultSocialImage = `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`;
+  const defaultSocialImage = `/uploads/properties/1759082074149-xrejrtvx6.jpg`;
   const primaryImage = (firstImage && typeof firstImage === 'object' && 'imageUrl' in firstImage) 
     ? firstImage.imageUrl 
     : (firstImage || defaultSocialImage);

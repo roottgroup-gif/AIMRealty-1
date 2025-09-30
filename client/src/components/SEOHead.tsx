@@ -381,7 +381,7 @@ function generateCombinedStructuredData(
       "width": 250,
       "height": 250
     },
-    "image": `${baseUrl}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`,
+    "image": `${baseUrl}/uploads/properties/1759082074149-xrejrtvx6.jpg`,
     "description": "AI-Powered Real Estate Platform for Kurdistan and Iraq",
     "slogan": "Find Your Perfect Home with AI",
     "foundingDate": "2024",
@@ -622,7 +622,7 @@ export function SEOHead({
   title,
   description,
   keywords,
-  ogImage = `${window.location.protocol}//${window.location.host}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`,
+  ogImage = `/uploads/properties/1759082074149-xrejrtvx6.jpg`,
   canonicalUrl,
   structuredData,
   breadcrumbs,
