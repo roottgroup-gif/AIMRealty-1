@@ -408,9 +408,9 @@ export default function HomePage() {
                   alt="MapEstate Logo"
                   className="h-6 w-6 sm:h-8 sm:w-8"
                 />
-                <h2 className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white company-name">
-                  MapEstate
-                </h2>
+                <h1 className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white company-name">
+                  MapEstate - AI-Powered Real Estate Finder
+                </h1>
                 <Badge
                   variant="secondary"
                   className="ml-1 sm:ml-2 text-[10px] sm:text-xs inline-flex light-sweep"
@@ -830,7 +830,7 @@ export default function HomePage() {
             <Card className="bg-white/95 dark:bg-black/95 backdrop-blur-xl border-white/30 dark:border-white/10 shadow-2xl h-full">
               <CardContent className="p-6 h-full flex flex-col">
                 <h2 className="text-xl font-bold mb-4 text-black dark:text-white">
-                  AI Search Results
+                  Search Results - Find Your Perfect Property
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto flex-1">
                   {searchResults.results.map((property) => (

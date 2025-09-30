@@ -218,10 +218,10 @@ export default function PropertiesPage() {
             <Card className="sticky top-8">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold flex items-center">
+                  <h2 className="font-semibold flex items-center">
                     <Filter className="mr-2 h-4 w-4" />
                     Filters
-                  </h3>
+                  </h2>
                   <Button
                     variant="ghost"
                     size="sm"
