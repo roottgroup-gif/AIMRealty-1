@@ -1,0 +1,52 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-79-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Tue Sep 30 13:33:22 UTC 2025
+
+  System load:  0.0                Processes:             104
+  Usage of /:   12.6% of 47.39GB   Users logged in:       0
+  Memory usage: 28%                IPv4 address for eth0: 72.60.134.44
+  Swap usage:   0%                 IPv6 address for eth0: 2a02:4780:41:695a::1
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+Last login: Tue Sep 30 11:04:51 2025 from 169.254.0.1
+root@srv1027249:~# pm2 restart all
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [all](ids: [ 0 ])
+[PM2] [mapestate-api](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 3    │ online    │ 0%       │ 17.0mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv1027249:~# git clone https://github.com/roottgroup-gif/AIMRealty-1 
+Cloning into 'AIMRealty-1'...
+remote: Enumerating objects: 6489, done.
+remote: Counting objects: 100% (6489/6489), done.
+remote: Compressing objects: 100% (2016/2016), done.
+remote: Total 6489 (delta 4511), reused 6400 (delta 4422), pack-reused 0 (from 0)
+Receiving objects: 100% (6489/6489), 30.67 MiB | 38.25 MiB/s, done.
+Resolving deltas: 100% (4511/4511), done.
+root@srv1027249:~#  
+root@srv1027249:~# 
+root@srv1027249:~# nano deploy.sh
+# Change line 10: DOMAIN="your-actual-domain.com"
+chmod +x deploy.sh
+root@srv1027249:~# v
+v: command not found
+root@srv1027249:~# 
