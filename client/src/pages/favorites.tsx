@@ -88,9 +88,6 @@ export default function FavoritesPage() {
                 {t('property.backToHome')}
               </Button>
             </Link>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              {t('favorites.title')}
-            </h1>
           </div>
         </div>
 
