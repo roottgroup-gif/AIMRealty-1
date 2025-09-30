@@ -134,9 +134,16 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     
     const propertyTitle = escapeHtml(`${property.title} - ${formatPrice(property.price, property.currency || 'USD', property.listingType)} | MapEstate`);
     const propertyDescription = escapeHtml(`${property.description || `${property.bedrooms} bedroom ${property.type} for ${property.listingType} in ${property.city}, ${property.country}.`} View details, photos, and contact information.`);
-    const propertyImage = property.images && property.images.length > 0 
-      ? (property.images[0].startsWith('http') ? property.images[0] : `${protocol}://${req.get('host')}${property.images[0]}`)
-      : `${protocol}://${req.get('host')}/logo_1757848527935.png`;
+    
+    // Handle property images - can be array of strings or array of objects with imageUrl
+    const firstImage = property.images && property.images.length > 0 ? property.images[0] : null;
+    let propertyImage = `${protocol}://${req.get('host')}/logo_1757848527935.png`;
+    
+    if (firstImage) {
+      // Check if it's an object with imageUrl property or just a string
+      const imageUrl = typeof firstImage === 'object' && firstImage.imageUrl ? firstImage.imageUrl : firstImage;
+      propertyImage = imageUrl.startsWith('http') ? imageUrl : `${protocol}://${req.get('host')}${imageUrl}`;
+    }
     // Generate property URL with language prefix if present
     const language = propertyMatch[1] || 'en';
     const languagePrefix = language !== 'en' ? `/${language}` : '';

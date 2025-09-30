@@ -363,9 +363,10 @@ export default function PropertyDetailPage() {
             address: property.address,
             country: property.country,
             currency: property.currency || 'USD',
-            area: property.area
+            area: property.area,
+            description: property.description || property.title
           }}
-          ogImage={property.images && property.images.length > 0 ? primaryImage : `${window.location.origin}/attached_assets/generated_images/MapEstate_real_estate_social_media_image_5fd65911.png`}
+          ogImage={primaryImage}
           canonicalUrl={undefined}
           structuredData={getPropertyStructuredData(property)}
           breadcrumbs={[
