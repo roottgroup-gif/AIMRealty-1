@@ -9,14 +9,6 @@ interface DatabaseConfig {
   connectionUrl: string;
 }
 
-// Default VPS MySQL configuration (without hardcoded credentials)
-const DEFAULT_VPS_CONFIG = {
-  host: process.env.MYSQL_HOST || "localhost",
-  port: parseInt(process.env.MYSQL_PORT || "3306"),
-  user: process.env.MYSQL_USER || "root",
-  password: process.env.MYSQL_PASSWORD || "",
-  database: process.env.MYSQL_DATABASE || "mapestate",
-};
 
 function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
   const { user, password, host, port, database } = config;
