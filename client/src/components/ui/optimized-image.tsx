@@ -10,6 +10,8 @@ export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageEl
   aspectRatio?: 'square' | '4/3' | '16/9' | '3/2' | 'auto';
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   blur?: boolean;
+  width?: number | string;
+  height?: number | string;
   onLoad?: () => void;
   onError?: () => void;
 }
@@ -52,6 +54,8 @@ export const OptimizedImage = forwardRef<HTMLImageElement, OptimizedImageProps>(
     aspectRatio = 'auto',
     objectFit = 'cover',
     blur = false,
+    width = 800,
+    height = 600,
     className,
     onLoad,
     onError,
@@ -147,6 +151,9 @@ export const OptimizedImage = forwardRef<HTMLImageElement, OptimizedImageProps>(
           ref={ref || imgRef}
           src={currentSrc}
           alt={alt}
+          title={alt}
+          width={width}
+          height={height}
           className={cn(
             "w-full h-full transition-opacity duration-300",
             aspectRatioClass,
