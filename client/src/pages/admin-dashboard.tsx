@@ -277,8 +277,8 @@ export default function AdminDashboard() {
   const updateCurrencyRateMutation = useUpdateCurrencyRate();
   const deleteCurrencyRateMutation = useDeleteCurrencyRate();
 
-  // Handle avatar file selection
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle avatar file selection and upload to server
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Check file size (limit to 5MB)
@@ -305,14 +305,50 @@ export default function AdminDashboard() {
       }
 
       setAvatarFile(file);
+      
+      // Create preview from file
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setAvatarPreview(result);
-        form.setValue('avatar', result);
-        editForm.setValue('avatar', result);
+        setAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload file to server
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/upload/avatar', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload avatar');
+        }
+
+        const data = await response.json();
+        
+        // Set the server URL in the form
+        form.setValue('avatar', data.url);
+        editForm.setValue('avatar', data.url);
+        
+        toast({
+          title: 'Avatar uploaded',
+          description: 'Avatar image uploaded successfully',
+        });
+      } catch (error) {
+        console.error('Avatar upload error:', error);
+        toast({
+          title: 'Upload failed',
+          description: 'Failed to upload avatar. Please try again.',
+          variant: 'destructive',
+        });
+        event.target.value = ''; // Clear the input
+        setAvatarFile(null);
+        setAvatarPreview('');
+      }
     }
   };
 
