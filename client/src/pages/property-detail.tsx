@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/lib/i18n";
 import { useProperty, useAddToFavorites, useRemoveFromFavorites, useIsFavorite } from "@/hooks/use-properties";
+import { useLocalFavorites } from "@/hooks/use-local-favorites";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { SEOHead } from "@/components/SEOHead";
@@ -56,8 +57,12 @@ export default function PropertyDetailPage() {
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
   const { data: favoriteData } = useIsFavorite(userId, property?.id || "");
+  const localFavorites = useLocalFavorites();
 
-  const isFavorite = favoriteData?.isFavorite || false;
+  // Check both server favorites (for logged-in users) and local favorites (for guests)
+  const isFavorite = userId 
+    ? (favoriteData?.isFavorite || false)
+    : localFavorites.isFavorite(property?.id || "");
 
   // Property language detection and styling
   const rawPropertyLanguage = property?.language || 'en';
@@ -166,35 +171,45 @@ export default function PropertyDetailPage() {
   };
 
   const handleFavoriteClick = async () => {
-    if (!property || !userId) {
-      toast({
-        title: t('property.loginRequired'),
-        description: t('property.loginRequiredDescription'),
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!property) return;
 
-    try {
-      if (isFavorite) {
-        await removeFromFavorites.mutateAsync({ userId, propertyId: property.id });
+    if (userId) {
+      // Logged-in user: use server-based favorites
+      try {
+        if (isFavorite) {
+          await removeFromFavorites.mutateAsync({ userId, propertyId: property.id });
+          toast({
+            title: t('property.removedFromFavorites'),
+            description: t('property.removedFromFavoritesDescription'),
+          });
+        } else {
+          await addToFavorites.mutateAsync({ userId, propertyId: property.id });
+          toast({
+            title: t('property.addedToFavorites'),
+            description: t('property.addedToFavoritesDescription'),
+          });
+        }
+      } catch (error) {
+        toast({
+          title: t('property.favoriteError'),
+          description: t('property.favoriteErrorDescription'),
+          variant: "destructive",
+        });
+      }
+    } else {
+      // Guest user: use localStorage favorites
+      localFavorites.toggleFavorite(property.id);
+      if (localFavorites.isFavorite(property.id)) {
         toast({
           title: t('property.removedFromFavorites'),
           description: t('property.removedFromFavoritesDescription'),
         });
       } else {
-        await addToFavorites.mutateAsync({ userId, propertyId: property.id });
         toast({
           title: t('property.addedToFavorites'),
           description: t('property.addedToFavoritesDescription'),
         });
       }
-    } catch (error) {
-      toast({
-        title: t('property.favoriteError'),
-        description: t('property.favoriteErrorDescription'),
-        variant: "destructive",
-      });
     }
   };
 
