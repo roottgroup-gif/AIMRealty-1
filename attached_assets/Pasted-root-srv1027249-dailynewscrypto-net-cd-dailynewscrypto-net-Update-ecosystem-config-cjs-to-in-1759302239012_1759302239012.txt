@@ -1,0 +1,162 @@
+root@srv1027249:~/dailynewscrypto.net# cd ~/dailynewscrypto.net
+
+# Update ecosystem.config.cjs to include environment variables
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'mapestate-api',
+    script: './dist/index.js',
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000,
+      MYSQL_HOST: 'localhost',
+      MYSQL_PORT: '3306',
+      MYSQL_USER: 'mapestate',
+      MYSQL_PASSWORD: 'MapEstate2025!@#',
+      MYSQL_DATABASE: 'mapestate',
+      DOMAIN: 'dailynewscrypto.net',
+      FRONTEND_URL: 'https://dailynewscrypto.net',
+      SESSION_SECRET: 'your-super-secret-session-key-change-this',
+      JWT_SECRET: 'your-jwt-secret-key-change-this'
+    },
+    env_production: {
+      NODE_ENV: 'production',
+      PORT: 3000,
+      MYSQL_HOST: 'localhost',
+      MYSQL_PORT: '3306',
+      MYSQL_USER: 'mapestate',
+      MYSQL_PASSWORD: 'MapEstate2025!@#',
+      MYSQL_DATABASE: 'mapestate',
+      DOMAIN: 'dailynewscrypto.net',
+      FRONTEND_URL: 'https://dailynewscrypto.net',
+      SESSION_SECRET: 'your-super-secret-session-key-change-this',
+      JWT_SECRET: 'your-jwt-secret-key-change-this'
+    },
+    log_file: './logs/combined.log',
+    out_file: './logs/out.log',
+    error_file: './logs/error.log',
+    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+    watch: false,
+pm2 logs mapestate-api --lines 30onnection successublic'],
+[PM2] Applying action deleteProcessId on app [mapestate-api](ids: [ 0 ])
+[PM2] [mapestate-api](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2][WARN] Applications mapestate-api not running, starting...
+[PM2] App [mapestate-api] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 0    │ online    │ 0%       │ 18.5mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+[TAILING] Tailing last 30 lines for [mapestate-api] process (change the value with --lines option)
+/root/dailynewscrypto.net/logs/error-0.log last 30 lines:
+0|mapestat | 2025-10-01 07:02:32 +00:00:   sqlMessage: "Access denied for user 'mapestate'@'localhost' (using password: YES)"
+0|mapestat | 2025-10-01 07:02:32 +00:00: }
+0|mapestat | 2025-10-01 07:02:32 +00:00: ❌ Failed to connect to MySQL VPS database:
+0|mapestat | 2025-10-01 07:02:32 +00:00:    Error: Error: Access denied for user 'mapestate'@'localhost' (using password: YES)
+0|mapestat | 2025-10-01 07:02:32 +00:00: ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 2025-10-01 07:02:32 +00:00: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-01 07:02:32 +00:00: Warning: connect.session() MemoryStore is not
+0|mapestat | 2025-10-01 07:02:32 +00:00: designed for a production environment, as it will leak
+0|mapestat | 2025-10-01 07:02:32 +00:00: memory, and will not scale past a single process.
+0|mapestat | 2025-10-01 07:03:37 +00:00: ⚠️ Connection test failed: Error: Access denied for user 'mapestate'@'localhost' (using password: YES)
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at PromisePool.query (/root/dailynewscrypto.net/node_modules/mysql2/lib/promise/pool.js:36:22)
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at initializeDb (file:///root/dailynewscrypto.net/dist/index.js:1547:25)
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at StorageFactory.getStorage (file:///root/dailynewscrypto.net/dist/index.js:2471:17)
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at file:///root/dailynewscrypto.net/dist/index.js:4959:35
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at file:///root/dailynewscrypto.net/dist/index.js:4990:3
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+0|mapestat | 2025-10-01 07:03:37 +00:00:     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24) {
+0|mapestat | 2025-10-01 07:03:37 +00:00:   code: 'ER_ACCESS_DENIED_ERROR',
+0|mapestat | 2025-10-01 07:03:37 +00:00:   errno: 1045,
+0|mapestat | 2025-10-01 07:03:37 +00:00:   sql: undefined,
+0|mapestat | 2025-10-01 07:03:37 +00:00:   sqlState: '28000',
+0|mapestat | 2025-10-01 07:03:37 +00:00:   sqlMessage: "Access denied for user 'mapestate'@'localhost' (using password: YES)"
+0|mapestat | 2025-10-01 07:03:37 +00:00: }
+0|mapestat | 2025-10-01 07:03:37 +00:00: ❌ Failed to connect to MySQL VPS database:
+0|mapestat | 2025-10-01 07:03:37 +00:00:    Error: Error: Access denied for user 'mapestate'@'localhost' (using password: YES)
+0|mapestat | 2025-10-01 07:03:37 +00:00: ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 2025-10-01 07:03:37 +00:00: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-01 07:03:37 +00:00: Warning: connect.session() MemoryStore is not
+0|mapestat | 2025-10-01 07:03:37 +00:00: designed for a production environment, as it will leak
+0|mapestat | 2025-10-01 07:03:37 +00:00: memory, and will not scale past a single process.
+
+/root/dailynewscrypto.net/logs/out-0.log last 30 lines:
+0|mapestat | 2025-10-01 07:02:32 +00:00:    Host: localhost:3306
+0|mapestat | 2025-10-01 07:02:32 +00:00:    User: mapestate
+0|mapestat | 2025-10-01 07:02:32 +00:00:    Database: mapestate
+0|mapestat | 2025-10-01 07:02:32 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-01 07:02:32 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-01 07:02:32 +00:00: 🔍 Testing database connection...
+0|mapestat | 2025-10-01 07:02:32 +00:00: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-01 07:02:32 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-01 07:02:32 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-01 07:02:32 +00:00: 7:02:32 AM [express] serving on port 3000
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔍 Environment Variables Debug:
+0|mapestat | 2025-10-01 07:03:37 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-01 07:03:37 +00:00:    MYSQL_HOST: [SET]
+0|mapestat | 2025-10-01 07:03:37 +00:00:    MYSQL_USER: [SET]
+0|mapestat | 2025-10-01 07:03:37 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestat | 2025-10-01 07:03:37 +00:00:    MYSQL_PORT: 3306
+0|mapestat | 2025-10-01 07:03:37 +00:00:    MYSQL_PASSWORD: [SET]
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔗 Using MySQL VPS configuration from environment variables
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔗 Database configuration:
+0|mapestat | 2025-10-01 07:03:37 +00:00:    Host: localhost:3306
+0|mapestat | 2025-10-01 07:03:37 +00:00:    User: mapestate
+0|mapestat | 2025-10-01 07:03:37 +00:00:    Database: mapestate
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-01 07:03:37 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔍 Testing database connection...
+0|mapestat | 2025-10-01 07:03:37 +00:00: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-01 07:03:37 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-01 07:03:37 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-01 07:03:38 +00:00: 7:03:38 AM [express] serving on port 3000
+
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔍 Environment Variables Debug:
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    MYSQL_HOST: [SET]
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    MYSQL_USER: [SET]
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    MYSQL_PORT: 3306
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    MYSQL_PASSWORD: [SET]
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔗 Database configuration:
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    Host: localhost:3306
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    User: mapestate
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    Database: mapestate
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔍 Testing database connection...
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: ⚠️ Connection test failed: Error: Access denied for user 'mapestate'@'localhost' (using password: YES)
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at PromisePool.query (/root/dailynewscrypto.net/node_modules/mysql2/lib/promise/pool.js:36:22)
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at initializeDb (file:///root/dailynewscrypto.net/dist/index.js:1547:25)
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at StorageFactory.getStorage (file:///root/dailynewscrypto.net/dist/index.js:2471:17)
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at file:///root/dailynewscrypto.net/dist/index.js:4959:35
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at file:///root/dailynewscrypto.net/dist/index.js:4990:3
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24) {
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:   code: 'ER_ACCESS_DENIED_ERROR',
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:   errno: 1045,
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:   sql: undefined,
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:   sqlState: '28000',
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:   sqlMessage: "Access denied for user 'mapestate'@'localhost' (using password: YES)"
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: }
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: ❌ Failed to connect to MySQL VPS database:
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00:    Error: Error: Access denied for user 'mapestate'@'localhost' (using password: YES)
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: ⚠️ No database configured, using in-memory storage for development
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: Warning: connect.session() MemoryStore is not
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: designed for a production environment, as it will leak
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: memory, and will not scale past a single process.
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestate-api  | 2025-10-01 07:03:52 +00:00: 7:03:52 AM [express] serving on port 3000
