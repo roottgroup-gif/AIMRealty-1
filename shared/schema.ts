@@ -1,5 +1,5 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, integer, decimal, boolean, timestamp } from "drizzle-orm/pg-core";
+import { mysqlTable, text, varchar, int, decimal, boolean, timestamp, uniqueIndex } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -13,7 +13,7 @@ export const LANGUAGE_NAMES = {
 export type Language = typeof SUPPORTED_LANGUAGES[number];
 
 // Users table (no JSON columns)
-export const users = pgTable("users", {
+export const users = mysqlTable("users", {
   id: varchar("id", { length: 36 }).primaryKey(),
   username: varchar("username", { length: 191 }).notNull().unique(),
   email: varchar("email", { length: 320 }).notNull().unique(),
@@ -24,24 +24,24 @@ export const users = pgTable("users", {
   phone: varchar("phone", { length: 20 }),
   avatar: text("avatar"),
   isVerified: boolean("is_verified").default(false),
-  waveBalance: integer("wave_balance").default(10),
+  waveBalance: int("wave_balance").default(10),
   expiresAt: timestamp("expires_at"),
   isExpired: boolean("is_expired").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // User languages table (normalized from users.allowed_languages JSON)
-export const userLanguages = pgTable("user_languages", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const userLanguages = mysqlTable("user_languages", {
+  id: int("id").primaryKey().autoincrement(),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
   language: varchar("language", { length: 3 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
-  uniqueUserLanguage: sql`UNIQUE KEY unique_user_language (user_id, language)`,
+  uniqueUserLanguage: uniqueIndex("unique_user_language").on(table.userId, table.language),
 }));
 
 // Waves table
-export const waves = pgTable("waves", {
+export const waves = mysqlTable("waves", {
   id: varchar("id", { length: 36 }).primaryKey(),
   name: varchar("name", { length: 200 }).notNull(),
   description: text("description"),
@@ -53,7 +53,7 @@ export const waves = pgTable("waves", {
 });
 
 // Properties table (no JSON columns)
-export const properties = pgTable("properties", {
+export const properties = mysqlTable("properties", {
   id: varchar("id", { length: 36 }).primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
@@ -61,9 +61,9 @@ export const properties = pgTable("properties", {
   listingType: varchar("listing_type", { length: 20 }).notNull(),
   price: decimal("price", { precision: 12, scale: 2 }).notNull(),
   currency: varchar("currency", { length: 3 }).default("USD"),
-  bedrooms: integer("bedrooms"),
-  bathrooms: integer("bathrooms"),
-  area: integer("area"),
+  bedrooms: int("bedrooms"),
+  bathrooms: int("bathrooms"),
+  area: int("area"),
   address: text("address").notNull(),
   city: varchar("city", { length: 100 }).notNull(),
   country: varchar("country", { length: 100 }).notNull(),
@@ -74,7 +74,7 @@ export const properties = pgTable("properties", {
   agentId: varchar("agent_id", { length: 36 }).references(() => users.id),
   contactPhone: varchar("contact_phone", { length: 20 }),
   waveId: varchar("wave_id", { length: 36 }).references(() => waves.id),
-  views: integer("views").default(0),
+  views: int("views").default(0),
   isFeatured: boolean("is_featured").default(false),
   slug: varchar("slug", { length: 255 }).unique(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -82,37 +82,37 @@ export const properties = pgTable("properties", {
 });
 
 // Property images table (normalized from properties.images JSON)
-export const propertyImages = pgTable("property_images", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const propertyImages = mysqlTable("property_images", {
+  id: int("id").primaryKey().autoincrement(),
   propertyId: varchar("property_id", { length: 36 }).notNull().references(() => properties.id, { onDelete: 'cascade' }),
   imageUrl: text("image_url").notNull(),
-  sortOrder: integer("sort_order").default(0),
+  sortOrder: int("sort_order").default(0),
   altText: varchar("alt_text", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Property amenities table (normalized from properties.amenities JSON)
-export const propertyAmenities = pgTable("property_amenities", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const propertyAmenities = mysqlTable("property_amenities", {
+  id: int("id").primaryKey().autoincrement(),
   propertyId: varchar("property_id", { length: 36 }).notNull().references(() => properties.id, { onDelete: 'cascade' }),
   amenity: varchar("amenity", { length: 100 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
-  uniquePropertyAmenity: sql`UNIQUE KEY unique_property_amenity (property_id, amenity)`,
+  uniquePropertyAmenity: uniqueIndex("unique_property_amenity").on(table.propertyId, table.amenity),
 }));
 
 // Property features table (normalized from properties.features JSON)
-export const propertyFeatures = pgTable("property_features", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const propertyFeatures = mysqlTable("property_features", {
+  id: int("id").primaryKey().autoincrement(),
   propertyId: varchar("property_id", { length: 36 }).notNull().references(() => properties.id, { onDelete: 'cascade' }),
   feature: varchar("feature", { length: 100 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
-  uniquePropertyFeature: sql`UNIQUE KEY unique_property_feature (property_id, feature)`,
+  uniquePropertyFeature: uniqueIndex("unique_property_feature").on(table.propertyId, table.feature),
 }));
 
 // Inquiries table
-export const inquiries = pgTable("inquiries", {
+export const inquiries = mysqlTable("inquiries", {
   id: varchar("id", { length: 36 }).primaryKey(),
   propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
   userId: varchar("user_id", { length: 36 }).references(() => users.id),
@@ -125,27 +125,27 @@ export const inquiries = pgTable("inquiries", {
 });
 
 // Favorites table
-export const favorites = pgTable("favorites", {
+export const favorites = mysqlTable("favorites", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: 'cascade' }),
   propertyId: varchar("property_id", { length: 36 }).references(() => properties.id, { onDelete: 'cascade' }),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
-  uniqueUserPropertyFavorite: sql`UNIQUE KEY unique_user_property_favorite (user_id, property_id)`,
+  uniqueUserPropertyFavorite: uniqueIndex("unique_user_property_favorite").on(table.userId, table.propertyId),
 }));
 
 // Search history table
-export const searchHistory = pgTable("search_history", {
+export const searchHistory = mysqlTable("search_history", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id),
   query: text("query").notNull(),
-  results: integer("results").default(0),
+  results: int("results").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Search filters table (normalized from search_history.filters JSON)
-export const searchFilters = pgTable("search_filters", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const searchFilters = mysqlTable("search_filters", {
+  id: int("id").primaryKey().autoincrement(),
   searchId: varchar("search_id", { length: 36 }).notNull().references(() => searchHistory.id, { onDelete: 'cascade' }),
   filterKey: varchar("filter_key", { length: 50 }).notNull(),
   filterValue: varchar("filter_value", { length: 200 }).notNull(),
@@ -153,18 +153,18 @@ export const searchFilters = pgTable("search_filters", {
 });
 
 // Customer activity table
-export const customerActivity = pgTable("customer_activity", {
+export const customerActivity = mysqlTable("customer_activity", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   activityType: varchar("activity_type", { length: 50 }).notNull(),
   propertyId: varchar("property_id", { length: 36 }).references(() => properties.id),
-  points: integer("points").default(0),
+  points: int("points").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Activity metadata table (normalized from customer_activity.metadata JSON)
-export const activityMetadata = pgTable("activity_metadata", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const activityMetadata = mysqlTable("activity_metadata", {
+  id: int("id").primaryKey().autoincrement(),
   activityId: varchar("activity_id", { length: 36 }).notNull().references(() => customerActivity.id, { onDelete: 'cascade' }),
   metadataKey: varchar("metadata_key", { length: 50 }).notNull(),
   metadataValue: text("metadata_value"),
@@ -172,18 +172,18 @@ export const activityMetadata = pgTable("activity_metadata", {
 });
 
 // Customer points table
-export const customerPoints = pgTable("customer_points", {
+export const customerPoints = mysqlTable("customer_points", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar("user_id", { length: 36 }).notNull().unique().references(() => users.id),
-  totalPoints: integer("total_points").default(0),
+  totalPoints: int("total_points").default(0),
   currentLevel: varchar("current_level", { length: 20 }).default("Bronze"),
-  pointsThisMonth: integer("points_this_month").default(0),
+  pointsThisMonth: int("points_this_month").default(0),
   lastActivity: timestamp("last_activity").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Currency rates table
-export const currencyRates = pgTable("currency_rates", {
+export const currencyRates = mysqlTable("currency_rates", {
   id: varchar("id", { length: 36 }).primaryKey(),
   fromCurrency: varchar("from_currency", { length: 3 }).notNull().default("USD"),
   toCurrency: varchar("to_currency", { length: 3 }).notNull(),
@@ -196,12 +196,12 @@ export const currencyRates = pgTable("currency_rates", {
 });
 
 // Client locations table (no JSON metadata)
-export const clientLocations = pgTable("client_locations", {
+export const clientLocations = mysqlTable("client_locations", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id),
   latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
   longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
-  accuracy: integer("accuracy"),
+  accuracy: int("accuracy"),
   source: varchar("source", { length: 32 }).default("map_button"),
   userAgent: text("user_agent"),
   language: varchar("language", { length: 10 }),
@@ -212,12 +212,12 @@ export const clientLocations = pgTable("client_locations", {
 });
 
 // Customer wave permissions table
-export const customerWavePermissions = pgTable("customer_wave_permissions", {
+export const customerWavePermissions = mysqlTable("customer_wave_permissions", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id),
   waveId: varchar("wave_id", { length: 36 }).notNull().references(() => waves.id),
-  maxProperties: integer("max_properties").notNull().default(1),
-  usedProperties: integer("used_properties").default(0),
+  maxProperties: int("max_properties").notNull().default(1),
+  usedProperties: int("used_properties").default(0),
   grantedBy: varchar("granted_by", { length: 36 }).references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
