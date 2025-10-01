@@ -9,6 +9,7 @@ import {
   useRemoveFromFavorites,
   useIsFavorite,
 } from "@/hooks/use-properties";
+import { useLocalFavorites } from "@/hooks/use-local-favorites";
 import { useState, useEffect } from "react";
 import type { Property } from "@/types";
 import {
@@ -52,10 +53,15 @@ export default function PropertyCard({
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
   const { data: favoriteData } = useIsFavorite(userId || "", property.id);
+  const localFavorites = useLocalFavorites();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { preferredCurrency } = useCurrency();
-  const isFavorite = favoriteData?.isFavorite || false;
+  
+  // Check both server favorites (for logged-in users) and local favorites (for guests)
+  const isFavorite = userId 
+    ? (favoriteData?.isFavorite || false)
+    : localFavorites.isFavorite(property.id);
 
   // Get currency conversion rate if needed
   const conversionQuery = useCurrencyConversion(
@@ -80,19 +86,23 @@ export default function PropertyCard({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!userId) return;
-
-    try {
-      if (isFavorite) {
-        await removeFromFavorites.mutateAsync({
-          userId,
-          propertyId: property.id,
-        });
-      } else {
-        await addToFavorites.mutateAsync({ userId, propertyId: property.id });
+    if (userId) {
+      // Logged-in user: use server-based favorites
+      try {
+        if (isFavorite) {
+          await removeFromFavorites.mutateAsync({
+            userId,
+            propertyId: property.id,
+          });
+        } else {
+          await addToFavorites.mutateAsync({ userId, propertyId: property.id });
+        }
+      } catch (error) {
+        console.error("Failed to update favorite:", error);
       }
-    } catch (error) {
-      console.error("Failed to update favorite:", error);
+    } else {
+      // Guest user: use localStorage favorites
+      localFavorites.toggleFavorite(property.id);
     }
   };
 
@@ -201,25 +211,23 @@ export default function PropertyCard({
             : t("filter.forRent")}
         </Badge>
 
-        {userId && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleFavoriteClick}
-            className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} rounded-full p-2 transition-all duration-200 ${
-              isFavorite
-                ? "bg-red-50 hover:bg-red-100 text-red-500 border border-red-200"
-                : "bg-black/50 hover:bg-black/70 text-white"
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleFavoriteClick}
+          className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} rounded-full p-2 transition-all duration-200 ${
+            isFavorite
+              ? "bg-red-50 hover:bg-red-100 text-red-500 border border-red-200"
+              : "bg-black/50 hover:bg-black/70 text-white"
+          }`}
+          data-testid={`favorite-button-${property.id}`}
+        >
+          <Heart
+            className={`h-4 w-4 transition-all duration-200 ${
+              isFavorite ? "fill-current scale-110" : "hover:scale-105"
             }`}
-            data-testid={`favorite-button-${property.id}`}
-          >
-            <Heart
-              className={`h-4 w-4 transition-all duration-200 ${
-                isFavorite ? "fill-current scale-110" : "hover:scale-105"
-              }`}
-            />
-          </Button>
-        )}
+          />
+        </Button>
       </div>
 
       <CardContent className="p-4 sm:p-5 md:p-6">
