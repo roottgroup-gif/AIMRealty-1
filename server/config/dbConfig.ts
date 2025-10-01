@@ -19,7 +19,8 @@ const DEFAULT_VPS_CONFIG = {
 
 function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
   const { user, password, host, port, database } = config;
-  const auth = password ? `${user}:${password}` : user;
+  const encodedPassword = password ? encodeURIComponent(password) : '';
+  const auth = encodedPassword ? `${encodeURIComponent(user)}:${encodedPassword}` : encodeURIComponent(user);
   return `mysql://${auth}@${host}:${port}/${database}`;
 }
 
@@ -47,7 +48,8 @@ function getDatabaseConfig(): DatabaseConfig {
   if (mysqlHost && mysqlUser && mysqlDatabase) {
     console.log("🔗 Using MySQL VPS configuration from environment variables");
     const port = parseInt(mysqlPort || "3306");
-    const auth = mysqlPassword ? `${mysqlUser}:${mysqlPassword}` : mysqlUser;
+    const encodedPassword = mysqlPassword ? encodeURIComponent(mysqlPassword) : '';
+    const auth = encodedPassword ? `${encodeURIComponent(mysqlUser)}:${encodedPassword}` : encodeURIComponent(mysqlUser);
     connectionUrl = `mysql://${auth}@${mysqlHost}:${port}/${mysqlDatabase}`;
     console.log(
       `🔧 MySQL VPS: mysql://${mysqlUser}:***@${mysqlHost}:${port}/${mysqlDatabase}`,
