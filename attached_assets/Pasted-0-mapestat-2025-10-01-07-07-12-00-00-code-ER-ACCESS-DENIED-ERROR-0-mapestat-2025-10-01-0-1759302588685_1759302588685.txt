@@ -1,0 +1,940 @@
+0|mapestat | 2025-10-01 07:07:12 +00:00:   code: 'ER_ACCESS_DENIED_ERROR',
+0|mapestat | 2025-10-01 07:07:12 +00:00:   errno: 1045,
+0|mapestat | 2025-10-01 07:07:12 +00:00:   sql: undefined,
+0|mapestat | 2025-10-01 07:07:12 +00:00:   sqlState: '28000',
+0|mapestat | 2025-10-01 07:07:12 +00:00:   sqlMessage: "Access denied for user 'mapestate'@'localhost' (using password: YES)"
+0|mapestat | 2025-10-01 07:07:12 +00:00: }
+0|mapestat | 2025-10-01 07:07:12 +00:00: ❌ Failed to connect to MySQL VPS database:
+0|mapestat | 2025-10-01 07:07:12 +00:00:    Error: Error: Access denied for user 'mapestate'@'localhost' (using password: YES)
+0|mapestat | 2025-10-01 07:07:12 +00:00: ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 2025-10-01 07:07:12 +00:00: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-01 07:07:12 +00:00: Warning: connect.session() MemoryStore is not
+0|mapestat | 2025-10-01 07:07:12 +00:00: designed for a production environment, as it will leak
+0|mapestat | 2025-10-01 07:07:12 +00:00: memory, and will not scale past a single process.
+
+/root/dailynewscrypto.net/logs/out-0.log last 50 lines:
+0|mapestat | 2025-10-01 07:04:53 +00:00:    Host: localhost:3306
+0|mapestat | 2025-10-01 07:04:53 +00:00:    User: mapestate
+0|mapestat | 2025-10-01 07:04:53 +00:00:    Database: mapestate
+0|mapestat | 2025-10-01 07:04:53 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-01 07:04:53 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-01 07:04:53 +00:00: 🔍 Testing database connection...
+0|mapestat | 2025-10-01 07:04:53 +00:00: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-01 07:04:53 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-01 07:04:53 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-01 07:04:53 +00:00: 7:04:53 AM [express] serving on port 3000
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔍 Environment Variables Debug:
+0|mapestat | 2025-10-01 07:06:13 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-01 07:06:13 +00:00:    MYSQL_HOST: [SET]
+0|mapestat | 2025-10-01 07:06:13 +00:00:    MYSQL_USER: [SET]
+0|mapestat | 2025-10-01 07:06:13 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestat | 2025-10-01 07:06:13 +00:00:    MYSQL_PORT: 3306
+0|mapestat | 2025-10-01 07:06:13 +00:00:    MYSQL_PASSWORD: [SET]
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔗 Using MySQL VPS configuration from environment variables
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔗 Database configuration:
+0|mapestat | 2025-10-01 07:06:13 +00:00:    Host: localhost:3306
+0|mapestat | 2025-10-01 07:06:13 +00:00:    User: mapestate
+0|mapestat | 2025-10-01 07:06:13 +00:00:    Database: mapestate
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-01 07:06:13 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔍 Testing database connection...
+0|mapestat | 2025-10-01 07:06:13 +00:00: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-01 07:06:13 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-01 07:06:13 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-01 07:06:13 +00:00: 7:06:13 AM [express] serving on port 3000
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔍 Environment Variables Debug:
+0|mapestat | 2025-10-01 07:07:12 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-01 07:07:12 +00:00:    MYSQL_HOST: [SET]
+0|mapestat | 2025-10-01 07:07:12 +00:00:    MYSQL_USER: [SET]
+0|mapestat | 2025-10-01 07:07:12 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestat | 2025-10-01 07:07:12 +00:00:    MYSQL_PORT: 3306
+0|mapestat | 2025-10-01 07:07:12 +00:00:    MYSQL_PASSWORD: [SET]
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔗 Using MySQL VPS configuration from environment variables
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔗 Database configuration:
+0|mapestat | 2025-10-01 07:07:12 +00:00:    Host: localhost:3306
+0|mapestat | 2025-10-01 07:07:12 +00:00:    User: mapestate
+0|mapestat | 2025-10-01 07:07:12 +00:00:    Database: mapestate
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-01 07:07:12 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔍 Testing database connection...
+0|mapestat | 2025-10-01 07:07:12 +00:00: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-01 07:07:12 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-01 07:07:12 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-01 07:07:12 +00:00: 7:07:12 AM [express] serving on port 3000
+
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔍 Environment Variables Debug:
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    MYSQL_HOST: [SET]
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    MYSQL_USER: [SET]
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    MYSQL_PORT: 3306
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    MYSQL_PASSWORD: [SET]
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔗 Database configuration:
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    Host: localhost:3306
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    User: mapestate
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00:    Database: mapestate
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔍 Testing database connection...
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 💓 Database connection is healthy
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: ✅ MySQL database initialized successfully
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔗 Using MySQL DatabaseStorage
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 🔧 Fixing existing users language permissions...
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: Found 0 regular users to fix
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: ✅ Finished fixing existing users language permissions
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: Warning: connect.session() MemoryStore is not
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: designed for a production environment, as it will leak
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: memory, and will not scale past a single process.
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 📁 Serving uploads from: /root/dailynewscrypto.net/dist/uploads
+0|mapestate-api  | 2025-10-01 07:08:06 +00:00: 7:08:06 AM [express] serving on port 3000
+^C
+root@srv1027249:~/dailynewscrypto.net# sudo mysql -u root << 'MYSQL_EOF'
+-- Temporarily lower password policy (for development)
+SET GLOBAL validate_password.policy = LOW;
+SET GLOBAL validate_password.length = 4;
+SET GLOBAL validate_password.mixed_case_count = 0;
+SET GLOBAL validate_password.number_count = 0;
+SET GLOBAL validate_password.special_char_count = 0;
+
+-- Now create simpler user
+DROP USER IF EXISTS 'mapestate'@'localhost';
+CREATE USER 'mapestate'@'localhost' IDENTIFIED BY 'mapestate';
+GRANT ALL PRIVILEGES ON mapestate.* TO 'mapestate'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Verify
+SELECT User, Host FROM mysql.user WHERE User='mapestate';
+MYSQL_EOF
+
+# Update PM2 config with simpler password
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'mapestate-api',
+    script: './dist/index.js',
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000,
+      MYSQL_HOST: 'localhost',
+      MYSQL_PORT: '3306',
+      MYSQL_USER: 'mapestate',
+      MYSQL_PASSWORD: 'mapestate',
+      MYSQL_DATABASE: 'mapestate',
+      DOMAIN: 'dailynewscrypto.net',
+      FRONTEND_URL: 'https://dailynewscrypto.net',
+      SESSION_SECRET: 'change-this-in-production',
+      JWT_SECRET: 'change-this-in-production'
+    },
+    log_file: './logs/combined.log',
+    out_file: './logs/out.log',
+EOF]max_memory_restart: '1G'M-DD HH:mm:ss Z',
+mysql: [ERROR] Found option without preceding group in config file /etc/mysql/mysql.conf.d/security.cnf at line 1.
+mysql: [ERROR] Stopped processing the 'includedir' directive in file /etc/mysql/my.cnf at line 21.
+User    Host
+mapestate       %
+mapestate       localhost
+root@srv1027249:~/dailynewscrypto.net# # Test if API is responding
+curl http://localhost:3000/api/health
+curl http://localhost:3000/api/test
+
+# Test database connection through API
+curl http://localhost:3000/api/debug/db
+
+# Check if the main page loads
+curl http://localhost:3000/
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+root@srv1027249:~/dailynewscrypto.net# # Test health endpoint
+curl http://localhost:3000/api/health
+
+# Test database connection endpoint
+curl http://localhost:3000/api/debug/db
+
+# Test properties endpoint
+curl http://localhost:3000/api/properties
+
+# Test users endpoint
+curl http://localhost:3000/api/users
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+[]<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-Dy_v0voL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+root@srv1027249:~/dailynewscrypto.net# # Check if the frontend loads (you already did this)
+echo "Frontend is accessible at: http://localhost:3000"
+
+# For production domain testing:
+echo "Production URL: https://dailynewscrypto.net"
+Frontend is accessible at: http://localhost:3000
+Production URL: https://dailynewscrypto.net
+root@srv1027249:~/dailynewscrypto.net# ls
+HOSTINGER_DEPLOYMENT_GUIDE.md  deploy.sh                       package-lock.json
+README_DATABASE.md             dist                            package.json
+VPS_IMAGE_FIX_GUIDE.md         drizzle.config.ts               postcss.config.js
+admin_check.txt                ecosystem.config.cjs            replit.md
+admin_cookies.txt              hostinger-nginx-fixed.conf      server
+admin_cookies_new.txt          hostinger-nginx-http-only.conf  setup-mysql-tables.sql
+attached_assets                hostinger-nginx.conf            shared
+client                         import-to-mysql.sh              tailwind.config.ts
+components.json                logs                            testuser_cookies.txt
+cookies.txt                    mysql-security.cnf              tsconfig.json
+database.sqlite                mysql_import.sql                vite.config.replit.ts
+deploy-real-mapestate.sh       netlify.toml                    vite.config.ts
+deploy-with-uploads-fix.sh     node_modules
+root@srv1027249:~/dailynewscrypto.net# 
