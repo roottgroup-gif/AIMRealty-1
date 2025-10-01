@@ -198,8 +198,9 @@ export default function PropertyDetailPage() {
       }
     } else {
       // Guest user: use localStorage favorites
+      const wasFavorite = localFavorites.isFavorite(property.id);
       localFavorites.toggleFavorite(property.id);
-      if (localFavorites.isFavorite(property.id)) {
+      if (wasFavorite) {
         toast({
           title: t('property.removedFromFavorites'),
           description: t('property.removedFromFavoritesDescription'),

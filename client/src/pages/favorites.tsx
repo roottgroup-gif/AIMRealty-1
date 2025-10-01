@@ -4,7 +4,8 @@ import PropertyCard from "@/components/property-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
-import { useFavorites } from "@/hooks/use-properties";
+import { useFavorites, useProperties } from "@/hooks/use-properties";
+import { useLocalFavorites } from "@/hooks/use-local-favorites";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/lib/i18n";
 import { ArrowLeft, Heart, Home as HomeIcon } from "lucide-react";
@@ -13,9 +14,19 @@ import type { Property } from "@/types";
 export default function FavoritesPage() {
   const { user } = useAuth();
   const userId = user?.id;
-  const { data: favorites, isLoading, error } = useFavorites(userId);
+  const { data: serverFavorites, isLoading: serverLoading, error: serverError } = useFavorites(userId);
+  const { data: allProperties, isLoading: propertiesLoading } = useProperties();
+  const localFavorites = useLocalFavorites();
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
+
+  // Determine which favorites to show
+  const favorites = userId 
+    ? serverFavorites 
+    : allProperties?.filter(property => localFavorites.isFavorite(property.id)) || [];
+  
+  const isLoading = userId ? serverLoading : propertiesLoading;
+  const error = userId ? serverError : null;
 
   const handleMapClick = (property: Property) => {
     // Navigate to home page with property ID to show on map
