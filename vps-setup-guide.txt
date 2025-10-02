@@ -1,0 +1,126 @@
+===============================================
+MapEstate VPS Database Setup Guide
+===============================================
+
+STEP 1: Create Database on VPS
+-------------------------------
+On your VPS (root@srv1027249:~#), run:
+
+mysql -u root -p < create-vps-database.sql
+
+Enter your MySQL root password when prompted.
+
+This will:
+- Create database 'mapestate'
+- Create user 'mapestate'@'localhost'
+- Grant all privileges
+
+
+STEP 2: Export Current Database
+-------------------------------
+On your Replit/local machine, run:
+
+tsx export-database.ts
+
+This creates a file like: database-export-2025-01-18.sql
+
+
+STEP 3: Transfer SQL File to VPS
+--------------------------------
+Use SCP to copy the export file to your VPS:
+
+scp database-export-*.sql root@72.60.134.44:/root/
+
+Or use any file transfer method you prefer.
+
+
+STEP 4: Import Database on VPS
+------------------------------
+On your VPS, clone the repository first:
+
+cd /var/www/
+git clone https://github.com/roottgroup-gif/AIMRealty-1.git
+cd AIMRealty-1
+npm install
+
+Then import the database:
+
+tsx server/import-sql.ts /root/database-export-*.sql
+
+Or use MySQL directly:
+
+mysql -u mapestate -p mapestate < /root/database-export-*.sql
+
+
+STEP 5: Update Environment Variables
+------------------------------------
+Create .env file in your VPS project:
+
+cd /var/www/AIMRealty-1
+
+cat > .env << 'EOF'
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USER=mapestate
+MYSQL_PASSWORD=mapestate_secure_password_2024
+MYSQL_DATABASE=mapestate
+
+SESSION_SECRET=change-this-to-random-string
+IMAGE_BASE_URL=http://72.60.134.44:3000
+NODE_ENV=production
+PORT=3000
+EOF
+
+
+STEP 6: Verify Database
+-----------------------
+Check if tables were created:
+
+mysql -u mapestate -p mapestate -e "SHOW TABLES;"
+
+Count records in a table:
+
+mysql -u mapestate -p mapestate -e "SELECT COUNT(*) FROM properties;"
+
+
+STEP 7: Start Application
+-------------------------
+npm run build
+pm2 start ecosystem.config.js
+pm2 save
+
+
+QUICK COMMANDS REFERENCE
+========================
+
+# Export database (on Replit/local)
+tsx export-database.ts
+
+# Transfer to VPS
+scp database-export-*.sql root@72.60.134.44:/root/
+
+# On VPS - Import
+cd /var/www/AIMRealty-1
+tsx server/import-sql.ts /root/database-export-*.sql
+
+# Verify
+mysql -u mapestate -p mapestate -e "SHOW TABLES;"
+
+# Start app
+npm run build && pm2 restart mapestate-api
+
+
+TROUBLESHOOTING
+===============
+
+Problem: "Access denied for user"
+Solution: Check password in create-vps-database.sql and .env match
+
+Problem: "Database doesn't exist"
+Solution: Run create-vps-database.sql first
+
+Problem: Import fails
+Solution: Check SQL file exists and path is correct
+
+Problem: App can't connect to database
+Solution: Verify .env file has correct MySQL credentials
