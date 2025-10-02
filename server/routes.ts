@@ -336,16 +336,18 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  // Helper function to get base URL for images
-  // Uses configured IMAGE_BASE_URL or falls back to localhost for development
-  function getImageBaseUrl(): string {
-    // Use environment variable if set (e.g., http://72.60.134.44:3000 for VPS)
+  // Helper function to get base URL for images from incoming request
+  // Automatically detects the correct server URL
+  function getImageBaseUrl(req: express.Request): string {
+    // Use environment variable if explicitly set
     if (process.env.IMAGE_BASE_URL) {
       return process.env.IMAGE_BASE_URL;
     }
     
-    // Default to localhost for development
-    return 'http://localhost:5000';
+    // Auto-detect from request headers
+    const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
+    const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:5000';
+    return `${protocol}://${host}`;
   }
 
   // File upload endpoints
@@ -362,9 +364,9 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Generate URL using configured base URL
-      const baseUrl = getImageBaseUrl();
-      const fileUrl = `${baseUrl}/uploads/${type}/${req.file.filename}`;
+      // Generate URL - use relative path for better portability
+      // This works with any domain/port without configuration
+      const fileUrl = `/uploads/${type}/${req.file.filename}`;
       
       res.json({
         message: "File uploaded successfully",
