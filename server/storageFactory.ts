@@ -23,6 +23,9 @@ class StorageFactory {
       const { DatabaseStorage } = await import("./storage");
       this.instance = new DatabaseStorage();
       console.log("🔗 Using MySQL DatabaseStorage");
+      
+      // Initialize default users if they don't exist
+      await this.initializeDefaultUsers(this.instance);
     } catch (error) {
       // If VPS database is configured but failing, don't fall back to MemStorage
       if (isVpsConfigured) {
@@ -49,6 +52,62 @@ class StorageFactory {
       throw new Error("Storage not initialized. Call getStorage() first.");
     }
     return this.instance!;
+  }
+
+  // Initialize default users in MySQL if they don't exist
+  private static async initializeDefaultUsers(storage: IStorage): Promise<void> {
+    try {
+      // Check if admin user exists
+      const adminUser = await storage.getUserByUsername('admin');
+      
+      if (!adminUser) {
+        console.log('🔧 Creating default admin user...');
+        
+        // Create admin user
+        await storage.createUser({
+          username: 'admin',
+          email: 'admin@estateai.com',
+          password: 'admin123', // Will be hashed by createUser
+          role: 'super_admin',
+          firstName: 'System',
+          lastName: 'Admin',
+          phone: '+964 750 000 0000',
+          isVerified: true
+        });
+        
+        console.log('✅ Default admin user created');
+        console.log('🔑 Username: admin, Password: admin123');
+      }
+      
+      // Check if agent user exists
+      const agentUser = await storage.getUserByUsername('john_agent');
+      
+      if (!agentUser) {
+        console.log('🔧 Creating default agent user...');
+        
+        // Create agent user
+        await storage.createUser({
+          username: 'john_agent',
+          email: 'john@estateai.com',
+          password: 'agent123', // Will be hashed by createUser
+          role: 'agent',
+          firstName: 'John',
+          lastName: 'Smith',
+          phone: '+964 750 123 4567',
+          isVerified: true
+        });
+        
+        console.log('✅ Default agent user created');
+        console.log('🔑 Username: john_agent, Password: agent123');
+      }
+      
+      if (adminUser && agentUser) {
+        console.log('ℹ️ Default users already exist in database');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error initializing default users:', error);
+    }
   }
 }
 
