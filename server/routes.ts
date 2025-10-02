@@ -364,9 +364,9 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      // Generate URL - use relative path for better portability
-      // This works with any domain/port without configuration
-      const fileUrl = `/uploads/${type}/${req.file.filename}`;
+      // Generate URL using configured IMAGE_BASE_URL or auto-detect from request
+      const baseUrl = getImageBaseUrl(req);
+      const fileUrl = `${baseUrl}/uploads/${type}/${req.file.filename}`;
       
       res.json({
         message: "File uploaded successfully",
