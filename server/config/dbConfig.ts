@@ -9,21 +9,6 @@ interface DatabaseConfig {
   connectionUrl: string;
 }
 
-const DEFAULT_VPS_CONFIG = {
-  host: process.env.MYSQL_HOST || "72.60.134.44",
-  port: parseInt(process.env.MYSQL_PORT || "3306"),
-  user: process.env.MYSQL_USER || "mapestate",
-  password: process.env.MYSQL_PASSWORD || "mapestate",
-  database: process.env.MYSQL_DATABASE || "mapestate",
-};
-
-function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
-  const { user, password, host, port, database } = config;
-  const encodedPassword = password ? encodeURIComponent(password) : '';
-  const auth = encodedPassword ? `${encodeURIComponent(user)}:${encodedPassword}` : encodeURIComponent(user);
-  return `mysql://${auth}@${host}:${port}/${database}`;
-}
-
 function getDatabaseConfig(): DatabaseConfig {
   // Only look for MYSQL_URL (not DATABASE_URL which is for PostgreSQL)
   let connectionUrl = process.env.MYSQL_URL;
@@ -55,12 +40,12 @@ function getDatabaseConfig(): DatabaseConfig {
       `🔧 MySQL VPS: mysql://${mysqlUser}:***@${mysqlHost}:${port}/${mysqlDatabase}`,
     );
   }
-  // If no URL provided and no individual vars, use default configuration
+  // If no URL provided and no individual vars, throw error
   else if (!connectionUrl) {
-    console.log("📝 No MYSQL_URL found, using default configuration from environment variables");
-    console.log("💡 Tip: Set environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE");
-
-    connectionUrl = createConnectionUrl(DEFAULT_VPS_CONFIG);
+    throw new Error(
+      "No MySQL database configured. " +
+      "Set MYSQL_URL or individual MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE environment variables."
+    );
   }
 
   // Parse the connection URL to get individual components
