@@ -1,0 +1,850 @@
+pto.net/dist/uploads
+0|mapestat | 2025-10-02T09:02:20: 9:02:20 AM [express] serving on port 3000
+0|mapestat | 2025-10-02T09:02:24: GET /api/health 200 in 10ms
+0|mapestat | 2025-10-02T09:02:24: GET /api/properties 200 in 4ms : []
+
+^C
+root@srv1027249:/var/www/dailynewscrypto.net# # Create a simple database test script
+cat > test-db.js << 'EOF'
+import mysql from 'mysql2/promise';
+
+const config = {
+  host: '72.60.134.44',
+  user: 'mapestate',
+  password: 'Mapestate123!',
+  database: 'mapestate',
+  port: 3306
+};
+
+async function testConnection() {
+  try {
+    const connection = await mysql.createConnection(config);
+    console.log('✅ Database connection successful');
+    const [rows] = await connection.execute('SELECT 1 as test');
+    console.log('✅ Database query successful:', rows);
+    await connection.end();
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+  }
+}
+
+testConnection();
+EOF
+
+# Run the test
+node test-db.js
+✅ Database connection successful
+✅ Database query successful: [ { test: 1 } ]
+root@srv1027249:/var/www/dailynewscrypto.net# # Check all services
+systemctl status nginx
+pm2 status
+
+# Test all endpoints
+echo "=== Testing API directly ==="
+curl -s http://localhost:3000/api/health | head -5
+
+echo "=== Testing API through nginx ==="
+curl -s https://dailynewscrypto.net/api/health | head -5
+
+echo "=== Testing Frontend ==="
+curl -s https://dailynewscrypto.net | grep -o '<title>.*</title>'
+
+echo "=== Checking processes ==="
+ps aux | grep -E '(nginx|node)' | grep -v grep
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2025-10-02 09:01:57 UTC; 41s ago
+       Docs: man:nginx(8)
+    Process: 39142 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on>
+    Process: 39144 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=e>
+    Process: 39155 ExecReload=/usr/sbin/nginx -g daemon on; master_process on; -s rel>
+   Main PID: 39145 (nginx)
+      Tasks: 2 (limit: 4654)
+     Memory: 2.0M (peak: 4.2M)
+        CPU: 24ms
+     CGroup: /system.slice/nginx.service
+             ├─39145 "nginx: master process /usr/sbin/nginx -g daemon on; master_proc>
+             └─39157 "nginx: worker process"
+
+Oct 02 09:01:57 srv1027249 systemd[1]: Starting nginx.service - A high performance we>
+Oct 02 09:01:57 srv1027249 systemd[1]: Started nginx.service - A high performance web>
+Oct 02 09:02:08 srv1027249 systemd[1]: Reloading nginx.service - A high performance w>
+Oct 02 09:02:08 srv1027249 nginx[39155]: 2025/10/02 09:02:08 [notice] 39155#39155: si>
+Oct 02 09:02:08 srv1027249 systemd[1]: Reloaded nginx.service - A high performance we>
+
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 1    │ online    │ 0%       │ 90.8mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+=== Testing API directly ===
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+=== Testing API through nginx ===
+=== Testing Frontend ===
+=== Checking processes ===
+root       39145  0.0  0.1  11964  4176 ?        Ss   09:01   0:00 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+www-data   39157  0.0  0.1  13316  4644 ?        S    09:02   0:00 nginx: worker process
+root       39168  2.9  2.3 11865552 93260 ?      Ssl  09:02   0:00 node /var/www/dailynewscrypto.net/dist/index.js
+root@srv1027249:/var/www/dailynewscrypto.net# # Test with HTTP instead of HTTPS
+curl -H "Accept: application/json" http://dailynewscrypto.net/api/health
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-C4aCAYP0.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+root@srv1027249:/var/www/dailynewscrypto.net# # Check what the API is actually returning
+curl -v http://localhost:3000/api/health 2>&1 | head -20
+
+# Test if there are any other API endpoints working
+curl http://localhost:3000/api/properties
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /api/health HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.5.0
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< X-Powered-By: Express
+< Accept-Ranges: bytes
+< Cache-Control: public, max-age=0
+< Last-Modified: Thu, 02 Oct 2025 09:00:58 GMT
+< ETag: W/"166c-199a4273b51"
+< Content-Type: text/html; charset=UTF-8
+< Content-Length: 5740
+[]root@srv1027249:/var/www/dailynewscrypto.net# Check PM2 environmentnt
+pm2 show mapestate-api
+
+# Update PM2 to use the proper .env file
+pm2 delete mapestate-api
+
+# Start with explicit environment file
+NODE_ENV=production pm2 start ecosystem.config.cjs --env production
+
+# Or set environment variables directly in PM2
+pm2 start ecosystem.config.cjs --env production --update-env
+ Describing process with id 0 - name mapestate-api 
+┌───────────────────┬──────────────────────────────────────────────────┐
+│ status            │ online                                           │
+│ name              │ mapestate-api                                    │
+│ namespace         │ default                                          │
+│ version           │ 1.0.0                                            │
+│ restarts          │ 1                                                │
+│ uptime            │ 73s                                              │
+│ entire log path   │ /var/www/dailynewscrypto.net/logs/combined-0.log │
+│ script path       │ /var/www/dailynewscrypto.net/dist/index.js       │
+│ script args       │ N/A                                              │
+│ error log path    │ /var/www/dailynewscrypto.net/logs/error-0.log    │
+│ out log path      │ /var/www/dailynewscrypto.net/logs/out-0.log      │
+│ pid path          │ /root/.pm2/pids/mapestate-api-0.pid              │
+│ interpreter       │ node                                             │
+│ interpreter args  │ N/A                                              │
+│ script id         │ 0                                                │
+│ exec cwd          │ /var/www/dailynewscrypto.net                     │
+│ exec mode         │ fork_mode                                        │
+│ node.js version   │ 20.19.5                                          │
+│ node env          │ production                                       │
+│ watch & reload    │ ✘                                                │
+│ unstable restarts │ 0                                                │
+│ created at        │ 2025-10-02T09:02:19.997Z                         │
+└───────────────────┴──────────────────────────────────────────────────┘
+ Actions available 
+┌────────────────────────┐
+│ km:heapdump            │
+│ km:cpu:profiling:start │
+│ km:cpu:profiling:stop  │
+│ km:heap:sampling:start │
+│ km:heap:sampling:stop  │
+└────────────────────────┘
+ Trigger via: pm2 trigger mapestate-api <action_name>
+
+ Code metrics value 
+┌────────────────────────┬──────────────┐
+│ Used Heap Size         │ 22.83 MiB    │
+│ Heap Usage             │ 95.03 %      │
+│ Heap Size              │ 24.03 MiB    │
+│ Event Loop Latency p95 │ 1.34 ms      │
+│ Event Loop Latency     │ 0.57 ms      │
+│ Active handles         │ 4            │
+│ Active requests        │ 0            │
+│ HTTP                   │ 0.07 req/min │
+│ HTTP P95 Latency       │ 11 ms        │
+│ HTTP Mean Latency      │ 4.5 ms       │
+└────────────────────────┴──────────────┘
+ Divergent env variables from local env 
+
+
+ Add your own code metrics: http://bit.ly/code-metrics
+ Use `pm2 logs mapestate-api [--lines 1000]` to display logs
+ Use `pm2 env 0` to display environment variables
+ Use `pm2 monit` to monitor CPU and Memory usage mapestate-api
+[PM2] Applying action deleteProcessId on app [mapestate-api](ids: [ 0 ])
+[PM2] [mapestate-api](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2][WARN] Applications mapestate-api not running, starting...
+[PM2] App [mapestate-api] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 0    │ online    │ 0%       │ 18.5mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Applying action restartProcessId on app [mapestate-api](ids: [ 0 ])
+[PM2] [mapestate-api](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 1    │ online    │ 0%       │ 15.6mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv1027249:/var/www/dailynewscrypto.net# # Create a better nginx configuration
+cat > /etc/nginx/sites-available/dailynewscrypto.net << 'EOF'
+server {
+    listen 80;
+    listen [::]:80;
+    server_name dailynewscrypto.net www.dailynewscrypto.net;
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    
+    # Frontend static files
+    root /var/www/dailynewscrypto.net;
+    index index.html;
+    
+    # API proxy - more specific configuration
+    location /api/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header Accept "application/json";
+        
+        # Additional proxy settings
+        proxy_redirect off;
+        proxy_buffering off;
+    }
+    
+    # Serve static files directly
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+systemctl reload nginxx503 504 /50x.html; immutable";
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@srv1027249:/var/www/dailynewscrypto.net# # Create a debug script to test the exact same connection the app uses
+cat > debug-db.js << 'EOF'
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+
+// Load environment variables the same way your app does
+dotenv.config();
+
+console.log('Environment variables:');
+console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
+console.log('MYSQL_USER:', process.env.MYSQL_USER);
+console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
+console.log('MYSQL_PORT:', process.env.MYSQL_PORT);
+console.log('MYSQL_PASSWORD:', process.env.MYSQL_PASSWORD ? '***' : 'NOT SET');
+
+const config = {
+  host: process.env.MYSQL_HOST || '72.60.134.44',
+  user: process.env.MYSQL_USER || 'mapestate',
+  password: process.env.MYSQL_PASSWORD || 'Mapestate123!',
+  database: process.env.MYSQL_DATABASE || 'mapestate',
+  port: process.env.MYSQL_PORT || 3306
+};
+
+async function testConnection() {
+  try {
+    console.log('Testing connection with config:', {
+      host: config.host,
+      user: config.user,
+      database: config.database,
+      port: config.port
+    });
+    
+    const connection = await mysql.createConnection(config);
+    console.log('✅ Database connection successful');
+    
+    const [rows] = await connection.execute('SELECT 1 as test');
+    console.log('✅ Database query successful:', rows);
+    
+    await connection.end();
+    console.log('✅ Connection closed');
+node debug-db.jsscriptl error:', error);age);e);');
+[dotenv@17.2.2] injecting env (11) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+Environment variables:
+MYSQL_HOST: 72.60.134.44
+MYSQL_USER: mapestate
+MYSQL_DATABASE: mapestate
+MYSQL_PORT: 3306
+MYSQL_PASSWORD: ***
+Testing connection with config: {
+  host: '72.60.134.44',
+  user: 'mapestate',
+  database: 'mapestate',
+  port: '3306'
+}
+✅ Database connection successful
+✅ Database query successful: [ { test: 1 } ]
+✅ Connection closed
+root@srv1027249:/var/www/dailynewscrypto.net# # Test API directly
+echo "=== Testing API directly on port 3000 ==="
+curl -s http://localhost:3000/api/health | jq . 2>/dev/null || curl -s http://localhost:3000/api/health | head -5
+
+# Test API through nginx
+echo "=== Testing API through nginx ==="
+curl -s http://dailynewscrypto.net/api/health | jq . 2>/dev/null || curl -s http://dailynewscrypto.net/api/health | head -5
+
+# Test frontend
+echo "=== Testing Frontend ==="
+curl -s http://dailynewscrypto.net | grep -o '<title>.*</title>'
+
+# Check services status
+echo "=== Services Status ==="
+systemctl is-active nginx
+pm2 status
+
+# Check logs
+echo "=== Recent App Logs ==="
+pm2 logs mapestate-api --lines 5 --nostream
+=== Testing API directly on port 3000 ===
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+=== Testing API through nginx ===
+<html>
+<head><title>500 Internal Server Error</title></head>
+<body>
+<center><h1>500 Internal Server Error</h1></center>
+<hr><center>nginx/1.24.0 (Ubuntu)</center>
+=== Testing Frontend ===
+<title>403 Forbidden</title>
+=== Services Status ===
+active
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 1    │ online    │ 0%       │ 87.0mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+=== Recent App Logs ===
+[TAILING] Tailing last 5 lines for [mapestate-api] process (change the value with --lines option)
+/var/www/dailynewscrypto.net/logs/error-0.log last 5 lines:
+0|mapestat | 2025-10-02T09:03:35: ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 2025-10-02T09:03:35: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:03:35: Warning: connect.session() MemoryStore is not
+0|mapestat | 2025-10-02T09:03:35: designed for a production environment, as it will leak
+0|mapestat | 2025-10-02T09:03:35: memory, and will not scale past a single process.
+
+/var/www/dailynewscrypto.net/logs/out-0.log last 5 lines:
+0|mapestat | 2025-10-02T09:03:35: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-02T09:03:35: 📁 Serving uploads from: /var/www/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-02T09:03:35: 9:03:35 AM [express] serving on port 3000
+0|mapestat | 2025-10-02T09:04:16: GET /api/health 200 in 8ms
+0|mapestat | 2025-10-02T09:04:16: GET /api/health 200 in 2ms
+
+root@srv1027249:/var/www/dailynewscrypto.net# # Try using MYSQL_URL instead of separate variables
+cat >> .env << 'EOF'
+
+# Alternative connection string format
+MYSQL_URL=mysql://mapestate:Mapestate123!@72.60.134.44:3306/mapestate
+EOF
+
+# Restart app
+pm2 restart mapestate-api
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [mapestate-api](ids: [ 0 ])
+[PM2] [mapestate-api](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 2    │ online    │ 0%       │ 9.5mb    │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv1027249:/var/www/dailynewscrypto.net# cd /var/www/dailynewscrypto.net
+
+# Create a proper ecosystem config that loads .env
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'mapestate-api',
+    script: './dist/index.js',
+    instances: 1,
+    exec_mode: 'fork',
+    env_file: '.env',  // This tells PM2 to load .env
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000,
+      MYSQL_HOST: '72.60.134.44',
+      MYSQL_USER: 'mapestate',
+      MYSQL_PASSWORD: 'Mapestate123!',
+      MYSQL_DATABASE: 'mapestate',
+      MYSQL_PORT: '3306'
+    },
+    log_file: './logs/combined.log',
+    out_file: './logs/out.log',
+    error_file: './logs/error.log',
+    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+    watch: false,
+    max_memory_restart: '1G',
+    restart_delay: 5000,
+    max_restarts: 10,
+    min_uptime: '10s',
+    kill_timeout: 5000
+  }]
+};
+EOF
+
+# Restart PM2 with the new config
+pm2 delete all
+pm2 start ecosystem.config.cjs --env production
+pm2 save
+
+# Check logs
+pm2 logs --lines 30
+[PM2] Applying action deleteProcessId on app [all](ids: [ 0 ])
+[PM2] [mapestate-api](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2][WARN] Applications mapestate-api not running, starting...
+[PM2][WARN] Environment [production] is not defined in process file
+[PM2] App [mapestate-api] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-api      │ fork     │ 0    │ online    │ 0%       │ 10.5mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+[TAILING] Tailing last 30 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 30 lines:
+PM2        | 2025-10-02T09:00:42: PM2 log: Stopping app:mapestate-api id:0
+PM2        | 2025-10-02T09:00:42: PM2 log: App [mapestate-api:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T09:00:42: PM2 log: pid=38914 msg=process killed
+PM2        | 2025-10-02T09:00:58: PM2 log: App [mapestate-api:0] starting in -fork mode-
+PM2        | 2025-10-02T09:00:58: PM2 log: App [mapestate-api:0] online
+PM2        | 2025-10-02T09:02:19: PM2 log: Stopping app:mapestate-api id:0
+PM2        | 2025-10-02T09:02:20: PM2 log: App [mapestate-api:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T09:02:20: PM2 log: pid=39037 msg=process killed
+PM2        | 2025-10-02T09:02:20: PM2 log: App [mapestate-api:0] starting in -fork mode-
+PM2        | 2025-10-02T09:02:20: PM2 log: App [mapestate-api:0] online
+PM2        | 2025-10-02T09:03:33: PM2 log: Stopping app:mapestate-api id:0
+PM2        | 2025-10-02T09:03:33: PM2 log: App [mapestate-api:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T09:03:33: PM2 log: pid=39168 msg=process killed
+PM2        | 2025-10-02T09:03:34: PM2 log: App [mapestate-api:0] starting in -fork mode-
+PM2        | 2025-10-02T09:03:34: PM2 log: App [mapestate-api:0] online
+PM2        | 2025-10-02T09:03:34: PM2 log: Stopping app:mapestate-api id:0
+PM2        | 2025-10-02T09:03:34: PM2 log: App [mapestate-api:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T09:03:34: PM2 log: pid=39255 msg=process killed
+PM2        | 2025-10-02T09:03:34: PM2 log: App [mapestate-api:0] starting in -fork mode-
+PM2        | 2025-10-02T09:03:34: PM2 log: App [mapestate-api:0] online
+PM2        | 2025-10-02T09:04:22: PM2 log: Stopping app:mapestate-api id:0
+PM2        | 2025-10-02T09:04:22: PM2 log: App [mapestate-api:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T09:04:23: PM2 log: pid=39274 msg=process killed
+PM2        | 2025-10-02T09:04:23: PM2 log: App [mapestate-api:0] starting in -fork mode-
+PM2        | 2025-10-02T09:04:23: PM2 log: App [mapestate-api:0] online
+PM2        | 2025-10-02T09:05:19: PM2 log: Stopping app:mapestate-api id:0
+PM2        | 2025-10-02T09:05:19: PM2 log: App [mapestate-api:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T09:05:19: PM2 log: pid=39345 msg=process killed
+PM2        | 2025-10-02T09:05:19: PM2 log: App [mapestate-api:0] starting in -fork mode-
+PM2        | 2025-10-02T09:05:19: PM2 log: App [mapestate-api:0] online
+
+/var/www/dailynewscrypto.net/logs/error-0.log last 30 lines:
+0|mapestat | 2025-10-02T09:03:35:   sqlMessage: "Access denied for user 'mapestate'@'72.60.134.44' (using password: YES)"
+0|mapestat | 2025-10-02T09:03:35: }
+0|mapestat | 2025-10-02T09:03:35: ❌ Failed to connect to MySQL VPS database:
+0|mapestat | 2025-10-02T09:03:35:    Error: Error: Access denied for user 'mapestate'@'72.60.134.44' (using password: YES)
+0|mapestat | 2025-10-02T09:03:35: ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 2025-10-02T09:03:35: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:03:35: Warning: connect.session() MemoryStore is not
+0|mapestat | 2025-10-02T09:03:35: designed for a production environment, as it will leak
+0|mapestat | 2025-10-02T09:03:35: memory, and will not scale past a single process.
+0|mapestat | 2025-10-02T09:04:23: ⚠️ Connection test failed: Error: Access denied for user 'mapestate'@'72.60.134.44' (using password: YES)
+0|mapestat | 2025-10-02T09:04:23:     at PromisePool.query (/var/www/dailynewscrypto.net/node_modules/mysql2/lib/promise/pool.js:36:22)
+0|mapestat | 2025-10-02T09:04:23:     at initializeDb (file:///var/www/dailynewscrypto.net/dist/index.js:1550:25)
+0|mapestat | 2025-10-02T09:04:23:     at StorageFactory.getStorage (file:///var/www/dailynewscrypto.net/dist/index.js:2474:17)
+0|mapestat | 2025-10-02T09:04:23:     at file:///var/www/dailynewscrypto.net/dist/index.js:4962:35
+0|mapestat | 2025-10-02T09:04:23:     at file:///var/www/dailynewscrypto.net/dist/index.js:4993:3
+0|mapestat | 2025-10-02T09:04:23:     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+0|mapestat | 2025-10-02T09:04:23:     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24) {
+0|mapestat | 2025-10-02T09:04:23:   code: 'ER_ACCESS_DENIED_ERROR',
+0|mapestat | 2025-10-02T09:04:23:   errno: 1045,
+0|mapestat | 2025-10-02T09:04:23:   sql: undefined,
+0|mapestat | 2025-10-02T09:04:23:   sqlState: '28000',
+0|mapestat | 2025-10-02T09:04:23:   sqlMessage: "Access denied for user 'mapestate'@'72.60.134.44' (using password: YES)"
+0|mapestat | 2025-10-02T09:04:23: }
+0|mapestat | 2025-10-02T09:04:23: ❌ Failed to connect to MySQL VPS database:
+0|mapestat | 2025-10-02T09:04:23:    Error: Error: Access denied for user 'mapestate'@'72.60.134.44' (using password: YES)
+0|mapestat | 2025-10-02T09:04:23: ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 2025-10-02T09:04:23: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:04:23: Warning: connect.session() MemoryStore is not
+0|mapestat | 2025-10-02T09:04:23: designed for a production environment, as it will leak
+0|mapestat | 2025-10-02T09:04:23: memory, and will not scale past a single process.
+
+/var/www/dailynewscrypto.net/logs/out-0.log last 30 lines:
+0|mapestat | 2025-10-02T09:03:35:    Database: mapestate
+0|mapestat | 2025-10-02T09:03:35: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-02T09:03:35: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-02T09:03:35: 🔍 Testing database connection...
+0|mapestat | 2025-10-02T09:03:35: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-02T09:03:35: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-02T09:03:35: 📁 Serving uploads from: /var/www/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-02T09:03:35: 9:03:35 AM [express] serving on port 3000
+0|mapestat | 2025-10-02T09:04:16: GET /api/health 200 in 8ms
+0|mapestat | 2025-10-02T09:04:16: GET /api/health 200 in 2ms
+0|mapestat | 2025-10-02T09:04:23: 🔍 Environment Variables Debug:
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_HOST: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_USER: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_DATABASE: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_PORT: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_PASSWORD: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23: 📝 No MYSQL_URL found, using default configuration from environment variables
+0|mapestat | 2025-10-02T09:04:23: 💡 Tip: Set environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
+0|mapestat | 2025-10-02T09:04:23: 🔗 Database configuration:
+0|mapestat | 2025-10-02T09:04:23:    Host: 72.60.134.44:3306
+0|mapestat | 2025-10-02T09:04:23:    User: mapestate
+0|mapestat | 2025-10-02T09:04:23:    Database: mapestate
+0|mapestat | 2025-10-02T09:04:23: 🔄 Connecting to MySQL VPS database...
+0|mapestat | 2025-10-02T09:04:23: ✅ MySQL VPS connection established successfully
+0|mapestat | 2025-10-02T09:04:23: 🔍 Testing database connection...
+0|mapestat | 2025-10-02T09:04:23: 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 2025-10-02T09:04:23: 🔧 Running startup fix for user language permissions...
+0|mapestat | 2025-10-02T09:04:23: 📁 Serving uploads from: /var/www/dailynewscrypto.net/dist/uploads
+0|mapestat | 2025-10-02T09:04:23: 9:04:23 AM [express] serving on port 3000
+
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔍 Environment Variables Debug:
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    MYSQL_HOST: [SET]
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    MYSQL_USER: [SET]
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    MYSQL_PORT: 3306
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    MYSQL_PASSWORD: [SET]
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔧 MySQL VPS: mysql://mapestate:***@72.60.134.44:3306/mapestate
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔗 Database configuration:
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    Host: 72.60.134.44:3306
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    User: mapestate
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00:    Database: mapestate
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔄 Connecting to MySQL VPS database...
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: ✅ MySQL VPS connection established successfully
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔍 Testing database connection...
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 💓 Database connection is healthy
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: ✅ MySQL database initialized successfully
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔗 Using MySQL DatabaseStorage
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔧 Running startup fix for user language permissions...
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 🔧 Fixing existing users language permissions...
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: Found 1 regular users to fix
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: ✅ Finished fixing existing users language permissions
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: Warning: connect.session() MemoryStore is not
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: designed for a production environment, as it will leak
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: memory, and will not scale past a single process.
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 📁 Serving uploads from: /var/www/dailynewscrypto.net/dist/uploads
+0|mapestate-api  | 2025-10-02 09:05:20 +00:00: 9:05:20 AM [express] serving on port 3000
+^C
+root@srv1027249:/var/www/dailynewscrypto.net# # Check if environment variables are now loaded
+pm2 logs --lines 50 | grep "MYSQL_"
+
+# Test database connection
+curl http://localhost:3000/api/health
+
+# Check if properties API works
+curl http://localhost:3000/api/properties
+0|mapestat | 2025-10-02T09:02:20: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:03:35: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:04:23: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_HOST: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_USER: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_DATABASE: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_PORT: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_PASSWORD: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23: 📝 No MYSQL_URL found, using default configuration from environment variables
+0|mapestat | 2025-10-02T09:04:23: 💡 Tip: Set environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_HOST: [SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_USER: [SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_PORT: 3306
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_PASSWORD: [SET]
+^C
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Charset must be first -->
+    <meta charset="UTF-8" />
+    
+    <!-- Viewport without maximum-scale for accessibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    
+    <!-- Performance optimizations - preconnect before other resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq</title>
+    <meta name="title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta name="description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters." />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="MapEstate" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailynewscrypto.net/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dailynewscrypto.net/" />
+    <meta property="og:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="og:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents." />
+    <meta property="og:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dailynewscrypto.net/" />
+    <meta property="twitter:title" content="MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq" />
+    <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq." />
+    <meta property="twitter:image" content="https://dailynewscrypto.net/og-image.jpg" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MapEstate",
+      "url": "https://dailynewscrypto.net",
+      "description": "AI-powered real estate platform for finding properties in Kurdistan, Iraq",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://dailynewscrypto.net/properties?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MapEstate",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://dailynewscrypto.net/logo_1757848527935.png"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Consolidated Google Fonts - Single request for all fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Noto+Sans+Kurdish:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome for icons with integrity check -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module" crossorigin src="/assets/index-C4aCAYP0.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CauQUjjo.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Global function for map popup navigation -->
+    <script>
+      window.viewPropertyFromMap = function(propertyId) {
+        // Navigate to property detail page
+        window.location.href = '/property/' + propertyId;
+      };
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
+[{"id":"28000b61-663c-4d50-abd7-535251d45abd","title":"E house","description":"Control whether your property appears on the public map and search results.Control whether your property appears on the public map and search results.Control whether your property appears on the public map and search results.Control whether your property appears on the public map and search results.","type":"apartment","listingType":"rent","price":"3000.00","currency":"USD","bedrooms":1,"bathrooms":1,"area":1,"address":"Kamarani city","city":"Erbil","country":"Iraq","latitude":"36.16448789","longitude":"44.06066895","status":"active","language":"en","agentId":"7aafd7e9-b716-4114-ae16-afb209650833","contactPhone":"07702134455","waveId":"wave-default-12345","views":0,"isFeatured":false,"slug":"erbil-1-bedroom-apartment-for-rent","createdAt":"2025-10-02T08:14:18.000Z","updatedAt":"2025-10-02T08:14:18.000Z","agent":{"id":"7aafd7e9-b716-4114-ae16-afb209650833","username":"farman","email":"farman@gmail.com","password":"$2b$12$38EHc0SrSRiGfjVQi6Gk0OI1ONUk4LiS/qa5skPHQgIc8AGNex6pi","role":"user","firstName":"farman","lastName":"osman","phone":"07702134455","avatar":"/uploads/avatar/1759308242055-p57lvj126.jpg","isVerified":true,"waveBalance":8,"expiresAt":"2025-10-23T11:44:00.000Z","isExpired":false,"createdAt":"2025-10-01T08:44:24.000Z"},"wave":{"id":"wave-default-12345","name":"Default Wave","description":"Default wave for all users","color":"#3B82F6","isActive":true,"createdBy":"admin-uuid-1234567890","createdAt":"2025-10-01T08:23:35.000Z","updatedAt":"2025-10-01T08:23:35.000Z"},"images":[{"id":5,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","imageUrl":"/uploads/properties/1759392838888-2mbfvllgz.webp","sortOrder":0,"altText":null,"createdAt":"2025-10-02T08:14:19.000Z"},{"id":6,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","imageUrl":"/uploads/properties/1759392844956-58zbgy5f0.jpg","sortOrder":1,"altText":null,"createdAt":"2025-10-02T08:14:19.000Z"}],"amenities":[{"id":7,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","amenity":"garden","createdAt":"2025-10-02T08:14:19.000Z"},{"id":8,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","amenity":"gym","createdAt":"2025-10-02T08:14:19.000Z"},{"id":9,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","amenity":"swimmingPool","createdAt":"2025-10-02T08:14:19.000Z"}],"features":[{"id":12,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","feature":"airConditioning","createdAt":"2025-10-02T08:14:20.000Z"},{"id":13,"propertyId":"28000b61-663c-4d50-abd7-535251d45abd","feature":"furnished","createdAt":root@srv1027249:/var/www/dailynewscrypto.net# -- Connect to MySQL on the database serverlynewscrypto.net# -- Connect to MySQL on the database server
+mysql -u root -p
+
+-- Grant access from the VPS IP
+GRANT ALL PRIVILEGES ON mapestate.* TO 'mapestate'@'72.60.134.44' IDENTIFIED BY 'Mapestate123!';
+FLUSH PRIVILEGES;
+EXIT;
+--: command not found
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 140
+Server version: 8.0.43-0ubuntu0.24.04.2 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> ^C
+mysql> ^C
+mysql> ^C
+mysql> 
+[1]+  Stopped                 mysql -u root -p
+--: command not found
+GRANT: command not found
+FLUSH: command not found
+EXIT: command not found
+root@srv1027249:/var/www/dailynewscrypto.net# pm2 logs --lines 50 | grep "MYSQL_"
+0|mapestat | 2025-10-02T09:02:20: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:03:35: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:04:23: 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_HOST: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_USER: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_DATABASE: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_PORT: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23:    MYSQL_PASSWORD: [NOT SET]
+0|mapestat | 2025-10-02T09:04:23: 📝 No MYSQL_URL found, using default configuration from environment variables
+0|mapestat | 2025-10-02T09:04:23: 💡 Tip: Set environment variables MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_URL: [NOT SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_HOST: [SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_USER: [SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_DATABASE: [SET]
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_PORT: 3306
+0|mapestat | 2025-10-02 09:05:20 +00:00:    MYSQL_PASSWORD: [SET]
