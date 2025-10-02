@@ -25,8 +25,8 @@ function createConnectionUrl(config: typeof DEFAULT_VPS_CONFIG): string {
 }
 
 function getDatabaseConfig(): DatabaseConfig {
-  // Try to get MYSQL_URL from environment first
-  let connectionUrl = process.env.MYSQL_URL || process.env.DATABASE_URL;
+  // Only look for MYSQL_URL (not DATABASE_URL which is for PostgreSQL)
+  let connectionUrl = process.env.MYSQL_URL;
 
   // Check if individual MySQL environment variables are provided (trim whitespace)
   const mysqlHost = process.env.MYSQL_HOST?.trim();

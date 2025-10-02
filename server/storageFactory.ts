@@ -12,8 +12,8 @@ class StorageFactory {
       return this.instance;
     }
 
-    // Check if VPS database is explicitly configured
-    const isVpsConfigured = process.env.MYSQL_URL || process.env.DATABASE_URL;
+    // Check if MySQL VPS database is explicitly configured
+    const isVpsConfigured = process.env.MYSQL_URL;
     
     try {
       await initializeDb();
