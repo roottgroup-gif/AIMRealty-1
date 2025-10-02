@@ -27,7 +27,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiRequest } from '@/lib/queryClient';
 import type { PropertyWithDetails, PropertyFilters } from '@shared/schema';
-import type { PropertyWithAgent } from '@shared/sqlite-schema';
 import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, type Language } from '@shared/schema';
 import { 
   Heart, Search, Filter, LogOut, MapPin, DollarSign,
@@ -550,7 +549,7 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedLocation, setSelectedLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editingProperty, setEditingProperty] = useState<PropertyWithAgent | null>(null);
+  const [editingProperty, setEditingProperty] = useState<PropertyWithDetails | null>(null);
   const [showBalanceModal, setShowBalanceModal] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [showLanguageSelection, setShowLanguageSelection] = useState(true);
@@ -646,7 +645,7 @@ export default function CustomerDashboard() {
   const t = translations[selectedLanguage];
 
   // Fetch all properties
-  const { data: allProperties = [], isLoading: propertiesLoading } = useQuery<PropertyWithAgent[]>({
+  const { data: allProperties = [], isLoading: propertiesLoading } = useQuery<PropertyWithDetails[]>({
     queryKey: ['/api/properties', mapFilters],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -663,7 +662,7 @@ export default function CustomerDashboard() {
   });
 
   // Fetch user's favorites
-  const { data: favorites = [] } = useQuery<PropertyWithAgent[]>({
+  const { data: favorites = [] } = useQuery<PropertyWithDetails[]>({
     queryKey: ['/api/users', user?.id, 'favorites'],
     enabled: !!user?.id,
   });
@@ -684,7 +683,7 @@ export default function CustomerDashboard() {
   // Fetch property statistics for charts
   const { data: propertyStats } = useQuery({
     queryKey: ['/api/properties', { limit: 1000 }],
-    select: (data: PropertyWithAgent[]) => {
+    select: (data: PropertyWithDetails[]) => {
       const byType = data?.reduce((acc, prop) => {
         acc[prop.type] = (acc[prop.type] || 0) + 1;
         return acc;
@@ -712,7 +711,7 @@ export default function CustomerDashboard() {
   });
 
   // Fetch user's own properties
-  const { data: userProperties = [], isLoading: userPropertiesLoading } = useQuery<PropertyWithAgent[]>({
+  const { data: userProperties = [], isLoading: userPropertiesLoading } = useQuery<PropertyWithDetails[]>({
     queryKey: ['/api/users', user?.id, 'properties'],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -933,7 +932,7 @@ export default function CustomerDashboard() {
     setMapFilters(filters);
   };
 
-  const handlePropertyInquiry = (property: PropertyWithAgent) => {
+  const handlePropertyInquiry = (property: PropertyWithDetails) => {
     // Open inquiry modal or navigate to property detail
     const identifier = property.slug || property.id;
     navigate(`/property/${identifier}`);
@@ -967,7 +966,7 @@ export default function CustomerDashboard() {
     updateProfileMutation.mutate(data);
   };
 
-  const handleEditProperty = (property: PropertyWithAgent) => {
+  const handleEditProperty = (property: PropertyWithDetails) => {
     setEditingProperty(property);
     
     // Set the language to match the property's language
@@ -3048,10 +3047,10 @@ function PropertyCard({
   onToggleFavorite,
   onInquiry
 }: { 
-  property: PropertyWithAgent;
+  property: PropertyWithDetails;
   isFavorite: boolean;
   onToggleFavorite: (isFavorite: boolean) => void;
-  onInquiry: (property: PropertyWithAgent) => void;
+  onInquiry: (property: PropertyWithDetails) => void;
 }) {
   return (
     <Card className="group hover:shadow-lg transition-shadow">
