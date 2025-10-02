@@ -867,13 +867,14 @@ export class DatabaseStorage implements IStorage {
       const { fileURLToPath } = await import('url');
       
       // Only clean up files that are in our uploads directory
-      if (imageUrl.startsWith('/uploads/properties/')) {
-        // Extract filename and build safe absolute path
+      if (imageUrl.startsWith('/uploads/properties/') || imageUrl.startsWith('/uploads/avatar/') || imageUrl.startsWith('/uploads/customer/')) {
+        // Extract filename and upload type from URL
         const filename = path.basename(imageUrl);
-        // Fix __dirname issue in ES modules
-        const currentFileUrl = import.meta.url;
-        const currentDir = path.dirname(fileURLToPath(currentFileUrl));
-        const uploadsDir = path.join(currentDir, 'uploads', 'properties');
+        const uploadType = imageUrl.split('/')[2]; // 'properties', 'avatar', or 'customer'
+        
+        // Use UPLOADS_PATH environment variable or fall back to relative path
+        const baseUploadsPath = process.env.UPLOADS_PATH || path.join(path.dirname(fileURLToPath(import.meta.url)), 'uploads');
+        const uploadsDir = path.join(baseUploadsPath, uploadType);
         const filePath = path.join(uploadsDir, filename);
         
         // Ensure the file path is within our uploads directory (prevent path traversal)
