@@ -1,0 +1,248 @@
+root@srv1027249:~/dailynewscrypto.net# cd ~/dailynewscrypto.net
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'mapestate-app',
+    script: 'dist/index.js',
+    env: {
+      NODE_ENV: 'production',
+      MYSQL_HOST: 'localhost',
+      MYSQL_USER: 'mapestate',
+      MYSQL_PASSWORD: 'Mapestate123!',
+      MYSQL_DATABASE: 'mapestate',
+      MYSQL_PORT: '3306'
+    }
+  }]
+};
+EOF
+
+pm2 restart mapestate-app
+pm2 logs mapestate-app --lines 20
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [mapestate-app](ids: [ 0 ])
+[PM2] [mapestate-app](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate-app      │ fork     │ 30   │ online    │ 0%       │ 18.6mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [mapestate-app] process (change the value with --lines option)
+/root/.pm2/logs/mapestate-app-out.log last 20 lines:
+0|mapestat |    MYSQL_DATABASE: [SET]
+0|mapestat |    MYSQL_PORT: 3306
+0|mapestat |    MYSQL_PASSWORD: [SET]
+0|mapestat | 🔗 Using MySQL VPS configuration from environment variables
+0|mapestat | 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestat | 🔗 Database configuration:
+0|mapestat |    Host: localhost:3306
+0|mapestat |    User: mapestate
+0|mapestat |    Database: mapestate
+0|mapestat | 🔄 Connecting to MySQL VPS database...
+0|mapestat | ✅ MySQL VPS connection established successfully
+0|mapestat | 🔍 Testing database connection...
+0|mapestat | 💓 Database connection is healthy
+0|mapestat | ✅ MySQL database initialized successfully
+0|mapestat | 🔗 Using MySQL DatabaseStorage
+0|mapestat | 🔧 Running startup fix for user language permissions...
+0|mapestat | 🔧 Fixing existing users language permissions...
+0|mapestat | Found 0 regular users to fix
+0|mapestat | ✅ Finished fixing existing users language permissions
+0|mapestat | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+
+/root/.pm2/logs/mapestate-app-error.log last 20 lines:
+0|mapestat | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestat |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestat |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestat |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestat | 
+0|mapestat | Node.js v20.19.5
+0|mapestat | Warning: connect.session() MemoryStore is not
+0|mapestat | designed for a production environment, as it will leak
+0|mapestat | memory, and will not scale past a single process.
+0|mapestat | /root/dailynewscrypto.net/server/vite.local.ts:79
+0|mapestat |     throw new Error(
+0|mapestat |           ^
+0|mapestat | 
+0|mapestat | 
+0|mapestat | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestat |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestat |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestat |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestat | 
+0|mapestat | Node.js v20.19.5
+
+0|mapestate-app  | 🔍 Environment Variables Debug:
+0|mapestate-app  |    MYSQL_URL: [NOT SET]
+0|mapestate-app  |    MYSQL_HOST: [SET]
+0|mapestate-app  |    MYSQL_USER: [SET]
+0|mapestate-app  |    MYSQL_DATABASE: [SET]
+0|mapestate-app  |    MYSQL_PORT: 3306
+0|mapestate-app  |    MYSQL_PASSWORD: [SET]
+0|mapestate-app  | 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-app  | 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-app  | 🔗 Database configuration:
+0|mapestate-app  |    Host: localhost:3306
+0|mapestate-app  |    User: mapestate
+0|mapestate-app  |    Database: mapestate
+0|mapestate-app  | 🔄 Connecting to MySQL VPS database...
+0|mapestate-app  | ✅ MySQL VPS connection established successfully
+0|mapestate-app  | 🔍 Testing database connection...
+0|mapestate-app  | 💓 Database connection is healthy
+0|mapestate-app  | ✅ MySQL database initialized successfully
+0|mapestate-app  | 🔗 Using MySQL DatabaseStorage
+0|mapestate-app  | 🔧 Running startup fix for user language permissions...
+0|mapestate-app  | 🔧 Fixing existing users language permissions...
+0|mapestate-app  | Found 0 regular users to fix
+0|mapestate-app  | ✅ Finished fixing existing users language permissions
+0|mapestate-app  | Warning: connect.session() MemoryStore is not
+0|mapestate-app  | designed for a production environment, as it will leak
+0|mapestate-app  | memory, and will not scale past a single process.
+0|mapestate-app  | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+0|mapestate-app  | /root/dailynewscrypto.net/server/vite.local.ts:79
+0|mapestate-app  |     throw new Error(
+0|mapestate-app  |           ^
+0|mapestate-app  | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestate-app  |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestate-app  |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestate-app  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestate-app  | Node.js v20.19.5
+0|mapestate-app  | 🔍 Environment Variables Debug:
+0|mapestate-app  |    MYSQL_URL: [NOT SET]
+0|mapestate-app  |    MYSQL_HOST: [SET]
+0|mapestate-app  |    MYSQL_USER: [SET]
+0|mapestate-app  |    MYSQL_DATABASE: [SET]
+0|mapestate-app  |    MYSQL_PORT: 3306
+0|mapestate-app  |    MYSQL_PASSWORD: [SET]
+0|mapestate-app  | 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-app  | 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-app  | 🔗 Database configuration:
+0|mapestate-app  |    Host: localhost:3306
+0|mapestate-app  |    User: mapestate
+0|mapestate-app  |    Database: mapestate
+0|mapestate-app  | 🔄 Connecting to MySQL VPS database...
+0|mapestate-app  | ✅ MySQL VPS connection established successfully
+0|mapestate-app  | 🔍 Testing database connection...
+0|mapestate-app  | 💓 Database connection is healthy
+0|mapestate-app  | ✅ MySQL database initialized successfully
+0|mapestate-app  | 🔗 Using MySQL DatabaseStorage
+0|mapestate-app  | 🔧 Running startup fix for user language permissions...
+0|mapestate-app  | 🔧 Fixing existing users language permissions...
+0|mapestate-app  | Found 0 regular users to fix
+0|mapestate-app  | ✅ Finished fixing existing users language permissions
+0|mapestate-app  | Warning: connect.session() MemoryStore is not
+0|mapestate-app  | designed for a production environment, as it will leak
+0|mapestate-app  | memory, and will not scale past a single process.
+0|mapestate-app  | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+0|mapestate-app  | /root/dailynewscrypto.net/server/vite.local.ts:79
+0|mapestate-app  |     throw new Error(
+0|mapestate-app  |           ^
+0|mapestate-app  | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestate-app  |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestate-app  |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestate-app  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestate-app  | Node.js v20.19.5
+0|mapestate-app  | 🔍 Environment Variables Debug:
+0|mapestate-app  |    MYSQL_URL: [NOT SET]
+0|mapestate-app  |    MYSQL_HOST: [SET]
+0|mapestate-app  |    MYSQL_USER: [SET]
+0|mapestate-app  |    MYSQL_DATABASE: [SET]
+0|mapestate-app  |    MYSQL_PORT: 3306
+0|mapestate-app  |    MYSQL_PASSWORD: [SET]
+0|mapestate-app  | 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-app  | 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-app  | 🔗 Database configuration:
+0|mapestate-app  |    Host: localhost:3306
+0|mapestate-app  |    User: mapestate
+0|mapestate-app  |    Database: mapestate
+0|mapestate-app  | 🔄 Connecting to MySQL VPS database...
+0|mapestate-app  | ✅ MySQL VPS connection established successfully
+0|mapestate-app  | 🔍 Testing database connection...
+0|mapestate-app  | 💓 Database connection is healthy
+0|mapestate-app  | ✅ MySQL database initialized successfully
+0|mapestate-app  | 🔗 Using MySQL DatabaseStorage
+0|mapestate-app  | 🔧 Running startup fix for user language permissions...
+0|mapestate-app  | 🔧 Fixing existing users language permissions...
+0|mapestate-app  | Found 0 regular users to fix
+0|mapestate-app  | ✅ Finished fixing existing users language permissions
+0|mapestate-app  | Warning: connect.session() MemoryStore is not
+0|mapestate-app  | designed for a production environment, as it will leak
+0|mapestate-app  | memory, and will not scale past a single process.
+0|mapestate-app  | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+0|mapestate-app  | /root/dailynewscrypto.net/server/vite.local.ts:79
+0|mapestate-app  |     throw new Error(
+0|mapestate-app  |           ^
+0|mapestate-app  | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestate-app  |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestate-app  |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestate-app  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestate-app  | Node.js v20.19.5
+ 0|mapestate-app  | 🔍 Environment Variables Debug:
+0|mapestate-app  |    MYSQL_URL: [NOT SET]
+0|mapestate-app  |    MYSQL_HOST: [SET]
+0|mapestate-app  |    MYSQL_USER: [SET]
+0|mapestate-app  |    MYSQL_DATABASE: [SET]
+0|mapestate-app  |    MYSQL_PORT: 3306
+0|mapestate-app  |    MYSQL_PASSWORD: [SET]
+0|mapestate-app  | 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-app  | 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-app  | 🔗 Database configuration:
+0|mapestate-app  |    Host: localhost:3306
+0|mapestate-app  |    User: mapestate
+0|mapestate-app  |    Database: mapestate
+0|mapestate-app  | 🔄 Connecting to MySQL VPS database...
+0|mapestate-app  | ✅ MySQL VPS connection established successfully
+0|mapestate-app  | 🔍 Testing database connection...
+0|mapestate-app  | 💓 Database connection is healthy
+0|mapestate-app  | ✅ MySQL database initialized successfully
+0|mapestate-app  | 🔗 Using MySQL DatabaseStorage
+0|mapestate-app  | 🔧 Running startup fix for user language permissions...
+0|mapestate-app  | 🔧 Fixing existing users language permissions...
+0|mapestate-app  | Found 0 regular users to fix
+0|mapestate-app  | ✅ Finished fixing existing users language permissions
+0|mapestate-app  | Warning: connect.session() MemoryStore is not
+0|mapestate-app  | designed for a production environment, as it will leak
+0|mapestate-app  | memory, and will not scale past a single process.
+0|mapestate-app  | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+0|mapestate-app  | /root/dailynewscrypto.net/server/vite.local.ts:79
+0|mapestate-app  |     throw new Error(
+0|mapestate-app  |           ^
+0|mapestate-app  | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestate-app  |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestate-app  |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestate-app  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestate-app  | Node.js v20.19.5
+0|mapestate-app  | 🔍 Environment Variables Debug:
+0|mapestate-app  |    MYSQL_URL: [NOT SET]
+0|mapestate-app  |    MYSQL_HOST: [SET]
+0|mapestate-app  |    MYSQL_USER: [SET]
+0|mapestate-app  |    MYSQL_DATABASE: [SET]
+0|mapestate-app  |    MYSQL_PORT: 3306
+0|mapestate-app  |    MYSQL_PASSWORD: [SET]
+0|mapestate-app  | 🔗 Using MySQL VPS configuration from environment variables
+0|mapestate-app  | 🔧 MySQL VPS: mysql://mapestate:***@localhost:3306/mapestate
+0|mapestate-app  | 🔗 Database configuration:
+0|mapestate-app  |    Host: localhost:3306
+0|mapestate-app  |    User: mapestate
+0|mapestate-app  |    Database: mapestate
+0|mapestate-app  | 🔄 Connecting to MySQL VPS database...
+0|mapestate-app  | ✅ MySQL VPS connection established successfully
+0|mapestate-app  | 🔍 Testing database connection...
+0|mapestate-app  | 💓 Database connection is healthy
+0|mapestate-app  | ✅ MySQL database initialized successfully
+0|mapestate-app  | 🔗 Using MySQL DatabaseStorage
+0|mapestate-app  | 🔧 Running startup fix for user language permissions...
+0|mapestate-app  | 🔧 Fixing existing users language permissions...
+0|mapestate-app  | Found 0 regular users to fix
+0|mapestate-app  | ✅ Finished fixing existing users language permissions
+0|mapestate-app  | Warning: connect.session() MemoryStore is not
+0|mapestate-app  | designed for a production environment, as it will leak
+0|mapestate-app  | memory, and will not scale past a single process.
+0|mapestate-app  | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+0|mapestate-app  | /root/dailynewscrypto.net/server/vite.local.ts:79
+0|mapestate-app  |     throw new Error(
+0|mapestate-app  |           ^
+0|mapestate-app  | Error: Could not find the build directory: /root/dailynewscrypto.net/server/public, make sure to build the client first
+0|mapestate-app  |     at serveStatic (/root/dailynewscrypto.net/server/vite.local.ts:79:11)
+0|mapestate-app  |     at <anonymous> (/root/dailynewscrypto.net/server/index.ts:300:5)
+0|mapestate-app  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|mapestate-app  | Node.js v20.19.5
