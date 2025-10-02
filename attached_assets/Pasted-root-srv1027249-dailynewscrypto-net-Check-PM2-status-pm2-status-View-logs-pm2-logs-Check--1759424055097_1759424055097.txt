@@ -1,0 +1,97 @@
+root@srv1027249:~/dailynewscrypto.net# # Check PM2 status
+pm2 status
+
+# View logs
+pm2 logs
+
+# Check if the server is responding
+curl http://localhost:5000
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 1  │ mapestate          │ cluster  │ 1    │ online    │ 0%       │ 106.9mb  │
+│ 0  │ mapestate-app      │ fork     │ 54   │ online    │ 0%       │ 61.0mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2025-10-02T16:53:14: PM2 log: App [mapestate-app:0] starting in -fork mode-
+PM2        | 2025-10-02T16:53:14: PM2 log: App [mapestate-app:0] online
+PM2        | 2025-10-02T16:53:14: PM2 log: App [mapestate:1] starting in -cluster mode-
+PM2        | 2025-10-02T16:53:14: PM2 log: App [mapestate:1] online
+PM2        | 2025-10-02T16:53:51: PM2 log: Stopping app:mapestate-app id:0
+PM2        | 2025-10-02T16:53:51: PM2 log: App [mapestate-app:0] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T16:53:51: PM2 log: pid=20611 msg=process killed
+PM2        | 2025-10-02T16:53:51: PM2 log: App [mapestate-app:0] starting in -fork mode-
+PM2        | 2025-10-02T16:53:51: PM2 log: App [mapestate-app:0] online
+PM2        | 2025-10-02T16:53:51: PM2 log: Stopping app:mapestate id:1
+PM2        | 2025-10-02T16:53:51: PM2 log: App name:mapestate id:1 disconnected
+PM2        | 2025-10-02T16:53:51: PM2 log: App [mapestate:1] exited with code [0] via signal [SIGINT]
+PM2        | 2025-10-02T16:53:51: PM2 log: pid=20612 msg=process killed
+PM2        | 2025-10-02T16:53:51: PM2 log: App [mapestate:1] starting in -cluster mode-
+PM2        | 2025-10-02T16:53:51: PM2 log: App [mapestate:1] online
+
+/root/.pm2/logs/mapestate-error-1.log last 15 lines:
+1|mapestat | Warning: connect.session() MemoryStore is not
+1|mapestat | designed for a production environment, as it will leak
+1|mapestat | memory, and will not scale past a single process.
+1|mapestat | Warning: connect.session() MemoryStore is not
+1|mapestat | designed for a production environment, as it will leak
+1|mapestat | memory, and will not scale past a single process.
+1|mapestat | Warning: connect.session() MemoryStore is not
+1|mapestat | designed for a production environment, as it will leak
+1|mapestat | memory, and will not scale past a single process.
+1|mapestat | Warning: connect.session() MemoryStore is not
+1|mapestat | designed for a production environment, as it will leak
+1|mapestat | memory, and will not scale past a single process.
+
+/root/.pm2/logs/mapestate-out-1.log last 15 lines:
+1|mapestat |    Host: localhost:3306
+1|mapestat |    User: mapestate
+1|mapestat |    Database: mapestate
+1|mapestat | 🔄 Connecting to MySQL VPS database...
+1|mapestat | ✅ MySQL VPS connection established successfully
+1|mapestat | 🔍 Testing database connection...
+1|mapestat | 💓 Database connection is healthy
+1|mapestat | ✅ MySQL database initialized successfully
+1|mapestat | 🔗 Using MySQL DatabaseStorage
+1|mapestat | 🔧 Running startup fix for user language permissions...
+1|mapestat | 🔧 Fixing existing users language permissions...
+1|mapestat | Found 0 regular users to fix
+1|mapestat | ✅ Finished fixing existing users language permissions
+1|mapestat | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+1|mapestat | 4:53:52 PM [express] serving on port 3000
+
+/root/.pm2/logs/mapestate-app-error.log last 15 lines:
+0|mapestat | 🚫 Rate limit exceeded for auth: 130.193.219.72 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15
+0|mapestat | 🚫 Rate limit exceeded for auth: 130.193.219.72 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15
+0|mapestat | 🚫 Rate limit exceeded for auth: 130.193.219.72 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15
+0|mapestat | 🚫 Rate limit exceeded for auth: 130.193.219.72 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15
+0|mapestat | 🚫 Rate limit exceeded for auth: 130.193.219.72 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15
+0|mapestat | 🚫 Rate limit exceeded for auth: 130.193.219.72 - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15
+0|mapestat | Warning: connect.session() MemoryStore is not
+0|mapestat | designed for a production environment, as it will leak
+0|mapestat | memory, and will not scale past a single process.
+0|mapestat | Warning: connect.session() MemoryStore is not
+0|mapestat | designed for a production environment, as it will leak
+0|mapestat | memory, and will not scale past a single process.
+0|mapestat | Warning: connect.session() MemoryStore is not
+0|mapestat | designed for a production environment, as it will leak
+0|mapestat | memory, and will not scale past a single process.
+
+/root/.pm2/logs/mapestate-app-out.log last 15 lines:
+0|mapestat |    Host: localhost:3306
+0|mapestat |    User: mapestate
+0|mapestat |    Database: mapestate
+0|mapestat | 🔄 Connecting to MySQL VPS database...
+0|mapestat | ✅ MySQL VPS connection established successfully
+0|mapestat | 🔍 Testing database connection...
+0|mapestat | 💓 Database connection is healthy
+0|mapestat | ✅ MySQL database initialized successfully
+0|mapestat | 🔗 Using MySQL DatabaseStorage
+0|mapestat | 🔧 Running startup fix for user language permissions...
+0|mapestat | 🔧 Fixing existing users language permissions...
+0|mapestat | Found 0 regular users to fix
+0|mapestat | ✅ Finished fixing existing users language permissions
+0|mapestat | 📁 Serving uploads from: /root/dailynewscrypto.net/server/uploads
+0|mapestat | 4:53:54 PM [express] serving on port 5000
+
