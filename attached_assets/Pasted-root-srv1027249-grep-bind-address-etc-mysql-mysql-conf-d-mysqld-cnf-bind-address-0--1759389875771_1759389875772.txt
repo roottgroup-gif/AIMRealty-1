@@ -1,0 +1,156 @@
+root@srv1027249:~# grep bind-address /etc/mysql/mysql.conf.d/mysqld.cnf
+bind-address            = 0.0.0.0
+mysqlx-bind-address = 0.0.0.0
+root@srv1027249:~# # Check if port 3306 is open
+sudo ufw status
+# If needed, allow MySQL port
+sudo ufw allow 3306/tcp
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                  
+Nginx Full                 ALLOW       Anywhere                  
+3306/tcp                   ALLOW       Anywhere                  
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+Nginx Full (v6)            ALLOW       Anywhere (v6)             
+3306/tcp (v6)              ALLOW       Anywhere (v6)             
+
+Skipping adding existing rule
+Skipping adding existing rule (v6)
+root@srv1027249:~# SELECT user, host FROM mysql.user WHERE user='mapestate';
+-- Host should be '%' or your Replit IP, not 'localhost'
+SELECT: command not found
+--: command not found
+root@srv1027249:~# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 88
+Server version: 8.0.43-0ubuntu0.24.04.2 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 3hY(JibuMkgaoMp@e56.
+    -> 
+    -> ^C
+mysql> SELECT user, host FROM mysql.user WHERE user='mapestate';
++-----------+--------------+
+| user      | host         |
++-----------+--------------+
+| mapestate | %            |
+| mapestate | 72.60.134.44 |
+| mapestate | localhost    |
++-----------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> -- Check current user permissions
+mysql> SELECT user, host FROM mysql.user WHERE user='mapestate';
++-----------+--------------+
+| user      | host         |
++-----------+--------------+
+| mapestate | %            |
+| mapestate | 72.60.134.44 |
+| mapestate | localhost    |
++-----------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- If the host is 'localhost', you need to create/update for remote access:
+mysql> -- First, drop the localhost-only user if it exists
+mysql> DROP USER IF EXISTS 'mapestate'@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> -- Create user that accepts connections from anywhere
+mysql> CREATE USER 'mapestate'@'%' IDENTIFIED BY 'Mapestate123!';
+ERROR 1396 (HY000): Operation CREATE USER failed for 'mapestate'@'%'
+mysql> GRANT ALL PRIVILEGES ON mapestate.* TO 'mapestate'@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> -- Verify the change
+mysql> SELECT user, host FROM mysql.user WHERE user='mapestate';
++-----------+--------------+
+| user      | host         |
++-----------+--------------+
+| mapestate | %            |
+| mapestate | 72.60.134.44 |
++-----------+--------------+
+2 rows in set (0.00 sec)
+
+mysql> -- Should show: mapestate | %
+mysql> 
+mysql> EXIT;
+Bye
+root@srv1027249:~# -- Check current user permissions
+SELECT user, host FROM mysql.user WHERE user='mapestate';
+
+-- If the host is 'localhost', you need to create/update for remote access:
+-- First, drop the localhost-only user if it exists
+DROP USER IF EXISTS 'mapestate'@'localhost';
+
+-- Create user that accepts connections from anywhere
+CREATE USER 'mapestate'@'%' IDENTIFIED BY 'Mapestate123!';
+GRANT ALL PRIVILEGES ON mapestate.* TO 'mapestate'@'%';
+FLUSH PRIVILEGES;
+
+-- Verify the change
+SELECT user, host FROM mysql.user WHERE user='mapestate';
+-- Should show: mapestate | %
+
+EXIT;
+--: command not found
+SELECT: command not found
+--: command not found
+--: command not found
+DROP: command not found
+--: command not found
+CREATE: command not found
+GRANT: command not found
+FLUSH: command not found
+--: command not found
+SELECT: command not found
+%: command not found
+--: command not found
+EXIT: command not found
+root@srv1027249:~# -- Check current user permissions
+SELECT user, host FROM mysql.user WHERE user='mapestate';
+
+-- If the host is 'localhost', you need to create/update for remote access:
+-- First, drop the localhost-only user if it exists
+DROP USER IF EXISTS 'mapestate'@'localhost';
+
+-- Create user that accepts connections from anywhere
+CREATE USER 'mapestate'@'%' IDENTIFIED BY 'Mapestate123!';
+GRANT ALL PRIVILEGES ON mapestate.* TO 'mapestate'@'%';
+FLUSH PRIVILEGES;
+
+-- Verify the change
+SELECT user, host FROM mysql.user WHERE user='mapestate';
+-- Should show: mapestate | %
+
+EXIT;
+--: command not found
+SELECT: command not found
+--: command not found
+--: command not found
+DROP: command not found
+--: command not found
+CREATE: command not found
+GRANT: command not found
+FLUSH: command not found
+--: command not found
+SELECT: command not found
+--: command not found
+%: command not found
+EXIT: command not found
+root@srv1027249:~# 
