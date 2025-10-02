@@ -1,0 +1,79 @@
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-79-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Thu Oct  2 16:29:54 UTC 2025
+
+  System load:  0.01              Processes:             108
+  Usage of /:   7.9% of 47.39GB   Users logged in:       0
+  Memory usage: 25%               IPv4 address for eth0: 72.60.134.44
+  Swap usage:   0%                IPv6 address for eth0: 2a02:4780:41:695a::1
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+12 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+Last login: Thu Oct  2 16:21:18 2025 from 169.254.0.1
+root@srv1027249:~# sudo systemctl status mysql
+● mysql.service - MySQL Community Server
+     Loaded: loaded (/usr/lib/systemd/system/mysql.service; enabled;>
+     Active: active (running) since Thu 2025-10-02 14:59:01 UTC; 1h >
+   Main PID: 15399 (mysqld)
+     Status: "Server is operational"
+      Tasks: 40 (limit: 4654)
+     Memory: 385.3M (peak: 385.5M)
+        CPU: 19.364s
+     CGroup: /system.slice/mysql.service
+             └─15399 /usr/sbin/mysqld
+
+Oct 02 14:59:00 srv1027249 systemd[1]: Starting mysql.service - MySQ>
+Oct 02 14:59:01 srv1027249 systemd[1]: Started mysql.service - MySQL>
+
+root@srv1027249:~# sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+root@srv1027249:~# sudo mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 69
+Server version: 8.0.43-0ubuntu0.24.04.2 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> CREATE USER IF NOT EXISTS 'mapestate'@'%' IDENTIFIED BY 'Mapestate123!';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> GRANT ALL PRIVILEGES ON mapestate.* TO 'mapestate'@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> EXIT;
+Bye
+root@srv1027249:~# sudo ufw allow 3306/tcp
+sudo ufw status
+Rules updated
+Rules updated (v6)
+Status: inactive
+root@srv1027249:~# sudo systemctl restart mysql
+root@srv1027249:~# sudo ss -tlnp | grep 3306
+LISTEN 0      151          0.0.0.0:3306       0.0.0.0:*    users:(("mysqld",pid=20316,fd=40))                         
+LISTEN 0      70         127.0.0.1:33060      0.0.0.0:*    users:(("mysqld",pid=20316,fd=23))                         
+root@srv1027249:~# 
