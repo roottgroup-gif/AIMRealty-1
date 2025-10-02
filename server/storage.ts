@@ -67,6 +67,7 @@ export interface IStorage {
 
   // Property Images
   getPropertyImages(propertyId: string): Promise<PropertyImage[]>;
+  getAllPropertyImages(): Promise<Array<PropertyImage & { propertyTitle?: string | null }>>;
   addPropertyImage(image: InsertPropertyImage): Promise<PropertyImage>;
   removePropertyImage(propertyId: string, imageUrl: string): Promise<boolean>;
   removePropertyImageWithResequencing(propertyId: string, imageUrl: string): Promise<{ success: boolean; remainingCount: number }>;
@@ -789,6 +790,24 @@ export class DatabaseStorage implements IStorage {
       .from(propertyImages)
       .where(eq(propertyImages.propertyId, propertyId))
       .orderBy(asc(propertyImages.sortOrder));
+  }
+
+  async getAllPropertyImages(): Promise<Array<PropertyImage & { propertyTitle?: string | null }>> {
+    const results = await this.dbConn
+      .select({
+        id: propertyImages.id,
+        propertyId: propertyImages.propertyId,
+        imageUrl: propertyImages.imageUrl,
+        sortOrder: propertyImages.sortOrder,
+        altText: propertyImages.altText,
+        createdAt: propertyImages.createdAt,
+        propertyTitle: properties.title,
+      })
+      .from(propertyImages)
+      .leftJoin(properties, eq(propertyImages.propertyId, properties.id))
+      .orderBy(propertyImages.propertyId, propertyImages.sortOrder);
+    
+    return results;
   }
 
   async addPropertyImage(image: InsertPropertyImage): Promise<PropertyImage> {

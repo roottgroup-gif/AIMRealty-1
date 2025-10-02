@@ -1440,6 +1440,47 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Get all images from database with property details
+  app.get("/api/admin/images", requireRole("admin"), async (req, res) => {
+    try {
+      const allImages = await storage.getAllPropertyImages();
+      
+      // Check if images exist on filesystem
+      const imagesWithStatus = allImages.map((img: typeof allImages[0]) => {
+        let fileExists = false;
+        let filePath = "";
+        
+        if (img.imageUrl.startsWith("http://") || img.imageUrl.startsWith("https://")) {
+          fileExists = true;
+          filePath = img.imageUrl;
+        } else {
+          const localPath = img.imageUrl.startsWith("/") ? img.imageUrl.substring(1) : img.imageUrl;
+          filePath = path.join(__dirname, "..", localPath);
+          try {
+            fs.accessSync(filePath, fs.constants.F_OK);
+            fileExists = true;
+          } catch {
+            fileExists = false;
+          }
+        }
+        
+        return {
+          ...img,
+          fileExists,
+          filePath
+        };
+      });
+      
+      res.json({
+        total: imagesWithStatus.length,
+        images: imagesWithStatus
+      });
+    } catch (error) {
+      console.error("Error fetching all images:", error);
+      res.status(500).json({ message: "Failed to fetch images" });
+    }
+  });
+
   app.delete("/api/properties/:id", requireAnyRole(["user", "admin"]), async (req, res) => {
     try {
       const { id } = req.params;

@@ -359,6 +359,20 @@ export class MemStorage implements IStorage {
     return this.propertyImages.get(propertyId) || [];
   }
 
+  async getAllPropertyImages(): Promise<Array<PropertyImage & { propertyTitle?: string | null }>> {
+    const allImages: Array<PropertyImage & { propertyTitle?: string | null }> = [];
+    for (const [propertyId, images] of this.propertyImages.entries()) {
+      const property = this.properties.get(propertyId);
+      images.forEach(img => {
+        allImages.push({
+          ...img,
+          propertyTitle: property?.title || null
+        });
+      });
+    }
+    return allImages;
+  }
+
   async addPropertyImage(image: InsertPropertyImage): Promise<PropertyImage> {
     const images = this.propertyImages.get(image.propertyId) || [];
     const newImage: PropertyImage = {
