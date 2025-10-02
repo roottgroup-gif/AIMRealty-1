@@ -20,25 +20,12 @@ function getDatabaseConfig(): DatabaseConfig {
   const mysqlPassword = process.env.MYSQL_PASSWORD?.trim();
   const mysqlDatabase = process.env.MYSQL_DATABASE?.trim();
 
-  // Debug logging for environment variables
-  console.log("🔍 Environment Variables Debug:");
-  console.log(`   MYSQL_URL: ${connectionUrl ? "[SET]" : "[NOT SET]"}`);
-  console.log(`   MYSQL_HOST: ${mysqlHost ? "[SET]" : "[NOT SET]"}`);
-  console.log(`   MYSQL_USER: ${mysqlUser ? "[SET]" : "[NOT SET]"}`);
-  console.log(`   MYSQL_DATABASE: ${mysqlDatabase ? "[SET]" : "[NOT SET]"}`);
-  console.log(`   MYSQL_PORT: ${mysqlPort || "[NOT SET]"}`);
-  console.log(`   MYSQL_PASSWORD: ${mysqlPassword ? "[SET]" : "[NOT SET]"}`);
-
   // If individual MySQL environment variables are provided, use them
   if (mysqlHost && mysqlUser && mysqlDatabase) {
-    console.log("🔗 Using MySQL VPS configuration from environment variables");
     const port = parseInt(mysqlPort || "3306");
     const encodedPassword = mysqlPassword ? encodeURIComponent(mysqlPassword) : '';
     const auth = encodedPassword ? `${encodeURIComponent(mysqlUser)}:${encodedPassword}` : encodeURIComponent(mysqlUser);
     connectionUrl = `mysql://${auth}@${mysqlHost}:${port}/${mysqlDatabase}`;
-    console.log(
-      `🔧 MySQL VPS: mysql://${mysqlUser}:***@${mysqlHost}:${port}/${mysqlDatabase}`,
-    );
   }
   // If no URL provided and no individual vars, throw error
   else if (!connectionUrl) {
@@ -80,12 +67,6 @@ function validateDatabaseConfig(config: DatabaseConfig): void {
 export function getValidatedDatabaseConfig(): DatabaseConfig {
   const config = getDatabaseConfig();
   validateDatabaseConfig(config);
-
-  console.log("🔗 Database configuration:");
-  console.log(`   Host: ${config.host}:${config.port}`);
-  console.log(`   User: ${config.user}`);
-  console.log(`   Database: ${config.database}`);
-
   return config;
 }
 
