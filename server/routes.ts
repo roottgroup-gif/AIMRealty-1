@@ -2077,6 +2077,57 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Fix external image URLs to use local server (admin only)
+  app.post("/api/admin/fix-image-urls", requireRole("admin"), async (req, res) => {
+    try {
+      const images = await storage.getAllPropertyImages();
+      console.log(`📊 Found ${images.length} total images to check`);
+      let fixedCount = 0;
+      
+      for (const image of images) {
+        console.log(`🔍 Checking image: ${image.imageUrl}`);
+        
+        // Check if the image URL contains an external domain
+        if (image.imageUrl.includes('dailynewscrypto.net') || 
+            (image.imageUrl.startsWith('http://') || image.imageUrl.startsWith('https://'))) {
+          
+          // Extract just the filename from the URL
+          const urlParts = image.imageUrl.split('/');
+          const filename = urlParts[urlParts.length - 1];
+          
+          // Create the new relative URL
+          const newUrl = `/uploads/properties/${filename}`;
+          
+          console.log(`🔄 Updating image URL from ${image.imageUrl} to ${newUrl}`);
+          
+          // Direct database update for MySQL
+          if (storage instanceof require('./storage').DatabaseStorage) {
+            const { db } = await import('./db');
+            const { propertyImages } = await import('@shared/schema');
+            const { eq } = await import('drizzle-orm');
+            
+            await db().update(propertyImages)
+              .set({ imageUrl: newUrl })
+              .where(eq(propertyImages.id, image.id));
+          }
+          
+          fixedCount++;
+          console.log(`✅ Fixed image URL: ${image.imageUrl} -> ${newUrl}`);
+        }
+      }
+      
+      console.log(`✨ Fixed ${fixedCount} image URLs total`);
+      res.json({ 
+        message: `Successfully fixed ${fixedCount} image URLs`,
+        fixedCount,
+        totalChecked: images.length
+      });
+    } catch (error) {
+      console.error("❌ Error fixing image URLs:", error);
+      res.status(500).json({ message: "Failed to fix image URLs", error: String(error) });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
