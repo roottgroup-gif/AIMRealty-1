@@ -336,6 +336,13 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
+  // Helper function to get base URL from request
+  function getBaseUrl(req: express.Request): string {
+    const protocol = req.protocol || 'http';
+    const host = req.get('host') || req.get('x-forwarded-host') || 'localhost:5000';
+    return `${protocol}://${host}`;
+  }
+
   // File upload endpoints
   app.post("/api/upload/:type", requireAuth, uploadRateLimit, upload.single('file'), async (req, res) => {
     try {
@@ -350,7 +357,9 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         return res.status(400).json({ message: "No file uploaded" });
       }
       
-      const fileUrl = `/uploads/${type}/${req.file.filename}`;
+      // Generate dynamic URL based on request host
+      const baseUrl = getBaseUrl(req);
+      const fileUrl = `${baseUrl}/uploads/${type}/${req.file.filename}`;
       
       res.json({
         message: "File uploaded successfully",

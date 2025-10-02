@@ -7,21 +7,24 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Normalizes property image URLs to ensure they point to the correct path
+ * Supports both full URLs (from dynamic host) and relative paths
  * @param imageUrl - The image URL to normalize
  * @returns Properly formatted image URL
  */
 export function normalizePropertyImageUrl(imageUrl: string): string {
-  // Handle external URLs (http/https)
-  if (imageUrl.startsWith('http')) {
+  if (!imageUrl) return '';
+  
+  // Handle external full URLs (http/https) - return as-is
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }
   
-  // Handle URLs that already start with /
+  // Handle URLs that already start with / (relative paths)
   if (imageUrl.startsWith('/')) {
     return imageUrl;
   }
   
-  // Handle URLs that start with "uploads/" - strip and re-add with leading slash
+  // Handle URLs that start with "uploads/" - add leading slash
   if (imageUrl.startsWith('uploads/')) {
     return `/${imageUrl}`;
   }
