@@ -253,7 +253,31 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     const jsonLd = JSON.stringify(structuredData, null, 6).replace(/<\/script>/gi, '<\\/script>');
     const structuredDataScript = `\n    <script type="application/ld+json">\n${jsonLd}\n    </script>\n`;
     
-    // Inject before </head> tag for robust insertion
+    // Remove default Open Graph and Twitter meta tags from index.html to avoid duplicates
+    // Social media crawlers use the FIRST occurrence of meta tags
+    html = html.replace(/<meta property="og:type"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:url"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:title"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:description"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image:width"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image:height"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:site_name"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:locale"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:card"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:url"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:title"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:description"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:image"[^>]*>/g, '');
+    html = html.replace(/<meta name="title"[^>]*>/g, '');
+    html = html.replace(/<meta name="description"[^>]*>/g, '');
+    html = html.replace(/<link rel="canonical"[^>]*>/g, '');
+    html = html.replace(/<title>.*?<\/title>/g, '');
+    
+    // Remove default structured data script
+    html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, '');
+    
+    // Inject property-specific tags before </head> tag
     html = html.replace('</head>', `${socialMetaTags}${structuredDataScript}  </head>`);
     
     res.setHeader('Content-Type', 'text/html');
