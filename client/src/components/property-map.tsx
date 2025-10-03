@@ -1648,7 +1648,7 @@ export default function PropertyMap({
           })()}
           <div class="popup-buttons" style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="popup-button" 
-                    onclick="window.viewPropertyFromMap('${property.id}')"
+                    onclick="window.viewPropertyFromMap('${property.slug || property.id}')"
                     onmouseover="this.style.background='#e56600'"
                     onmouseout="this.style.background='#FF7800'"
                     style="flex: 1; min-width: 100px; background: #FF7800; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: background-color 0.2s ease; z-index: 9999; position: relative;">
