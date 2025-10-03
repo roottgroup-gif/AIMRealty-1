@@ -367,25 +367,41 @@ export default function PropertyDetailPage() {
   }
 
   const firstImage = property.images?.[0];
-  const defaultSocialImage = `/uploads/properties/1759082074149-xrejrtvx6.jpg`;
-  const primaryImage = (firstImage && typeof firstImage === 'object' && 'imageUrl' in firstImage) 
-    ? firstImage.imageUrl 
-    : (firstImage || defaultSocialImage);
+  const defaultSocialImage = `${window.location.origin}/uploads/properties/1759082074149-xrejrtvx6.jpg`;
+  
+  // Get primary image URL with proper formatting
+  let primaryImageUrl = '';
+  if (firstImage && typeof firstImage === 'object' && 'imageUrl' in firstImage) {
+    primaryImageUrl = firstImage.imageUrl;
+  } else if (firstImage) {
+    primaryImageUrl = firstImage as string;
+  } else {
+    primaryImageUrl = defaultSocialImage;
+  }
+  
+  // Ensure image URL is absolute for social sharing
+  const primaryImage = primaryImageUrl.startsWith('http') 
+    ? primaryImageUrl 
+    : `${window.location.origin}${primaryImageUrl.startsWith('/') ? primaryImageUrl : '/' + primaryImageUrl}`;
+    
   const images = Array.isArray(property.images) && property.images.length > 0 
-    ? property.images.map((img: any) => img.imageUrl || img) : [primaryImage];
+    ? property.images.map((img: any) => img.imageUrl || img) : [primaryImageUrl];
+
+  // SEO data for meta tags
+  const seoTitle = `${property.title} - ${formatPrice(property.price, property.currency || 'USD', property.listingType, displayCurrency, convertedAmount, t)} | ${property.city}, Iraq | MapEstate`;
+  const seoDescription = property.description ? 
+    (property.description.length > 160 ? 
+      property.description.substring(0, 157) + '...' : 
+      property.description) : 
+    `${property.bedrooms} bedroom ${property.type} for ${property.listingType} in ${property.city}. ${property.address}. Contact our expert agents for viewing and details.`;
 
   return (
     <div className="min-h-screen bg-background">
       {property && (
         <SEOHead
           pageType="property-detail"
-          title={`${property.title} - ${formatPrice(property.price, property.currency || 'USD', property.listingType, displayCurrency, convertedAmount, t)} | ${property.city}, Iraq | MapEstate`}
-          description={property.description ? 
-            (property.description.length > 160 ? 
-              property.description.substring(0, 157) + '...' : 
-              property.description) : 
-            `${property.bedrooms} bedroom ${property.type} for ${property.listingType} in ${property.city}. ${property.address}. Contact our expert agents for viewing and details.`
-          }
+          title={seoTitle}
+          description={seoDescription}
           propertyData={{
             propertyType: property.type,
             listingType: property.listingType,
@@ -398,7 +414,7 @@ export default function PropertyDetailPage() {
             currency: property.currency || 'USD',
             area: property.area
           }}
-          ogImage={primaryImage.startsWith('http') ? primaryImage : `${window.location.origin}${primaryImage}`}
+          ogImage={primaryImage}
           canonicalUrl={`${window.location.origin}${window.location.pathname}`}
           structuredData={getPropertyStructuredData(property)}
           breadcrumbs={[
