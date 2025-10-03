@@ -399,8 +399,8 @@ export default function AdminDashboard() {
         delete transformedData.expiresAt; // Empty or null, remove it
       }
       
-      // Only super admins can set language permissions
-      if (user?.role !== 'super_admin') {
+      // Only admins and super admins can set language permissions
+      if (user?.role !== 'admin' && user?.role !== 'super_admin') {
         delete transformedData.allowedLanguages;
       }
       
@@ -445,8 +445,8 @@ export default function AdminDashboard() {
         delete transformedData.expiresAt; // Empty or null, remove it
       }
       
-      // Only super admins can set language permissions
-      if (user?.role !== 'super_admin') {
+      // Only admins and super admins can set language permissions
+      if (user?.role !== 'admin' && user?.role !== 'super_admin') {
         delete transformedData.allowedLanguages;
       }
       
@@ -1004,8 +1004,8 @@ export default function AdminDashboard() {
                         )}
                       />
                       
-                      {/* Language Permissions - Super Admin Only */}
-                      {user?.role === 'super_admin' && (
+                      {/* Language Permissions - Admin & Super Admin Only */}
+                      {(user?.role === 'admin' || user?.role === 'super_admin') && (
                         <FormField
                           control={form.control}
                           name="allowedLanguages"
@@ -1328,8 +1328,8 @@ export default function AdminDashboard() {
                         )}
                       />
                       
-                      {/* Language Permissions - Super Admin Only */}
-                      {user?.role === 'super_admin' && (
+                      {/* Language Permissions - Admin & Super Admin Only */}
+                      {(user?.role === 'admin' || user?.role === 'super_admin') && (
                         <FormField
                           control={editForm.control}
                           name="allowedLanguages"

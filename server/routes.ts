@@ -742,10 +742,10 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         }
       }
 
-      // Only super admins can set language permissions for other users
-      if (processedBody.allowedLanguages && req.user?.role !== 'super_admin') {
+      // Only admins and super admins can set language permissions for other users
+      if (processedBody.allowedLanguages && req.user?.role !== 'admin' && req.user?.role !== 'super_admin') {
         return res.status(403).json({ 
-          message: "Only super admins can set language permissions" 
+          message: "Only admins can set language permissions" 
         });
       }
 
@@ -768,8 +768,8 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         password: hashedPassword
       });
       
-      // Handle language permissions after user creation (only for super admin)
-      if (allowedLanguages && req.user?.role === 'super_admin') {
+      // Handle language permissions after user creation (only for admin/super admin)
+      if (allowedLanguages && (req.user?.role === 'admin' || req.user?.role === 'super_admin')) {
         // Remove any existing languages first
         const existingLanguages = await storage.getUserLanguages(user.id);
         for (const lang of existingLanguages) {
@@ -813,10 +813,10 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         }
       }
 
-      // Only super admins can modify language permissions
-      if (processedBody.allowedLanguages && req.user?.role !== 'super_admin') {
+      // Only admins and super admins can modify language permissions
+      if (processedBody.allowedLanguages && req.user?.role !== 'admin' && req.user?.role !== 'super_admin') {
         return res.status(403).json({ 
-          message: "Only super admins can modify language permissions" 
+          message: "Only admins can modify language permissions" 
         });
       }
 
@@ -837,8 +837,8 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Handle language permissions after user update (only for super admin)
-      if (allowedLanguages && req.user?.role === 'super_admin') {
+      // Handle language permissions after user update (only for admin/super admin)
+      if (allowedLanguages && (req.user?.role === 'admin' || req.user?.role === 'super_admin')) {
         // Remove any existing languages first
         const existingLanguages = await storage.getUserLanguages(id);
         for (const lang of existingLanguages) {
