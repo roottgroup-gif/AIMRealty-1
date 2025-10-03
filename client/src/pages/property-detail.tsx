@@ -379,6 +379,13 @@ export default function PropertyDetailPage() {
       {property && (
         <SEOHead
           pageType="property-detail"
+          title={`${property.title} - ${formatPrice(property.price, property.currency || 'USD', property.listingType, displayCurrency, convertedAmount, t)} | ${property.city}, Iraq | MapEstate`}
+          description={property.description ? 
+            (property.description.length > 160 ? 
+              property.description.substring(0, 157) + '...' : 
+              property.description) : 
+            `${property.bedrooms} bedroom ${property.type} for ${property.listingType} in ${property.city}. ${property.address}. Contact our expert agents for viewing and details.`
+          }
           propertyData={{
             propertyType: property.type,
             listingType: property.listingType,
@@ -391,8 +398,8 @@ export default function PropertyDetailPage() {
             currency: property.currency || 'USD',
             area: property.area
           }}
-          ogImage={primaryImage}
-          canonicalUrl={undefined}
+          ogImage={primaryImage.startsWith('http') ? primaryImage : `${window.location.origin}${primaryImage}`}
+          canonicalUrl={`${window.location.origin}${window.location.pathname}`}
           structuredData={getPropertyStructuredData(property)}
           breadcrumbs={[
             { name: 'Home', url: '/' },
