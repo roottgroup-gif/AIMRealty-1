@@ -29,14 +29,22 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage & Management
 - **Database**: MySQL VPS (Production) - FULLY OPERATIONAL ✅
-- **VPS Details**: 
-  - Host: 72.60.134.44:3306
+- **VPS Details** (DEFAULT CONFIGURATION - PERMANENT): 
+  - Host: 72.60.134.44
+  - Port: 3306
   - Database: mapestate
   - User: mapestate 
+  - Password: Stored in Replit Secrets (MYSQL_PASSWORD)
   - Status: CONNECTED & TESTED ✅
-- **Auto-Connect**: All credentials permanently saved in Replit secrets
-- **Configuration**: Automatically detects and uses VPS MySQL credentials every startup
-- **No Manual Setup**: Environment variables auto-loaded, no re-entry required
+- **Auto-Connect**: All credentials permanently saved in Replit Secrets as:
+  - MYSQL_HOST=72.60.134.44
+  - MYSQL_PORT=3306
+  - MYSQL_USER=mapestate
+  - MYSQL_PASSWORD=[secure]
+  - MYSQL_DATABASE=mapestate
+- **Configuration**: Automatically detects and uses these VPS MySQL credentials every startup
+- **No Manual Setup**: Environment variables auto-loaded from Replit Secrets, no re-entry required
+- **Persistence**: These settings are permanent and will always be used as default
 - **ORM**: Drizzle ORM for type-safe database interactions
 - **Schema**: Centralized schema definitions in shared directory  
 - **Migrations**: Drizzle Kit for database schema management
