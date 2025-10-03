@@ -144,7 +144,7 @@ export default function PropertiesPage() {
           item: {
             "@type": "RealEstateListing",
             name: property.title,
-            url: `${window.location.origin}/property/${property.id}`,
+            url: `${window.location.origin}/property/${property.slug || property.id}`,
             image:
               Array.isArray(property.images) && property.images.length > 0
                 ? property.images.map((img) =>

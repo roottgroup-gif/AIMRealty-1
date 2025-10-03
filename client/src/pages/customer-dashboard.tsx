@@ -2667,7 +2667,7 @@ export default function CustomerDashboard() {
                                 <Button 
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => navigate(`/property/${property.id}`)}
+                                  onClick={() => navigate(`/property/${property.slug || property.id}`)}
                                   data-testid={`button-view-${property.id}`}
                                 >
                                   <Eye className="h-3 w-3 mr-1" />
