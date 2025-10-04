@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { PropertyWithDetails, PropertyFilters } from "@shared/schema";
-import { Search, MapPin, Navigation } from "lucide-react";
+import { Search, MapPin, Navigation, X } from "lucide-react";
 import {
   useAddToFavorites,
   useRemoveFromFavorites,
@@ -61,6 +61,8 @@ export default function PropertyMap({
   const currentPropertiesRef = useRef<PropertyWithDetails[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const userLocationMarkerRef = useRef<any>(null);
+  const [isUserLocationVisible, setIsUserLocationVisible] = useState(false);
 
   // Track last calculated bounds to avoid unnecessary recalculation
   const lastBoundsRef = useRef<string>('');
@@ -1890,8 +1892,19 @@ export default function PropertyMap({
     onFilterChange?.(newFilters);
   };
 
-  // Enhanced geolocation function with better error handling
+  // Enhanced geolocation function with better error handling and toggle
   const handleGetMyLocation = () => {
+    // If user location is already visible, hide it
+    if (isUserLocationVisible && userLocationMarkerRef.current) {
+      console.log("🔍 Hiding user location marker...");
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(userLocationMarkerRef.current);
+      }
+      userLocationMarkerRef.current = null;
+      setIsUserLocationVisible(false);
+      return;
+    }
+
     console.log("🔍 Getting user location...");
     
     if (!mapInstanceRef.current) {
@@ -2002,22 +2015,19 @@ export default function PropertyMap({
             iconAnchor: [20, 20],
           });
 
-          // Remove any existing user location markers
-          markersRef.current.forEach((marker) => {
-            if (
-              marker.options &&
-              marker.options.icon &&
-              marker.options.icon.options.className === "user-location-marker"
-            ) {
-              mapInstanceRef.current.removeLayer(marker);
-            }
-          });
+          // Remove any existing user location marker
+          if (userLocationMarkerRef.current) {
+            mapInstanceRef.current.removeLayer(userLocationMarkerRef.current);
+          }
 
-          const userMarker = L.marker([latitude, longitude], {
+          // Create and add the user location marker
+          userLocationMarkerRef.current = L.marker([latitude, longitude], {
             icon: userLocationIcon,
           }).addTo(mapInstanceRef.current);
-          userMarker.bindPopup("📍 Your Current Location").openPopup();
-          markersRef.current.push(userMarker);
+          userLocationMarkerRef.current.bindPopup("📍 Your Current Location").openPopup();
+          
+          // Set visibility state
+          setIsUserLocationVisible(true);
           
           console.log("✅ User location marker added to map at", latitude, longitude);
         } else {
@@ -2032,7 +2042,7 @@ export default function PropertyMap({
             const locationData = {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
-              accuracy: position.coords.accuracy,
+              accuracy: Math.round(position.coords.accuracy), // Round to integer
               userId: user?.id || null,
               metadata: {
                 userAgent: navigator.userAgent,
@@ -2130,20 +2140,27 @@ export default function PropertyMap({
           {/* Legend Overlay on Map */}
           <div className="fixed bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 z-[1000] transition-all duration-500 ease-out">
             <div className="p-4 md:p-5 transition-all duration-300 space-y-4">
-              {/* Get My Location Icon Button - Positioned above filters */}
+              {/* Get My Location / Close Location Button - Positioned above filters */}
               <div className="flex justify-end">
                 <Button
                   onClick={handleGetMyLocation}
                   disabled={isLocating}
-                  className={`relative w-10 h-10 rounded-full backdrop-blur-md border shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl bg-orange-500 hover:bg-orange-600 border-orange-400 text-white flex-shrink-0 flex items-center justify-center overflow-hidden ${isLocating ? "animate-pulse" : ""}`}
+                  className={`relative ${isUserLocationVisible ? 'w-auto px-4' : 'w-10'} h-10 rounded-full backdrop-blur-md border shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${isUserLocationVisible ? 'bg-red-500 hover:bg-red-600 border-red-400' : 'bg-orange-500 hover:bg-orange-600 border-orange-400'} text-white flex-shrink-0 flex items-center justify-center gap-2 overflow-hidden ${isLocating ? "animate-pulse" : ""}`}
                   data-testid="footer-location-button"
                 >
-                  {!isLocating && (
+                  {!isLocating && !isUserLocationVisible && (
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-sweep" />
                   )}
-                  <Navigation
-                    className={`relative h-4 w-4 text-white z-10 transition-transform duration-300 ${isLocating ? "animate-slow-spin" : ""}`}
-                  />
+                  {isUserLocationVisible ? (
+                    <>
+                      <X className="relative h-4 w-4 text-white z-10" />
+                      <span className="text-sm font-medium">Close Location</span>
+                    </>
+                  ) : (
+                    <Navigation
+                      className={`relative h-4 w-4 text-white z-10 transition-transform duration-300 ${isLocating ? "animate-slow-spin" : ""}`}
+                    />
+                  )}
                 </Button>
               </div>
 
