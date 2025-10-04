@@ -1953,7 +1953,7 @@ export default function PropertyMap({
             easeLinearity: 0.25,
           });
 
-          // Add a more visible pulsing marker for user's location
+          // Add a more visible pulsing marker for user's location with orange color
           const userLocationIcon = L.divIcon({
             html: `
               <div style="
@@ -1968,21 +1968,21 @@ export default function PropertyMap({
                   transform: translate(-50%, -50%);
                   width: 40px;
                   height: 40px;
-                  background: rgba(59, 130, 246, 0.2);
+                  background: rgba(255, 120, 0, 0.2);
                   border-radius: 50%;
-                  animation: pulse-blue 2s ease-out infinite;
+                  animation: pulse-orange 2s ease-out infinite;
                 "></div>
                 <div style="
                   position: absolute;
                   top: 50%;
                   left: 50%;
                   transform: translate(-50%, -50%);
-                  background: #3B82F6;
+                  background: #FF7800;
                   width: 16px;
                   height: 16px;
                   border-radius: 50%;
                   border: 3px solid white;
-                  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.6);
+                  box-shadow: 0 2px 10px rgba(255, 120, 0, 0.6);
                   z-index: 10;
                 ">
                   <div style="
@@ -1998,7 +1998,7 @@ export default function PropertyMap({
                 </div>
               </div>
               <style>
-                @keyframes pulse-blue {
+                @keyframes pulse-orange {
                   0% {
                     transform: translate(-50%, -50%) scale(0.5);
                     opacity: 1;
@@ -2020,11 +2020,10 @@ export default function PropertyMap({
             mapInstanceRef.current.removeLayer(userLocationMarkerRef.current);
           }
 
-          // Create and add the user location marker
+          // Create and add the user location marker (without popup)
           userLocationMarkerRef.current = L.marker([latitude, longitude], {
             icon: userLocationIcon,
           }).addTo(mapInstanceRef.current);
-          userLocationMarkerRef.current.bindPopup("📍 Your Current Location").openPopup();
           
           // Set visibility state
           setIsUserLocationVisible(true);
@@ -2145,17 +2144,14 @@ export default function PropertyMap({
                 <Button
                   onClick={handleGetMyLocation}
                   disabled={isLocating}
-                  className={`relative ${isUserLocationVisible ? 'w-auto px-4' : 'w-10'} h-10 rounded-full backdrop-blur-md border shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${isUserLocationVisible ? 'bg-red-500 hover:bg-red-600 border-red-400' : 'bg-orange-500 hover:bg-orange-600 border-orange-400'} text-white flex-shrink-0 flex items-center justify-center gap-2 overflow-hidden ${isLocating ? "animate-pulse" : ""}`}
+                  className={`relative w-10 h-10 rounded-full backdrop-blur-md border shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl ${isUserLocationVisible ? 'bg-red-500 hover:bg-red-600 border-red-400' : 'bg-orange-500 hover:bg-orange-600 border-orange-400'} text-white flex-shrink-0 flex items-center justify-center gap-2 overflow-hidden ${isLocating ? "animate-pulse" : ""}`}
                   data-testid="footer-location-button"
                 >
                   {!isLocating && !isUserLocationVisible && (
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-sweep" />
                   )}
                   {isUserLocationVisible ? (
-                    <>
-                      <X className="relative h-4 w-4 text-white z-10" />
-                      <span className="text-sm font-medium">Close Location</span>
-                    </>
+                    <X className="relative h-4 w-4 text-white z-10" />
                   ) : (
                     <Navigation
                       className={`relative h-4 w-4 text-white z-10 transition-transform duration-300 ${isLocating ? "animate-slow-spin" : ""}`}
