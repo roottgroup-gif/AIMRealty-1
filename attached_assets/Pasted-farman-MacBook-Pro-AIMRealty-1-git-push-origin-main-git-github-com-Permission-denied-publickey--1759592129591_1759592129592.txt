@@ -1,0 +1,85 @@
+farman@MacBook-Pro AIMRealty-1 % git push origin main
+
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+farman@MacBook-Pro AIMRealty-1 % git pull origin main --rebase
+git push origin main
+
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+farman@MacBook-Pro AIMRealty-1 % git push origin main --force
+
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+farman@MacBook-Pro AIMRealty-1 % clear
+farman@MacBook-Pro AIMRealty-1 % git pull origin main --rebase
+git push origin main
+
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+farman@MacBook-Pro AIMRealty-1 % git add .
+git commit -m "Updated location button and marker styling"
+git push origin main
+On branch main
+Your branch and 'origin/main' have diverged,
+and have 407 and 4 different commits each, respectively.
+
+nothing to commit, working tree clean
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+farman@MacBook-Pro AIMRealty-1 % # 1. Change from SSH to HTTPS
+git remote set-url origin https://github.com/roottgroup-gif/AIMRealty-1.git
+
+# 2. Now try to push
+git push origin main
+zsh: command not found: #
+zsh: command not found: #
+To https://github.com/roottgroup-gif/AIMRealty-1.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/roottgroup-gif/AIMRealty-1.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+farman@MacBook-Pro AIMRealty-1 % # 1. Change from SSH to HTTPS
+git remote set-url origin https://github.com/roottgroup-gif/AIMRealty-1.git
+
+# 2. Now try to push
+git push origin main
+zsh: command not found: #
+zsh: command not found: #
+To https://github.com/roottgroup-gif/AIMRealty-1.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/roottgroup-gif/AIMRealty-1.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+farman@MacBook-Pro AIMRealty-1 % 
