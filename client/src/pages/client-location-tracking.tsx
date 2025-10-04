@@ -312,7 +312,7 @@ export default function ClientLocationTracking() {
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Accuracy</p>
                   <p className="text-3xl font-bold text-blue-600">
-                    {Math.round(analyticsData.accuracyStats.average)}m
+                    {Math.round(analyticsData?.accuracyStats?.average || 0)}m
                   </p>
                 </div>
                 <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">

@@ -1437,11 +1437,108 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getClientLocationStats(): Promise<any> {
-    return {
-      total: await this.countClientLocations(),
-      byCountry: [],
-      byCity: []
-    };
+    try {
+      // Get all locations for analysis
+      const allLocations = await this.dbConn
+        .select()
+        .from(clientLocations)
+        .orderBy(desc(clientLocations.createdAt));
+
+      const totalLocations = allLocations.length;
+
+      // Calculate accuracy stats
+      const accuracyValues = allLocations
+        .map(loc => loc.accuracy)
+        .filter(acc => acc !== null && acc !== undefined) as number[];
+      
+      const accuracyStats = {
+        average: accuracyValues.length > 0 
+          ? accuracyValues.reduce((sum, val) => sum + val, 0) / accuracyValues.length 
+          : 0,
+        min: accuracyValues.length > 0 ? Math.min(...accuracyValues) : 0,
+        max: accuracyValues.length > 0 ? Math.max(...accuracyValues) : 0
+      };
+
+      // Calculate daily stats (last 7 days)
+      const dailyStatsMap = new Map<string, number>();
+      allLocations.forEach(loc => {
+        if (loc.createdAt) {
+          const date = new Date(loc.createdAt).toISOString().split('T')[0];
+          dailyStatsMap.set(date, (dailyStatsMap.get(date) || 0) + 1);
+        }
+      });
+      const dailyStats = Array.from(dailyStatsMap.entries())
+        .map(([date, count]) => ({ date, count }))
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .slice(-7); // Last 7 days
+
+      // Calculate top cities
+      const cityStatsMap = new Map<string, number>();
+      allLocations.forEach(loc => {
+        if (loc.city) {
+          cityStatsMap.set(loc.city, (cityStatsMap.get(loc.city) || 0) + 1);
+        }
+      });
+      const topCities = Array.from(cityStatsMap.entries())
+        .map(([city, count]) => ({ city, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      // Calculate device stats (from userAgent)
+      const deviceStatsMap = new Map<string, number>();
+      allLocations.forEach(loc => {
+        if (loc.userAgent) {
+          // Extract simplified device info from user agent
+          let device = 'Unknown';
+          const ua = loc.userAgent.toLowerCase();
+          
+          if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+            device = 'Mobile';
+          } else if (ua.includes('tablet') || ua.includes('ipad')) {
+            device = 'Tablet';
+          } else if (ua.includes('windows') || ua.includes('macintosh') || ua.includes('linux')) {
+            device = 'Desktop';
+          }
+          
+          deviceStatsMap.set(device, (deviceStatsMap.get(device) || 0) + 1);
+        }
+      });
+      const deviceStats = Array.from(deviceStatsMap.entries())
+        .map(([device, count]) => ({ device, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Calculate top countries
+      const countryStatsMap = new Map<string, number>();
+      allLocations.forEach(loc => {
+        if (loc.country) {
+          countryStatsMap.set(loc.country, (countryStatsMap.get(loc.country) || 0) + 1);
+        }
+      });
+      const topCountries = Array.from(countryStatsMap.entries())
+        .map(([country, count]) => ({ country, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      return {
+        totalLocations,
+        accuracyStats,
+        dailyStats,
+        topCities,
+        topCountries,
+        deviceStats
+      };
+    } catch (error) {
+      console.error('Error getting client location stats:', error);
+      // Return safe default values if there's an error
+      return {
+        totalLocations: 0,
+        accuracyStats: { average: 0, min: 0, max: 0 },
+        dailyStats: [],
+        topCities: [],
+        topCountries: [],
+        deviceStats: []
+      };
+    }
   }
 }
 
