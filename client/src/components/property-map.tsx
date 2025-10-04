@@ -1940,33 +1940,66 @@ export default function PropertyMap({
             easeLinearity: 0.25,
           });
 
-          // Add a marker for user's location
+          // Add a more visible pulsing marker for user's location
           const userLocationIcon = L.divIcon({
             html: `
               <div style="
-                background: #FF7800;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                border: 3px solid white;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                 position: relative;
+                width: 40px;
+                height: 40px;
               ">
                 <div style="
                   position: absolute;
                   top: 50%;
                   left: 50%;
                   transform: translate(-50%, -50%);
-                  width: 8px;
-                  height: 8px;
-                  background: white;
+                  width: 40px;
+                  height: 40px;
+                  background: rgba(59, 130, 246, 0.2);
                   border-radius: 50%;
+                  animation: pulse-blue 2s ease-out infinite;
                 "></div>
+                <div style="
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  background: #3B82F6;
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                  border: 3px solid white;
+                  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.6);
+                  z-index: 10;
+                ">
+                  <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 6px;
+                    height: 6px;
+                    background: white;
+                    border-radius: 50%;
+                  "></div>
+                </div>
               </div>
+              <style>
+                @keyframes pulse-blue {
+                  0% {
+                    transform: translate(-50%, -50%) scale(0.5);
+                    opacity: 1;
+                  }
+                  100% {
+                    transform: translate(-50%, -50%) scale(2.5);
+                    opacity: 0;
+                  }
+                }
+              </style>
             `,
             className: "user-location-marker",
-            iconSize: [20, 20],
-            iconAnchor: [10, 10],
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
           });
 
           // Remove any existing user location markers
@@ -1983,10 +2016,10 @@ export default function PropertyMap({
           const userMarker = L.marker([latitude, longitude], {
             icon: userLocationIcon,
           }).addTo(mapInstanceRef.current);
-          userMarker.bindPopup("📍 Your Current Location");
+          userMarker.bindPopup("📍 Your Current Location").openPopup();
           markersRef.current.push(userMarker);
           
-          console.log("✅ User location marker added to map");
+          console.log("✅ User location marker added to map at", latitude, longitude);
         } else {
           console.error("❌ Map instance or Leaflet not available");
         }
@@ -2033,32 +2066,48 @@ export default function PropertyMap({
       },
       (error) => {
         console.error("❌ Geolocation error:", error);
+        console.error("❌ Error details:", {
+          code: error?.code,
+          message: error?.message,
+          PERMISSION_DENIED: error?.PERMISSION_DENIED,
+          POSITION_UNAVAILABLE: error?.POSITION_UNAVAILABLE,
+          TIMEOUT: error?.TIMEOUT
+        });
         setIsLocating(false);
         
         let errorMessage = "Unable to get your location. ";
         
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage += "You denied location access. To enable location services:\n\n";
-            errorMessage += "• Click the location icon in your browser's address bar\n";
-            errorMessage += "• Select 'Allow' for location access\n";
-            errorMessage += "• Refresh the page and try again";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage += "Location information is unavailable. Please check:\n\n";
-            errorMessage += "• Your device's location services are enabled\n";
-            errorMessage += "• You have a stable internet connection\n";
-            errorMessage += "• Try moving to a location with better GPS signal";
-            break;
-          case error.TIMEOUT:
-            errorMessage += "Location request timed out. Please:\n\n";
-            errorMessage += "• Check your internet connection\n";
-            errorMessage += "• Try again in a moment\n";
-            errorMessage += "• Make sure location services are enabled on your device";
-            break;
-          default:
-            errorMessage += "An unknown error occurred. Please try again or check your browser settings.";
-            break;
+        // Handle both standard error codes and empty error objects
+        if (!error || !error.code) {
+          errorMessage += "Location service is not responding. Please check:\n\n";
+          errorMessage += "• Your device has location services enabled\n";
+          errorMessage += "• Your browser has permission to access location\n";
+          errorMessage += "• You're using HTTPS or localhost\n";
+          errorMessage += "\nTry refreshing the page and allowing location access when prompted.";
+        } else {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += "You denied location access. To enable location services:\n\n";
+              errorMessage += "• Click the location icon in your browser's address bar\n";
+              errorMessage += "• Select 'Allow' for location access\n";
+              errorMessage += "• Refresh the page and try again";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += "Location information is unavailable. Please check:\n\n";
+              errorMessage += "• Your device's location services are enabled\n";
+              errorMessage += "• You have a stable internet connection\n";
+              errorMessage += "• Try moving to a location with better GPS signal";
+              break;
+            case error.TIMEOUT:
+              errorMessage += "Location request timed out. Please:\n\n";
+              errorMessage += "• Check your internet connection\n";
+              errorMessage += "• Try again in a moment\n";
+              errorMessage += "• Make sure location services are enabled on your device";
+              break;
+            default:
+              errorMessage += "An unknown error occurred. Please try again or check your browser settings.";
+              break;
+          }
         }
         
         alert(errorMessage);
