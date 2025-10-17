@@ -2087,8 +2087,9 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
       for (const image of images) {
         console.log(`🔍 Checking image: ${image.imageUrl}`);
         
-        // Check if the image URL contains an external domain
+        // Check if the image URL contains an external domain (including old domains)
         if (image.imageUrl.includes('dailynewscrypto.net') || 
+            image.imageUrl.includes('mapestate.com') ||
             (image.imageUrl.startsWith('http://') || image.imageUrl.startsWith('https://'))) {
           
           // Extract just the filename from the URL
