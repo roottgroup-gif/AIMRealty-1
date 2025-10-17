@@ -288,8 +288,8 @@ export function generateOrganizationStructuredData() {
     "@type": "Organization",
     "name": "MapEstate",
     "description": "AI-Powered Real Estate Platform for Kurdistan, Iraq",
-    "url": "https://mapestate.com",
-    "logo": "https://mapestate.com/logo_1757848527935.png",
+    "url": "https://mapestate.net/",
+    "logo": "https://mapestate.net/logo_1757848527935.png",
     "foundingDate": "2024",
     "contactPoint": [
       {
