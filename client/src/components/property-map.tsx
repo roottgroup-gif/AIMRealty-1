@@ -827,21 +827,16 @@ export default function PropertyMap({
     propertiesToCluster: PropertyWithDetails[],
     zoomLevel: number,
   ) => {
-    // Three-tier clustering system based on zoom level:
-    // Low zoom (< 8): Group by country
-    // Medium zoom (8-12): Group by city 
-    // High zoom (>= 12): Show individual properties
+    // Two-tier clustering system based on zoom level:
+    // Low zoom (< 10): Group by country (show clusters when zoomed out)
+    // High zoom (>= 10): Show individual properties (no clustering when viewing city)
     
-    if (zoomLevel < 8) {
-      // Very zoomed out - group by country
+    if (zoomLevel < 10) {
+      // Zoomed out to country level - show grouped clusters
       return createCountryBasedClusters(propertiesToCluster);
     }
-    else if (zoomLevel < 12) {
-      // Medium zoom - group by city
-      return createCityBasedClusters(propertiesToCluster);
-    }
     else {
-      // Zoomed in - show individual properties (no clustering)
+      // Zoomed in to city level - show individual property pins (no clustering)
       return propertiesToCluster
         .filter(property => property.latitude && property.longitude)
         .map(property => ({
