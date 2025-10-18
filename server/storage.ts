@@ -312,8 +312,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async authenticateUser(username: string, password: string): Promise<User | null> {
+    console.log(`🔍 Authenticating user: "${username}"`);
     const user = await this.getUserByUsername(username);
-    if (!user) return null;
+    if (!user) {
+      console.log(`❌ User not found: "${username}"`);
+      return null;
+    }
+    
+    console.log(`✅ User found: "${username}" (role: ${user.role})`);
+    console.log(`🔑 Password is hashed: ${user.password.startsWith('$2')}`);
     
     // Handle backward compatibility for existing plaintext passwords
     const { comparePassword, hashPassword } = await import("./auth");
@@ -321,10 +328,13 @@ export class DatabaseStorage implements IStorage {
     // If password is already hashed (starts with $2), use bcrypt comparison
     if (user.password.startsWith('$2')) {
       const isValidPassword = await comparePassword(password, user.password);
+      console.log(`🔐 Bcrypt comparison result: ${isValidPassword}`);
       return isValidPassword ? user : null;
     } else {
       // Legacy plaintext comparison - rehash and update if successful
-      if (user.password === password) {
+      const isMatch = user.password === password;
+      console.log(`🔐 Plaintext comparison result: ${isMatch}`);
+      if (isMatch) {
         // Upgrade to hashed password
         const hashedPassword = await hashPassword(password);
         await this.updateUser(user.id, { password: hashedPassword });

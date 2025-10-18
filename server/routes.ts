@@ -90,16 +90,22 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     try {
       const { username, password } = req.body;
       
+      console.log(`🔐 Login attempt for username: "${username}"`);
+      
       if (!username || !password) {
+        console.log("❌ Missing username or password");
         return res.status(400).json({ message: "Username and password are required" });
       }
 
       const user = await storage.authenticateUser(username, password);
       
       if (!user) {
+        console.log(`❌ Authentication failed for username: "${username}"`);
         return res.status(401).json({ message: "Invalid username or password" });
       }
 
+      console.log(`✅ Login successful for user: ${username} (role: ${user.role})`);
+      
       // Set session
       req.session.userId = user.id;
       
