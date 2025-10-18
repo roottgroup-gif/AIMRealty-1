@@ -102,10 +102,10 @@ const translations: { [key: string]: { en: string; ar: string; kur: string } } =
   }
 };
 
-// SEO language override helper - maps Kurdish to English for SEO meta content
+// SEO language helper - now supports all three languages equally
 function resolveSeoLanguage(language: Language): Language {
-  // User requested that Kurdish URLs show English SEO content for social media sharing
-  return language === 'kur' ? 'en' : language;
+  // All languages (en, ar, kur) now show their own SEO content
+  return language;
 }
 
 // Custom translation function for SEO that can handle language override
@@ -690,6 +690,7 @@ export function SEOHead({
     
     // Enhanced Twitter Card tags for Twitter sharing
     updateMetaTag('name', 'twitter:card', 'summary_large_image');
+    updateMetaTag('name', 'twitter:url', properCanonicalUrl);
     updateMetaTag('name', 'twitter:title', dynamicTitle);
     updateMetaTag('name', 'twitter:description', dynamicDescription);
     updateMetaTag('name', 'twitter:image', ogImage);
