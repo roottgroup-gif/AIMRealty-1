@@ -1,0 +1,93 @@
+root@srv1027249:/var/www/mapestate.net# # Remove the old file and create the correct one
+rm ecosystem.config.js
+
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'mapestate',
+    script: 'npm',
+    args: 'run dev',
+    env: {
+      NODE_ENV: 'production',
+      MYSQL_HOST: '72.60.134.44',
+      MYSQL_USER: 'mapestate',
+      MYSQL_PASSWORD: 'Mapestate123!',
+      MYSQL_DATABASE: 'mapestate',
+      MYSQL_PORT: '3306'
+    }
+  }]
+}
+EOF
+
+# Now start PM2 with the correct file
+pm2 start ecosystem.config.cjs
+pm2 save
+pm2 status
+pm2 logs mapestate --lines 30
+[PM2][WARN] Applications mapestate not running, starting...
+[PM2] App [mapestate] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate          │ fork     │ 0    │ online    │ 0%       │ 14.8mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate          │ fork     │ 0    │ online    │ 0%       │ 59.8mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 30 lines for [mapestate] process (change the value with --lines option)
+/root/.pm2/logs/mapestate-error.log last 30 lines:
+0|mapestat | ❌ Failed to connect to MySQL VPS database:
+0|mapestat |    Error: Error: No MySQL database configured. Set MYSQL_URL or individual MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE environment variables.
+0|mapestat | ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 💡 Set MYSQL_URL environment variable to use a database
+0|mapestat | ❌ Failed to connect to MySQL VPS database:
+0|mapestat |    Error: Error: No MySQL database configured. Set MYSQL_URL or individual MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE environment variables.
+0|mapestat | ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 💡 Set MYSQL_URL environment variable to use a database
+
+/root/.pm2/logs/mapestate-out.log last 30 lines:
+0|mapestat | 
+0|mapestat | > rest-express@1.0.0 dev
+0|mapestat | > NODE_ENV=development tsx server/index.ts
+0|mapestat | 
+0|mapestat | 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 🔧 Running startup fix for user language permissions...
+0|mapestat | 📁 Created upload directory: /var/www/mapestate.net/server/uploads/customer
+0|mapestat | 📁 Serving uploads from: /var/www/mapestate.net/server/uploads
+0|mapestat | 6:09:29 AM [express] serving on port 5000
+0|mapestat | ✅ Default users initialized in MemStorage (development mode)
+0|mapestat | 🔑 Use 'admin' and 'john_agent' usernames to login
+0|mapestat | 
+0|mapestat | > rest-express@1.0.0 dev
+0|mapestat | > NODE_ENV=development tsx server/index.ts .env
+0|mapestat | 
+0|mapestat | 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 🔧 Running startup fix for user language permissions...
+0|mapestat | 📁 Serving uploads from: /var/www/mapestate.net/server/uploads
+0|mapestat | 6:11:05 AM [express] serving on port 5000
+0|mapestat | ✅ Default users initialized in MemStorage (development mode)
+0|mapestat | 🔑 Use 'admin' and 'john_agent' usernames to login
+0|mapestat | 
+0|mapestat | > rest-express@1.0.0 dev
+0|mapestat | > NODE_ENV=development tsx server/index.ts
+0|mapestat | 
+
+0|mapestate  | 🔄 Connecting to MySQL VPS database...
+0|mapestate  | ✅ MySQL VPS connection established successfully
+0|mapestate  | 🔍 Testing database connection...
+0|mapestate  | 💓 Database connection is healthy
+0|mapestate  | ✅ MySQL database initialized successfully
+0|mapestate  | 🔗 Using MySQL DatabaseStorage
+0|mapestate  | ℹ️ Default users already exist in database
+0|mapestate  | 🔧 Running startup fix for user language permissions...
+0|mapestate  | 🔧 Fixing existing users language permissions...
+0|mapestate  | Found 1 regular users to fix
+0|mapestate  | ✅ Finished fixing existing users language permissions
+0|mapestate  | 📁 Serving uploads from: /var/www/mapestate.net/server/uploads
+0|mapestate  | 6:12:20 AM [express] serving on port 5000
+^X^C
+root@srv1027249:/var/www/mapestate.net# 
