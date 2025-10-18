@@ -35,7 +35,9 @@ import {
   type CreateCurrencyRateForm,
   type UpdateCurrencyRateForm
 } from '@/hooks/use-currency-rates';
+import { useProperties, useDeleteProperty } from '@/hooks/use-properties';
 import { normalizePropertyImageUrl } from '@/lib/utils';
+import type { Property } from '@/types';
 
 const createUserSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -197,6 +199,10 @@ export default function AdminDashboard() {
   const [isCreateCurrencyRateOpen, setIsCreateCurrencyRateOpen] = useState(false);
   const [isEditCurrencyRateOpen, setIsEditCurrencyRateOpen] = useState(false);
   const [editingCurrencyRate, setEditingCurrencyRate] = useState<CurrencyRate | null>(null);
+  
+  // Properties management state
+  const [propertySearchTerm, setPropertySearchTerm] = useState('');
+  const [propertyTypeFilter, setPropertyTypeFilter] = useState<string>('all');
 
   // Redirect if not admin or super admin
   useEffect(() => {
@@ -276,6 +282,10 @@ export default function AdminDashboard() {
   const createCurrencyRateMutation = useCreateCurrencyRate();
   const updateCurrencyRateMutation = useUpdateCurrencyRate();
   const deleteCurrencyRateMutation = useDeleteCurrencyRate();
+  
+  // Properties hooks
+  const { data: allProperties = [], isLoading: propertiesLoading } = useProperties();
+  const deletePropertyMutation = useDeleteProperty();
 
   // Handle avatar file selection and upload to server
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -616,6 +626,24 @@ export default function AdminDashboard() {
     setSelectedCustomer(customer);
     setIsCustomerDetailsOpen(true);
   };
+  
+  const handleDeleteProperty = async (propertyId: string, propertyTitle: string) => {
+    if (window.confirm(`Are you sure you want to delete property "${propertyTitle}"? This action cannot be undone.`)) {
+      try {
+        await deletePropertyMutation.mutateAsync(propertyId);
+        toast({
+          title: 'Success',
+          description: 'Property deleted successfully',
+        });
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.message || 'Failed to delete property',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
 
   // Reset page to 1 when filters change
   useEffect(() => {
@@ -633,6 +661,19 @@ export default function AdminDashboard() {
     const matchesRole = roleFilter === 'all' || u.role === roleFilter;
     
     return matchesSearch && matchesRole;
+  });
+  
+  const filteredProperties = allProperties.filter(p => {
+    const matchesSearch = !propertySearchTerm || 
+      p.title.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+      p.address.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+      p.city.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+      p.country.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+      p.description?.toLowerCase().includes(propertySearchTerm.toLowerCase());
+    
+    const matchesType = propertyTypeFilter === 'all' || p.type === propertyTypeFilter;
+    
+    return matchesSearch && matchesType;
   });
 
   // Pagination calculations
@@ -1886,6 +1927,161 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* All Properties Management - Super Admin Only */}
+        {user?.role === 'super_admin' && (
+          <Card className="shadow-lg border-0 bg-white dark:bg-gray-800 mt-8">
+            <CardHeader className="border-b border-orange-100 dark:border-gray-700 bg-gradient-to-r from-orange-50 to-white dark:from-gray-800 dark:to-gray-800">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                <div>
+                  <CardTitle className="text-lg sm:text-xl text-orange-800 dark:text-orange-200 font-bold flex items-center gap-2">
+                    <Building2 className="h-6 w-6" />
+                    All Properties Management
+                  </CardTitle>
+                  <CardDescription className="text-orange-600 dark:text-orange-300 mt-1">
+                    View and manage all properties in the system ({filteredProperties.length} properties)
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              {/* Filters */}
+              <div className="space-y-3 sm:space-y-4 mb-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 h-4 w-4" />
+                    <Input
+                      placeholder="Search properties by title, address, city..."
+                      value={propertySearchTerm}
+                      onChange={(e) => setPropertySearchTerm(e.target.value)}
+                      className="pl-10 border-orange-200 focus:border-orange-500 focus:ring-orange-500"
+                      data-testid="input-property-search"
+                    />
+                  </div>
+                  <Select value={propertyTypeFilter} onValueChange={setPropertyTypeFilter}>
+                    <SelectTrigger className="w-full sm:w-48 border-orange-200 focus:border-orange-500 focus:ring-orange-500" data-testid="select-property-type-filter">
+                      <SelectValue placeholder="Filter by type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="apartment">Apartment</SelectItem>
+                      <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="villa">Villa</SelectItem>
+                      <SelectItem value="land">Land</SelectItem>
+                      <SelectItem value="commercial">Commercial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Properties Table */}
+              <div className="border border-orange-200 rounded-lg overflow-hidden">
+                {propertiesLoading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin h-8 w-8 border-4 border-orange-600 border-t-transparent rounded-full mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading properties...</p>
+                  </div>
+                ) : filteredProperties.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <Building2 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>No properties found</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b border-orange-200 dark:border-gray-600 bg-orange-50 dark:bg-gray-700">
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Image</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Title</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Location</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Price</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                          <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredProperties.map((property) => (
+                          <tr key={property.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-orange-25 dark:hover:bg-gray-750" data-testid={`row-property-${property.id}`}>
+                            <td className="py-3 px-4">
+                              {property.images && property.images.length > 0 ? (
+                                <img
+                                  src={normalizePropertyImageUrl(property.images[0])}
+                                  alt={property.title}
+                                  className="w-16 h-16 object-cover rounded"
+                                />
+                              ) : (
+                                <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                                  <ImageIcon className="h-6 w-6 text-gray-400" />
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="max-w-xs">
+                                <p className="font-semibold text-gray-800 dark:text-gray-200 truncate">{property.title}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{property.bedrooms}bd • {property.bathrooms}ba • {property.area}m²</p>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">
+                              <Badge variant="outline" className="capitalize">{property.type}</Badge>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="max-w-xs">
+                                <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{property.city}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{property.country}</p>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-green-600">${parseFloat(property.price).toLocaleString()}</span>
+                                <Badge className={`text-xs mt-1 ${
+                                  property.listingType === 'sale' 
+                                    ? 'bg-red-100 text-red-800 hover:bg-red-200' 
+                                    : 'bg-green-100 text-green-800 hover:bg-green-200'
+                                }`}>
+                                  {property.listingType === 'sale' ? 'Sale' : 'Rent'}
+                                </Badge>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">
+                              <Badge variant={property.status === 'active' ? 'default' : 'secondary'} className={property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                                {property.status}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                <Link href={`/en/properties/${property.slug || property.id}`}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                    data-testid={`button-view-${property.id}`}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteProperty(property.id, property.title)}
+                                  disabled={deletePropertyMutation.isPending}
+                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                  data-testid={`button-delete-property-${property.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
