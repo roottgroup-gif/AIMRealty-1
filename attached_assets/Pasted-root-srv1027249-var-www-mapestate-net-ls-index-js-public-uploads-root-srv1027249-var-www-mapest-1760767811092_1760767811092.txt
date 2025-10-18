@@ -1,0 +1,277 @@
+root@srv1027249:/var/www/mapestate.net# ls
+index.js  public  uploads
+root@srv1027249:/var/www/mapestate.net# cd ..
+root@srv1027249:/var/www# cd ..
+root@srv1027249:/var# cd ..
+root@srv1027249:/# ls
+bin                dev   lib                lost+found  opt   run                 snap  tmp
+bin.usr-is-merged  etc   lib.usr-is-merged  media       proc  sbin                srv   usr
+boot               home  lib64              mnt         root  sbin.usr-is-merged  sys   var
+root@srv1027249:/# # On your VPS
+cd /var/www
+git clone <your-repository-url> mapestate.net
+cd mapestate.net
+-bash: your-repository-url: No such file or directory
+root@srv1027249:/var/www/mapestate.net# cd ..
+root@srv1027249:/var/www# ls
+html  mapestate.net  shared
+root@srv1027249:/var/www# cd  mapestate.net 
+root@srv1027249:/var/www/mapestate.net# cd /var/www
+rm -rf mapestate.net  # Remove old files
+git clone https://github.com/roottgroup-gif/AIMRealty-1 mapestate.net
+cd mapestate.net
+Cloning into 'mapestate.net'...
+remote: Enumerating objects: 8403, done.
+remote: Counting objects: 100% (131/131), done.
+remote: Compressing objects: 100% (41/41), done.
+remote: Total 8403 (delta 114), reused 90 (delta 90), pack-reused 8272 (from 3)
+Receiving objects: 100% (8403/8403), 141.24 MiB | 41.45 MiB/s, done.
+Resolving deltas: 100% (4918/4918), done.
+root@srv1027249:/var/www/mapestate.net# npm install
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+
+added 573 packages, and audited 574 packages in 13s
+
+83 packages are looking for funding
+  run `npm fund` for details
+
+7 vulnerabilities (1 low, 6 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+root@srv1027249:/var/www/mapestate.net# nano .env
+root@srv1027249:/var/www/mapestate.net# npm run build
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm
+ --outdir=dist
+
+vite v5.4.19 building for production...
+✓ 2716 modules transformed.
+../dist/public/index.html                                                   5.76 kB │ gzip:   1.8
+9 kB
+../dist/public/assets/logo_1757848527935-f97yEqP4.png                      34.60 kB
+../dist/public/assets/UniQAIDAR_Asiacell 001_1758107005933-Cl-Cqdhv.ttf    57.23 kB
+../dist/public/assets/UniQAIDAR_Asiacell 002_1758107005922-ClO-zV7t.ttf    57.24 kB
+../dist/public/assets/US_flag_circular_design_55844ad0-B0cUOQ6G.png       506.88 kB
+../dist/public/assets/Saudi_flag_circular_design_3c46c604-D1J1e9j5.png    518.22 kB
+../dist/public/assets/Kurdish_flag_circular_design_55e28463-qI8fKU0i.png  529.54 kB
+../dist/public/assets/index-BMDYjy7_.css                                  129.16 kB │ gzip:  20.4
+4 kB
+../dist/public/assets/filter-DzIiP1sy.js                                    0.33 kB │ gzip:   0.2
+6 kB
+../dist/public/assets/arrow-left-ZPhp-7UG.js                                0.33 kB │ gzip:   0.2
+7 kB
+../dist/public/assets/search-Dd7Q9Ap0.js                                    0.34 kB │ gzip:   0.2
+7 kB
+../dist/public/assets/user-BrPFFYK3.js                                      0.37 kB │ gzip:   0.2
+8 kB
+../dist/public/assets/dollar-sign-BA1hwHAK.js                               0.39 kB │ gzip:   0.3
+0 kB
+../dist/public/assets/heart-ugh8tity.js                                     0.41 kB │ gzip:   0.3
+1 kB
+../dist/public/assets/globe-DiXF2AXU.js                                     0.41 kB │ gzip:   0.3
+0 kB
+../dist/public/assets/circle-alert-DLh5opmk.js                              0.42 kB │ gzip:   0.2
+9 kB
+../dist/public/assets/map-pin-Df_Hm20H.js                                   0.42 kB │ gzip:   0.3
+2 kB
+../dist/public/assets/calendar-B2oJEVlU.js                                  0.43 kB │ gzip:   0.3
+0 kB
+../dist/public/assets/chart-pie-Ch0ybIQB.js                                 0.44 kB │ gzip:   0.3
+3 kB
+../dist/public/assets/shield-DLqIfm0_.js                                    0.44 kB │ gzip:   0.3
+3 kB
+../dist/public/assets/award-DRhwiIu6.js                                     0.44 kB │ gzip:   0.3
+3 kB
+../dist/public/assets/lightbulb-BskGNy4D.js                                 0.46 kB │ gzip:   0.3
+3 kB
+../dist/public/assets/users-DwyYTUSx.js                                     0.47 kB │ gzip:   0.3
+2 kB
+../dist/public/assets/phone-8_t8KdIB.js                                     0.56 kB │ gzip:   0.3
+6 kB
+../dist/public/assets/input-ChclZyPL.js                                     0.58 kB │ gzip:   0.3
+6 kB
+../dist/public/assets/eye-off-BKKMohmz.js                                   0.60 kB │ gzip:   0.3
+8 kB
+../dist/public/assets/not-found-Dar3rPpl.js                                 0.67 kB │ gzip:   0.3
+8 kB
+../dist/public/assets/separator-BrR8Sjv-.js                                 0.67 kB │ gzip:   0.4
+0 kB
+../dist/public/assets/badge-DLsBG4y8.js                                     0.71 kB │ gzip:   0.3
+7 kB
+../dist/public/assets/dashboard-redirect-DcI2AoiC.js                        0.74 kB │ gzip:   0.4
+4 kB
+../dist/public/assets/key-ZeBIMHEj.js                                       0.84 kB │ gzip:   0.4
+3 kB
+../dist/public/assets/label-BAjqoZIB.js                                     0.93 kB │ gzip:   0.6
+0 kB
+../dist/public/assets/bed-CPbljWgi.js                                       0.94 kB │ gzip:   0.4
+4 kB
+../dist/public/assets/card-BNIqXmwf.js                                      0.99 kB │ gzip:   0.3
+7 kB
+../dist/public/assets/use-local-favorites-CS33FFN9.js                       1.36 kB │ gzip:   0.6
+1 kB
+../dist/public/assets/tag-mWTbNSOz.js                                       1.41 kB │ gzip:   0.5
+6 kB
+../dist/public/assets/optimized-image-U24XcGH8.js                           2.21 kB │ gzip:   1.1
+6 kB
+../dist/public/assets/avatar-CjqGt2_r.js                                    2.46 kB │ gzip:   1.1
+8 kB
+../dist/public/assets/use-properties-DEf7DGjU.js                            2.67 kB │ gzip:   0.9
+2 kB
+../dist/public/assets/index--M_hY-bj.js                                     3.38 kB │ gzip:   1.5
+4 kB
+../dist/public/assets/favorites-C5bE1JsJ.js                                 3.51 kB │ gzip:   1.4
+4 kB
+../dist/public/assets/location-selection-map-C90A9lCD.js                    3.76 kB │ gzip:   1.7
+7 kB
+../dist/public/assets/admin-login-DyrYLS1f.js                               4.88 kB │ gzip:   1.8
+3 kB
+../dist/public/assets/usePropertyEvents-CgS8zXbQ.js                         5.73 kB │ gzip:   1.8
+3 kB
+../dist/public/assets/property-card-BQSMOAsz.js                             7.31 kB │ gzip:   2.7
+7 kB
+../dist/public/assets/about-D4KNeLPz.js                                     8.50 kB │ gzip:   2.0
+1 kB
+../dist/public/assets/dialog-D-V2A08n.js                                   11.29 kB │ gzip:   3.9
+4 kB
+../dist/public/assets/settings-CkAJ7Dgs.js                                 13.22 kB │ gzip:   3.7
+0 kB
+../dist/public/assets/meta-enhancement-g2hSXPe1.js                         14.36 kB │ gzip:   5.7
+4 kB
+../dist/public/assets/typography-showcase-E1GH7rMj.js                      14.36 kB │ gzip:   2.8
+5 kB
+../dist/public/assets/properties-CA_iAYyx.js                               14.72 kB │ gzip:   4.0
+2 kB
+../dist/public/assets/Combination-S75LiYFR.js                              16.93 kB │ gzip:   6.4
+7 kB
+../dist/public/assets/SEOHead-ZpJefZv-.js                                  19.84 kB │ gzip:   7.2
+0 kB
+../dist/public/assets/home-BJrAbghi.js                                     20.01 kB │ gzip:   5.4
+8 kB
+../dist/public/assets/dropdown-menu-D9OGAQo4.js                            21.26 kB │ gzip:   6.2
+7 kB
+../dist/public/assets/select-f_B4I9Gy.js                                   21.80 kB │ gzip:   7.6
+1 kB
+../dist/public/assets/property-detail-CJAcKqjR.js                          33.29 kB │ gzip:   9.7
+9 kB
+../dist/public/assets/property-map-Bwunpxwt.js                             49.05 kB │ gzip:  12.7
+6 kB
+../dist/public/assets/index-BUzIeUke.js                                    88.91 kB │ gzip:  24.8
+1 kB
+../dist/public/assets/admin-dashboard-C6uKygt7.js                          91.56 kB │ gzip:  20.3
+7 kB
+../dist/public/assets/customer-dashboard-1YxRc6kF.js                       97.56 kB │ gzip:  23.7
+4 kB
+../dist/public/assets/client-location-tracking-CjJaMX2Z.js                195.60 kB │ gzip:  66.4
+2 kB
+../dist/public/assets/index-DHEBNcyU.js                                   317.74 kB │ gzip: 105.9
+1 kB
+../dist/public/assets/PieChart-NKape-4s.js                                442.42 kB │ gzip: 119.3
+6 kB
+✓ built in 15.07s
+
+  dist/index.js  208.4kb
+
+⚡ Done in 26ms
+root@srv1027249:/var/www/mapestate.net# sudo nano /etc/nginx/sites-available/mapestate.net
+
+root@srv1027249:/var/www/mapestate.net# sudo nano /etc/nginx/sites-available/mapestate.net
+root@srv1027249:/var/www/mapestate.net# sudo nginx -t
+sudo systemctl reload nginx
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@srv1027249:/var/www/mapestate.net# # Stop any existing PM2 processes
+pm2 delete all
+
+# Start your app (it uses npm run dev which works with tsx)
+pm2 start npm --name "mapestate" -- run dev
+
+# Save PM2 configuration
+pm2 save
+
+# Check status
+pm2 status
+pm2 logs mapestate
+[PM2] Applying action deleteProcessId on app [all](ids: [ 0, 1 ])
+[PM2] [mapestate](1) ✓
+[PM2] [mapestate-app](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Starting /usr/bin/npm in fork_mode (1 instance)
+[PM2] Done.
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate          │ fork     │ 0    │ online    │ 0%       │ 11.5mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate          │ fork     │ 0    │ online    │ 0%       │ 60.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 15 lines for [mapestate] process (change the value with --lines option)
+/root/.pm2/logs/mapestate-error.log last 15 lines:
+/root/.pm2/logs/mapestate-out.log last 15 lines:
+0|mapestat | 
+0|mapestat | > rest-express@1.0.0 dev
+0|mapestat | > NODE_ENV=development tsx server/index.ts
+0|mapestat | 
+
+0|mapestate  | ❌ Failed to connect to MySQL VPS database:
+0|mapestate  |    Error: Error: No MySQL database configured. Set MYSQL_URL or individual MYSQL_H
+OST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE environment variables.
+0|mapestate  | ⚠️ No database configured, using in-memory storage for development
+0|mapestate  | 💡 Set MYSQL_URL environment variable to use a database
+0|mapestate  | 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestate  | 🔧 Running startup fix for user language permissions...
+0|mapestate  | 📁 Created upload directory: /var/www/mapestate.net/server/uploads/customer
+0|mapestate  | 📁 Serving uploads from: /var/www/mapestate.net/server/uploads
+0|mapestate  | 6:09:29 AM [express] serving on port 5000
+0|mapestate  | ✅ Default users initialized in MemStorage (development mode)
+0|mapestate  | 🔑 Use 'admin' and 'john_agent' usernames to login
+^X^Xçsudo chown -R www-data:www-data /var/www/mapestate.net
+sudo chmod -R 755 /var/www/mapestate.netsudo chown -R www-data:www-data /var/www/mapestate.net
+sudo chmod -R 755 /var/www/mapestate.net
+^X^C
+root@srv1027249:/var/www/mapestate.net# sudo chown -R www-data:www-data /var/www/mapestate.net
+sudo chmod -R 755 /var/www/mapestate.net
+root@srv1027249:/var/www/mapestate.net# pm2 status
+pm2 logs mapestate --lines 50
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ mapestate          │ fork     │ 0    │ online    │ 0%       │ 55.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 50 lines for [mapestate] process (change the value with --lines option)
+/root/.pm2/logs/mapestate-error.log last 50 lines:
+0|mapestat | ❌ Failed to connect to MySQL VPS database:
+0|mapestat |    Error: Error: No MySQL database configured. Set MYSQL_URL or individual MYSQL_HOS
+T, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE environment variables.
+0|mapestat | ⚠️ No database configured, using in-memory storage for development
+0|mapestat | 💡 Set MYSQL_URL environment variable to use a database
+
+/root/.pm2/logs/mapestate-out.log last 50 lines:
+0|mapestat | 
+0|mapestat | > rest-express@1.0.0 dev
+0|mapestat | > NODE_ENV=development tsx server/index.ts
+0|mapestat | 
+0|mapestat | 💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+0|mapestat | 🔧 Running startup fix for user language permissions...
+0|mapestat | 📁 Created upload directory: /var/www/mapestate.net/server/uploads/customer
+0|mapestat | 📁 Serving uploads from: /var/www/mapestate.net/server/uploads
+0|mapestat | 6:09:29 AM [express] serving on port 5000
+0|mapestat | ✅ Default users initialized in MemStorage (development mode)
+0|mapestat | 🔑 Use 'admin' and 'john_agent' usernames to login
+
