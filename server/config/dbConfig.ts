@@ -17,14 +17,6 @@ function getDatabaseConfig(): DatabaseConfig {
   const mysqlPassword = process.env.MYSQL_PASSWORD?.trim();
   const mysqlDatabase = process.env.MYSQL_DATABASE?.trim();
 
-  // Debug logging
-  console.log("🔍 Database config from environment:");
-  console.log(`   Host: "${mysqlHost}" (length: ${mysqlHost?.length})`);
-  console.log(`   Port: "${mysqlPort}"`);
-  console.log(`   User: "${mysqlUser}"`);
-  console.log(`   Database: "${mysqlDatabase}"`);
-  console.log(`   Password present: ${mysqlPassword ? 'yes' : 'no'}`);
-
   // If individual MySQL environment variables are provided, use them directly
   if (mysqlHost && mysqlUser && mysqlDatabase) {
     const port = parseInt(mysqlPort || "3306");
