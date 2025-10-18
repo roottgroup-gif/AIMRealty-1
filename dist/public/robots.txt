@@ -1,0 +1,48 @@
+User-agent: *
+Allow: /
+
+# Disallow private/admin areas (matching actual routes)
+Disallow: /admin/login
+Disallow: /admin/dashboard
+Disallow: /customer/dashboard
+Disallow: /dashboard
+
+# Disallow API endpoints (not meant for crawling)
+Disallow: /api/
+
+# Allow important public pages
+Allow: /
+Allow: /properties
+Allow: /property/*
+Allow: /favorites
+Allow: /settings
+
+# Crawl delay for all bots (Google ignores this, others respect it)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: /sitemap.xml
+
+# Additional SEO-friendly directives
+# Allow manifest and important static files
+Allow: /manifest.json
+Allow: /offline.html
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+
+# Block common attack vectors and unnecessary files
+Disallow: /.env
+Disallow: /package*.json
+Disallow: /*.config.*
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /.git/
+
+# Cache directive for robots.txt itself
+# Cache-directive: max-age=86400
