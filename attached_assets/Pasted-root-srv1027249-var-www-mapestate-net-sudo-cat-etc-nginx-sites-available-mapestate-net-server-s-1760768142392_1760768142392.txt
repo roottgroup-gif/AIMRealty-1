@@ -1,0 +1,73 @@
+root@srv1027249:/var/www/mapestate.net# sudo cat /etc/nginx/sites-available/mapestate.net
+server { server_name mapestate.net www.mapestate.net; root 
+    /root/dailynewscrypto.net/dist; index index.html;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API proxy if you have backend
+    location /api/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/mapestate.net/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/mapestate.net/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+server {
+    if ($host = www.mapestate.net) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = mapestate.net) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name mapestate.net www.mapestate.net;
+    return 404; # managed by Certbot
+
+
+
+
+}
+root@srv1027249:/var/www/mapestate.net# sudo nano /etc/nginx/sites-available/mapestate.net
+root@srv1027249:/var/www/mapestate.net# root /var/www/mapestate.net/dist/public;
+Command 'root' not found, did you mean:
+  command 'rott' from deb rott (20230810-1)
+  command 'foot' from deb foot (1.16.2-2ubuntu0.1)
+  command 'toot' from deb toot (0.39.0-1)
+  command 'proot' from deb proot (5.1.0-1.3)
+  command 'rootv' from deb xawtv (3.107-1.1)
+Try: apt install <deb name>
+root@srv1027249:/var/www/mapestate.net# proxy_pass http://localhost:5000;
+proxy_pass: command not found
+root@srv1027249:/var/www/mapestate.net# sudo nginx -t
+sudo systemctl reload nginx
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@srv1027249:/var/www/mapestate.net# 
