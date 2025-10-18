@@ -1,0 +1,56 @@
+Database config from environment:
+   Host: "• MYSQL_HOST:" (length: 13)
+   Port: "3306"
+   User: "mapestate"
+   Database: "mapestate"
+   Password present: yes
+🔄 Connecting to MySQL VPS database...
+✅ MySQL VPS connection established successfully
+🔍 Testing database connection...
+⚠️ Connection test failed: Error: getaddrinfo ENOTFOUND • MYSQL_HOST:
+    at PromisePool.query (/home/runner/workspace/node_modules/mysql2/lib/promise/pool.js:36:22)
+    at initializeDb (/home/runner/workspace/server/db.ts:36:25)
+    at Function.getStorage (/home/runner/workspace/server/storageFactory.ts:19:13)
+    at <anonymous> (/home/runner/workspace/server/index.ts:296:34)
+    at <anonymous> (/home/runner/workspace/server/index.ts:346:1)
+    at ModuleJob.run (node:internal/modules/esm/module_job:263:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:540:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  code: 'ENOTFOUND',
+  errno: -3008,
+  sql: undefined,
+  sqlState: undefined,
+  sqlMessage: undefined
+}
+❌ Failed to connect to MySQL VPS database:
+   Error: Error: getaddrinfo ENOTFOUND • MYSQL_HOST:
+⚠️ No database configured, using in-memory storage for development
+💡 Set MYSQL_URL environment variable to use a database
+💾 Using MemStorage (in-memory) - DEVELOPMENT ONLY
+🔧 Running startup fix for user language permissions...
+📁 Serving uploads from: /home/runner/workspace/server/uploads
+10:07:14 AM [express] serving on port 5000
+✅ Default users initialized in MemStorage (development mode)
+🔑 Use 'admin' and 'john_agent' usernames to login
+GET /api/auth/me 401 in 2ms : {"message":"Unauthorized"}
+GET /api/properties 304 in 2ms : []
+🔌 New SSE connection established
+📡 SSE padding sent, forcing stream start
+📡 SSE initial connection message sent and flushed
+📊 SSE clients connected: 1
+💓 SSE heartbeat sent and flushed
+GET /api/properties 304 in 1ms : []
+💓 SSE heartbeat sent and flushed
+GET /api/properties 304 in 1ms : []
+🔌 SSE client disconnected (error): aborted
+📊 SSE clients connected: 0
+🔌 SSE client disconnected (close)
+📊 SSE clients connected: 0
+GET /api/auth/me 401 in 1ms : {"message":"Unauthorized"}
+🔌 New SSE connection established
+📡 SSE padding sent, forcing stream start
+📡 SSE initial connection message sent and flushed
+📊 SSE clients connected: 1
+GET /api/properties 304 in 1ms : []
+💓 SSE heartbeat sent and flushed
+GET /api/properties 304 in 1ms : []
