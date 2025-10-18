@@ -99,6 +99,36 @@ export const populateUser = async (req: Request, res: Response, next: NextFuncti
   next();
 };
 
+// Check if user account is expired
+export const checkExpiration = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // Admins and super_admins are exempt from expiration checks
+  if (req.user.role === 'admin' || req.user.role === 'super_admin') {
+    return next();
+  }
+
+  // Check if user is expired
+  if (req.user.isExpired) {
+    return res.status(403).json({ 
+      message: 'Your account has expired. Please contact an administrator to renew your account.',
+      expired: true 
+    });
+  }
+
+  // Check if expiration date has passed
+  if (req.user.expiresAt && new Date(req.user.expiresAt) < new Date()) {
+    return res.status(403).json({ 
+      message: 'Your account has expired. Please contact an administrator to renew your account.',
+      expired: true 
+    });
+  }
+
+  next();
+};
+
 // Middleware to validate user can add data in the specified language
 export const validateLanguagePermission = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {

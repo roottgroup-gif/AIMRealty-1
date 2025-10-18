@@ -14,7 +14,7 @@ import {
   insertClientLocationSchema
 } from "@shared/schema";
 import { extractPropertyIdentifier } from "@shared/slug-utils";
-import { hashPassword, requireAuth, requireRole, requireAnyRole, populateUser, validateLanguagePermission } from "./auth";
+import { hashPassword, requireAuth, requireRole, requireAnyRole, populateUser, validateLanguagePermission, checkExpiration } from "./auth";
 import session from "express-session";
 import { z } from "zod";
 import sitemapRouter from "./routes/sitemap";
@@ -90,21 +90,15 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     try {
       const { username, password } = req.body;
       
-      console.log(`🔐 Login attempt for username: "${username}"`);
-      
       if (!username || !password) {
-        console.log("❌ Missing username or password");
         return res.status(400).json({ message: "Username and password are required" });
       }
 
       const user = await storage.authenticateUser(username, password);
       
       if (!user) {
-        console.log(`❌ Authentication failed for username: "${username}"`);
         return res.status(401).json({ message: "Invalid username or password" });
       }
-
-      console.log(`✅ Login successful for user: ${username} (role: ${user.role})`);
       
       // Set session
       req.session.userId = user.id;
@@ -1356,7 +1350,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  app.post("/api/properties", requireAnyRole(["user", "admin"]), validateLanguagePermission, async (req, res) => {
+  app.post("/api/properties", requireAnyRole(["user", "admin"]), checkExpiration, validateLanguagePermission, async (req, res) => {
     try {
       const validatedData = insertPropertySchema.parse(req.body);
       
@@ -1392,7 +1386,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  app.put("/api/properties/:id", requireAnyRole(["user", "admin"]), validateLanguagePermission, async (req, res) => {
+  app.put("/api/properties/:id", requireAnyRole(["user", "admin"]), checkExpiration, validateLanguagePermission, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -1489,7 +1483,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  app.delete("/api/properties/:id", requireAnyRole(["user", "admin"]), async (req, res) => {
+  app.delete("/api/properties/:id", requireAnyRole(["user", "admin"]), checkExpiration, async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -1648,7 +1642,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  app.post("/api/favorites", async (req, res) => {
+  app.post("/api/favorites", requireAuth, checkExpiration, async (req, res) => {
     try {
       const validatedData = insertFavoriteSchema.parse(req.body);
       const favorite = await storage.addToFavorites(validatedData);
@@ -1663,7 +1657,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
     }
   });
 
-  app.delete("/api/favorites", async (req, res) => {
+  app.delete("/api/favorites", requireAuth, checkExpiration, async (req, res) => {
     try {
       const { userId, propertyId } = req.body;
       
