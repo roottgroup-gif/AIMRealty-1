@@ -294,7 +294,7 @@ export default function HomePage() {
         ogImage={
           featuredProperties && featuredProperties.length > 0
             ? featuredProperties[0].images?.[0]
-            : `/uploads/properties/1759082074149-xrejrtvx6.jpg`
+            : undefined
         }
         canonicalUrl={undefined}
         structuredData={[getHomepageStructuredData(), generateFAQStructuredData(language)]}

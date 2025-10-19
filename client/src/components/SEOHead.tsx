@@ -404,7 +404,7 @@ function generateCombinedStructuredData(
       "width": 250,
       "height": 250
     },
-    "image": `${baseUrl}/uploads/properties/1759082074149-xrejrtvx6.jpg`,
+    "image": `${baseUrl}/mapestate-social-preview.png`,
     "description": "AI-Powered Global Real Estate Platform - Find Your Perfect Property Worldwide",
     "slogan": "Find Your Perfect Home with AI",
     "foundingDate": "2024",

@@ -367,7 +367,7 @@ export default function PropertyDetailPage() {
   }
 
   const firstImage = property.images?.[0];
-  const defaultSocialImage = `${window.location.origin}/uploads/properties/1759082074149-xrejrtvx6.jpg`;
+  const defaultSocialImage = `${window.location.origin}/mapestate-social-preview.png`;
   
   // Get primary image URL with proper formatting
   let primaryImageUrl = '';

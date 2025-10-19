@@ -188,7 +188,7 @@ export default function PropertiesPage() {
         ogImage={seoContent.ogImage || (
           properties && properties.length > 0
             ? properties[0].images?.[0]
-            : `/uploads/properties/1759082074149-xrejrtvx6.jpg`
+            : undefined
         )}
         canonicalUrl={undefined}
         structuredData={getPropertiesStructuredData()}
