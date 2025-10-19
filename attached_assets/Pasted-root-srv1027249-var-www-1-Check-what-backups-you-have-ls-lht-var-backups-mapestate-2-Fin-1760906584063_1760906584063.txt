@@ -1,0 +1,43 @@
+root@srv1027249:/var/www# # 1. Check what backups you have
+ls -lht /var/backups/mapestate/
+
+# 2. Find the most recent uploads backup (from today)
+ls -lht /var/backups/mapestate/uploads-* | head -5
+
+# 3. Once you see the most recent one, restore it
+# Replace YYYYMMDD-HHMMSS with the actual timestamp from the most recent backup
+cd /var/backups/mapestate/
+
+# List files in the backup to verify
+ls -lah uploads-YYYYMMDD-HHMMSS/properties/
+
+# If the files look good, restore them
+cp -r uploads-YYYYMMDD-HHMMSS/properties/* /var/www/mapestate.net/server/uploads/properties/
+
+# Fix permissions
+chown -R www-data:www-data /var/www/mapestate.net/server/uploads/
+chmod -R 755 /var/www/mapestate.net/server/uploads/
+
+# Restart your application
+pm2 restart all
+total 80K
+-rw-r--r-- 1 root root  72K Oct 19 20:06 db-backup-20251019-200608.sql
+drwxr-xr-x 6 root root 4.0K Oct 19 20:06 uploads-20251019-200608
+-rw-r--r-- 1 root root    0 Oct 19 20:05 db-backup-20251019-200541.sql
+drwxr-xr-x 6 root root 4.0K Oct 19 20:05 uploads-20251019-200541
+/var/backups/mapestate/uploads-20251019-200608:
+total 24K
+drwxr-xr-x 5 root root 4.0K Oct 19 20:06 uploads_backup_20251019
+drwxr-xr-x 2 root root 4.0K Oct 19 20:06 customer
+drwxr-xr-x 2 root root  12K Oct 19 20:06 properties
+ls: cannot access 'uploads-YYYYMMDD-HHMMSS/properties/': No such file or directory
+cp: cannot stat 'uploads-YYYYMMDD-HHMMSS/properties/*': No such file or directory
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [all](ids: [ 0 ])
+[PM2] [mapestate](0) ✓
+┌────┬──────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name         │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼──────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ mapestate    │ default     │ N/A     │ fork    │ 6925     │ 0s     │ 8    │ online    │ 0%       │ 18.4mb   │ root     │ disabled │
+└────┴──────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@srv1027249:/var/backups/mapestate# 
