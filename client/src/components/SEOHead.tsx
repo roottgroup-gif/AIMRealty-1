@@ -6,29 +6,29 @@ import { useLanguage, useTranslation, getLocalizedPath, detectLanguageFromUrl, d
 // Note: This assumes translations are exported from i18n.ts
 const translations: { [key: string]: { en: string; ar: string; kur: string } } = {
   "seo.homeTitle": {
-    en: "MapEstate - AI-Powered Real Estate Finder | Properties in Kurdistan, Iraq",
-    ar: "MapEstate - محرك البحث العقاري المدعوم بالذكاء الاصطناعي | عقارات في كردستان، العراق",
-    kur: "MapEstate - دۆزەرەوەی خانووبەرەی پاڵپشتیکراو بە AI | خانووبەرە لە کوردستان، عێراق",
+    en: "MapEstate - AI-Powered Real Estate Finder | Find Your Perfect Property",
+    ar: "MapEstate - محرك البحث العقاري المدعوم بالذكاء الاصطناعي | اعثر على عقارك المثالي",
+    kur: "MapEstate - دۆزەرەوەی خانووبەرەی پاڵپشتیکراو بە AI | خانووبەرەی تەواوت بدۆزەرەوە",
   },
   "seo.homeDescription": {
-    en: "Find your perfect home with AI-powered recommendations. Discover properties for rent and sale in Kurdistan, Iraq with intelligent search and expert agents.",
-    ar: "اعثر على منزلك المثالي مع التوصيات المدعومة بالذكاء الاصطناعي. اكتشف العقارات للإيجار والبيع في كردستان، العراق مع البحث الذكي والوكلاء الخبراء.",
-    kur: "ماڵی تەواوی خۆت بدۆزەرەوە لەگەڵ پێشنیارەکانی پاڵپشتیکراو بە AI. خانووبەرەکان بۆ کرێ و فرۆشتن لە کوردستان، عێراق بدۆزەرەوە لەگەڵ گەڕانی زیرەک و بریکارە شارەزاکان.",
+    en: "Find your perfect home with AI-powered recommendations. Discover properties for rent and sale worldwide with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters.",
+    ar: "اعثر على منزلك المثالي مع التوصيات المدعومة بالذكاء الاصطناعي. اكتشف العقارات للإيجار والبيع في جميع أنحاء العالم مع البحث الذكي والخرائط التفصيلية والوكلاء الخبراء.",
+    kur: "ماڵی تەواوی خۆت بدۆزەرەوە لەگەڵ پێشنیارەکانی پاڵپشتیکراو بە AI. خانووبەرەکان بۆ کرێ و فرۆشتن لە سەرانسەری جیهان بدۆزەرەوە لەگەڵ گەڕانی زیرەک و نەخشەی ورد و بریکارە شارەزاکان.",
   },
   "seo.propertiesTitle": {
-    en: "Properties for Sale and Rent in Kurdistan, Iraq | MapEstate",
-    ar: "عقارات للبيع والإيجار في كردستان، العراق | MapEstate",
-    kur: "خانووبەرە بۆ فرۆشتن و کرێ لە کوردستان، عێراق | MapEstate",
+    en: "Properties for Sale and Rent Worldwide | MapEstate",
+    ar: "عقارات للبيع والإيجار في جميع أنحاء العالم | MapEstate",
+    kur: "خانووبەرە بۆ فرۆشتن و کرێ لە سەرانسەری جیهان | MapEstate",
   },
   "seo.propertiesDescription": {
-    en: "Browse thousands of properties for sale and rent. Find apartments, houses, villas, and land in Kurdistan, Iraq with advanced search and AI recommendations.",
-    ar: "تصفح آلاف العقارات للبيع والإيجار. ابحث عن شقق ومنازل وفيلات وأراضي في كردستان، العراق مع البحث المتقدم والتوصيات الذكية.",
-    kur: "هەزاران خانووبەرە بۆ فرۆشتن و کرێ بگەڕێ. شوقە، ماڵ، ڤیلا و زەوی لە کوردستان، عێراق بدۆزەرەوە لەگەڵ گەڕانی پێشکەوتوو و پێشنیاری AI.",
+    en: "Browse thousands of properties for sale and rent worldwide. Find apartments, houses, villas, and land with advanced search, AI recommendations, and detailed property information.",
+    ar: "تصفح آلاف العقارات للبيع والإيجار في جميع أنحاء العالم. ابحث عن شقق ومنازل وفيلات وأراضي مع البحث المتقدم والتوصيات الذكية والمعلومات التفصيلية عن العقارات.",
+    kur: "هەزاران خانووبەرە بۆ فرۆشتن و کرێ لە سەرانسەری جیهان بگەڕێ. شوقە، ماڵ، ڤیلا و زەوی بدۆزەرەوە لەگەڵ گەڕانی پێشکەوتوو، پێشنیاری AI و زانیاری ورد لەسەر خانووبەرەکان.",
   },
   "seo.propertyDetailTitle": {
-    en: "{propertyType} for {listingType} - {price} | {city}, Iraq | MapEstate",
-    ar: "{propertyType} لل{listingType} - {price} | {city}، العراق | MapEstate",
-    kur: "{propertyType} بۆ {listingType} - {price} | {city}، عێراق | MapEstate",
+    en: "{propertyType} for {listingType} - {price} | {city} | MapEstate",
+    ar: "{propertyType} لل{listingType} - {price} | {city} | MapEstate",
+    kur: "{propertyType} بۆ {listingType} - {price} | {city} | MapEstate",
   },
   "seo.propertyDetailDescription": {
     en: "{bedrooms} bedroom {propertyType} for {listingType} in {city}. {description} Contact our expert agents for viewing and details.",
@@ -36,9 +36,9 @@ const translations: { [key: string]: { en: string; ar: string; kur: string } } =
     kur: "{propertyType}ی {bedrooms} ژووری نوستن بۆ {listingType} لە {city}. {description} پەیوەندی بە بریکارە شارەزاکانمانەوە بکە بۆ بینین و وردەکاری.",
   },
   "seo.keywords": {
-    en: "real estate, Kurdistan, Iraq, properties for sale, properties for rent, apartments, houses, villas, land, AI search, Erbil, Sulaymaniyah, Dohuk",
-    ar: "عقارات، كردستان، العراق، عقارات للبيع، عقارات للإيجار، شقق، منازل، فيلات، أراضي، بحث ذكي، أربيل، السليمانية، دهوك",
-    kur: "خانووبەرە، کوردستان، عێراق، خانووبەرە بۆ فرۆشتن، خانووبەرە بۆ کرێ، شوقە، ماڵ، ڤیلا، زەوی، گەڕانی AI، هەولێر، سلێمانی، دهۆک",
+    en: "real estate, properties for sale, properties for rent, apartments, houses, villas, land, AI search, property finder, real estate platform, buy property, rent property, property search, home finder",
+    ar: "عقارات، عقارات للبيع، عقارات للإيجار، شقق، منازل، فيلات، أراضي، بحث ذكي، محرك بحث عقاري، منصة عقارية، شراء عقار، استئجار عقار",
+    kur: "خانووبەرە، خانووبەرە بۆ فرۆشتن، خانووبەرە بۆ کرێ، شوقە، ماڵ، ڤیلا، زەوی، گەڕانی AI، دۆزەرەوەی خانووبەرە، پلاتفۆرمی خانووبەرە، کڕینی خانووبەرە، کرێی خانووبەرە",
   },
   "seo.propertyType.apartment": {
     en: "Apartment",
@@ -76,19 +76,19 @@ const translations: { [key: string]: { en: string; ar: string; kur: string } } =
     kur: "خانووبەرە دڵخوازەکانم | MapEstate - ماڵی خەونەکانت پاشەکەوت بکە",
   },
   "seo.favoritesDescription": {
-    en: "View and manage your saved properties. Access your favorite real estate listings in Kurdistan, Iraq with MapEstate's AI-powered platform.",
-    ar: "عرض وإدارة العقارات المحفوظة الخاصة بك. الوصول إلى قوائم العقارات المفضلة لديك في كردستان، العراق مع منصة MapEstate المدعومة بالذكاء الاصطناعي.",
-    kur: "خانووبەرە پاشەکەوتکراوەکانت ببینە و بەڕێوەبەرە. دەستگەیشتن بە لیستی خانووبەرە دڵخوازەکانت لە کوردستان، عێراق لەگەڵ پلاتفۆرمی MapEstate پاڵپشتیکراو بە AI.",
+    en: "View and manage your saved properties. Access your favorite real estate listings worldwide with MapEstate's AI-powered platform.",
+    ar: "عرض وإدارة العقارات المحفوظة الخاصة بك. الوصول إلى قوائم العقارات المفضلة لديك في جميع أنحاء العالم مع منصة MapEstate المدعومة بالذكاء الاصطناعي.",
+    kur: "خانووبەرە پاشەکەوتکراوەکانت ببینە و بەڕێوەبەرە. دەستگەیشتن بە لیستی خانووبەرە دڵخوازەکانت لە سەرانسەری جیهان لەگەڵ پلاتفۆرمی MapEstate پاڵپشتیکراو بە AI.",
   },
   "seo.aboutTitle": {
-    en: "About MapEstate | AI-Powered Real Estate Platform in Kurdistan",
-    ar: "عن MapEstate | منصة عقارية مدعومة بالذكاء الاصطناعي في كردستان",
-    kur: "دەربارەی MapEstate | پلاتفۆرمی خانووبەرەی پاڵپشتیکراو بە AI لە کوردستان",
+    en: "About MapEstate | AI-Powered Global Real Estate Platform",
+    ar: "عن MapEstate | منصة عقارية عالمية مدعومة بالذكاء الاصطناعي",
+    kur: "دەربارەی MapEstate | پلاتفۆرمی جیهانی خانووبەرەی پاڵپشتیکراو بە AI",
   },
   "seo.aboutDescription": {
-    en: "Learn about MapEstate - your trusted AI-powered real estate platform. Discover our mission to transform property search in Kurdistan, Iraq with innovative technology and expert service.",
-    ar: "تعرف على MapEstate - منصتك العقارية الموثوقة المدعومة بالذكاء الاصطناعي. اكتشف مهمتنا لتحويل البحث عن العقارات في كردستان، العراق بالتكنولوجيا المبتكرة والخدمة الخبيرة.",
-    kur: "زانیاری دەربارەی MapEstate - پلاتفۆرمی خانووبەرەی متمانەپێکراوی پاڵپشتیکراو بە AI. ئامانجمان بدۆزەرەوە بۆ گۆڕینی گەڕانی خانووبەرە لە کوردستان، عێراق لەگەڵ تەکنەلۆژیای نوێ و خزمەتگوزاری شارەزا.",
+    en: "Learn about MapEstate - your trusted AI-powered real estate platform. Discover our mission to transform property search worldwide with innovative technology, detailed maps, and expert service.",
+    ar: "تعرف على MapEstate - منصتك العقارية الموثوقة المدعومة بالذكاء الاصطناعي. اكتشف مهمتنا لتحويل البحث عن العقارات في جميع أنحاء العالم بالتكنولوجيا المبتكرة والخرائط التفصيلية والخدمة الخبيرة.",
+    kur: "زانیاری دەربارەی MapEstate - پلاتفۆرمی خانووبەرەی متمانەپێکراوی پاڵپشتیکراو بە AI. ئامانجمان بدۆزەرەوە بۆ گۆڕینی گەڕانی خانووبەرە لە سەرانسەری جیهان لەگەڵ تەکنەلۆژیای نوێ، نەخشەی ورد و خزمەتگوزاری شارەزا.",
   },
   "seo.settingsTitle": {
     en: "Account Settings | Customize Your MapEstate Experience",
@@ -96,9 +96,9 @@ const translations: { [key: string]: { en: string; ar: string; kur: string } } =
     kur: "ڕێکخستنەکانی ئەکاونت | ئەزموونی MapEstate خۆت کەسیکەرەوە",
   },
   "seo.settingsDescription": {
-    en: "Manage your MapEstate account settings. Customize language, currency, notifications, and display preferences for the best property search experience in Kurdistan, Iraq.",
-    ar: "إدارة إعدادات حساب MapEstate الخاص بك. تخصيص اللغة والعملة والإشعارات وتفضيلات العرض للحصول على أفضل تجربة بحث عن العقارات في كردستان، العراق.",
-    kur: "ڕێکخستنەکانی ئەکاونتی MapEstate خۆت بەڕێوەبەرە. زمان، دراو، ئاگادارکردنەوەکان، و هەڵبژاردنەکانی پیشاندان کەسیکەرەوە بۆ باشترین ئەزموونی گەڕانی خانووبەرە لە کوردستان، عێراق.",
+    en: "Manage your MapEstate account settings. Customize language, currency, notifications, and display preferences for the best property search experience.",
+    ar: "إدارة إعدادات حساب MapEstate الخاص بك. تخصيص اللغة والعملة والإشعارات وتفضيلات العرض للحصول على أفضل تجربة بحث عن العقارات.",
+    kur: "ڕێکخستنەکانی ئەکاونتی MapEstate خۆت بەڕێوەبەرە. زمان، دراو، ئاگادارکردنەوەکان، و هەڵبژاردنەکانی پیشاندان کەسیکەرەوە بۆ باشترین ئەزموونی گەڕانی خانووبەرە.",
   }
 };
 
@@ -405,7 +405,7 @@ function generateCombinedStructuredData(
       "height": 250
     },
     "image": `${baseUrl}/uploads/properties/1759082074149-xrejrtvx6.jpg`,
-    "description": "AI-Powered Real Estate Platform for Kurdistan and Iraq",
+    "description": "AI-Powered Global Real Estate Platform - Find Your Perfect Property Worldwide",
     "slogan": "Find Your Perfect Home with AI",
     "foundingDate": "2024",
     "numberOfEmployees": {
@@ -413,62 +413,21 @@ function generateCombinedStructuredData(
       "minValue": 10,
       "maxValue": 50
     },
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "Iraq",
-      "addressRegion": "Kurdistan",
-      "addressLocality": "Erbil"
-    },
-    "location": {
-      "@type": "Place",
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 36.1911,
-        "longitude": 44.0093
-      }
-    },
     "contactPoint": [
       {
         "@type": "ContactPoint",
         "contactType": "customer service",
         "availableLanguage": ["English", "Arabic", "Kurdish"],
-        "serviceArea": {
-          "@type": "AdministrativeArea",
-          "name": "Kurdistan Region"
-        }
+        "areaServed": "Worldwide"
       },
       {
         "@type": "ContactPoint",
         "contactType": "sales",
-        "availableLanguage": ["English", "Arabic", "Kurdish"]
+        "availableLanguage": ["English", "Arabic", "Kurdish"],
+        "areaServed": "Worldwide"
       }
     ],
-    "areaServed": [
-      {
-        "@type": "City",
-        "name": "Erbil",
-        "containedInPlace": {
-          "@type": "AdministrativeArea",
-          "name": "Kurdistan Region"
-        }
-      },
-      {
-        "@type": "City",
-        "name": "Sulaymaniyah",
-        "containedInPlace": {
-          "@type": "AdministrativeArea",
-          "name": "Kurdistan Region"
-        }
-      },
-      {
-        "@type": "City",
-        "name": "Dohuk",
-        "containedInPlace": {
-          "@type": "AdministrativeArea",
-          "name": "Kurdistan Region"
-        }
-      }
-    ],
+    "areaServed": "Worldwide",
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Real Estate Listings",
@@ -609,7 +568,7 @@ function generateCombinedStructuredData(
           "name": "What areas does MapEstate cover?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MapEstate covers properties across Kurdistan Region of Iraq, including Erbil, Sulaymaniyah, and Dohuk."
+            "text": "MapEstate is a global real estate platform that helps you find properties worldwide. Our AI-powered search makes it easy to discover your perfect property anywhere in the world."
           }
         },
         {
@@ -617,7 +576,7 @@ function generateCombinedStructuredData(
           "name": "How does AI-powered search work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Our AI analyzes your search criteria and preferences to recommend properties that best match your needs, considering factors like location, budget, and lifestyle requirements."
+            "text": "Our AI analyzes your search criteria and preferences to recommend properties that best match your needs, considering factors like location, budget, lifestyle requirements, and property features to provide personalized recommendations."
           }
         },
         {
@@ -625,7 +584,7 @@ function generateCombinedStructuredData(
           "name": "What languages does MapEstate support?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MapEstate supports English, Arabic, and Kurdish languages to serve the diverse community in Kurdistan and Iraq."
+            "text": "MapEstate supports English, Arabic, and Kurdish languages to serve a global community of property seekers and investors worldwide."
           }
         }
       ]
