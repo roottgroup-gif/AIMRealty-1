@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Shield, Lock } from 'lucide-react';
+import { SEOHead } from '@/components/SEOHead';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -93,6 +94,11 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 p-4">
+      <SEOHead
+        title="Admin Login | MapEstate"
+        description="Sign in to access the MapEstate admin dashboard. Manage properties, users, and platform settings."
+        robots="noindex, nofollow"
+      />
       <div className="w-full max-w-md">
         <Card className="border-0 bg-white/90 dark:bg-orange-800/90 backdrop-blur-sm">
           <CardHeader className="space-y-4 pb-6">
