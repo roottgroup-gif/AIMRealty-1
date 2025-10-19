@@ -665,7 +665,7 @@ export default function PropertyMap({
             maxZoom: maxZoom, // Prevent excessive zoom in
             zoomSnap: 0.5, // Allow half-zoom levels for smoother experience
             zoomDelta: 0.5, // Smoother zoom steps
-          }).setView([36.1911, 44.0093], 13);
+          }).setView([36.1911, 44.0093], 4);
 
           // Add OpenStreetMap tiles
           L.tileLayer(
