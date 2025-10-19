@@ -277,6 +277,29 @@ interface SEOProps {
   robots?: 'index,follow' | 'noindex,follow' | 'index,nofollow' | 'noindex,nofollow' | string;
 }
 
+// Helper function to convert relative URLs to absolute URLs
+function makeAbsoluteUrl(url: string | undefined | null): string {
+  // Handle undefined, null, or empty strings
+  if (!url || typeof url !== 'string') {
+    // Return default image as absolute URL
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/uploads/properties/1759082074149-xrejrtvx6.jpg`;
+  }
+  
+  // If already absolute URL, return as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // Convert relative URL to absolute using current origin
+  const baseUrl = window.location.origin;
+  
+  // Ensure URL starts with /
+  const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+  
+  return `${baseUrl}${normalizedUrl}`;
+}
+
 function generateCanonicalUrl(location: string, language: Language): string {
   const baseUrl = window.location.origin;
   
@@ -656,17 +679,21 @@ export function SEOHead({
     updateMetaTag('name', 'description', dynamicDescription);
     updateMetaTag('name', 'keywords', dynamicKeywords);
     
+    // Convert image URL to absolute URL for social media
+    const absoluteOgImage = makeAbsoluteUrl(ogImage);
+    const secureOgImage = absoluteOgImage.replace('http://', 'https://');
+    
     // Comprehensive Open Graph tags for Facebook, LinkedIn, and general sharing
     updateMetaTag('property', 'og:title', dynamicTitle);
     updateMetaTag('property', 'og:description', dynamicDescription);
-    updateMetaTag('property', 'og:image', ogImage);
-    updateMetaTag('property', 'og:image:secure_url', ogImage && typeof ogImage === 'string' ? ogImage.replace('http://', 'https://') : ogImage);
+    updateMetaTag('property', 'og:image', absoluteOgImage);
+    updateMetaTag('property', 'og:image:secure_url', secureOgImage);
     updateMetaTag('property', 'og:image:width', '1200');
     updateMetaTag('property', 'og:image:height', '630');
     updateMetaTag('property', 'og:image:alt', dynamicTitle);
     // Derive image type from file extension instead of hardcoding
-    const imageType = (typeof ogImage === 'string' && ogImage.includes('.png')) ? 'image/png' : 
-                      (typeof ogImage === 'string' && (ogImage.includes('.jpg') || ogImage.includes('.jpeg'))) ? 'image/jpeg' : 'image/png';
+    const imageType = (typeof absoluteOgImage === 'string' && absoluteOgImage.includes('.png')) ? 'image/png' : 
+                      (typeof absoluteOgImage === 'string' && (absoluteOgImage.includes('.jpg') || absoluteOgImage.includes('.jpeg'))) ? 'image/jpeg' : 'image/png';
     updateMetaTag('property', 'og:image:type', imageType);
     
     const properCanonicalUrl = canonicalUrl || generateCanonicalUrl(location, currentLanguage);
@@ -693,7 +720,7 @@ export function SEOHead({
     updateMetaTag('name', 'twitter:url', properCanonicalUrl);
     updateMetaTag('name', 'twitter:title', dynamicTitle);
     updateMetaTag('name', 'twitter:description', dynamicDescription);
-    updateMetaTag('name', 'twitter:image', ogImage);
+    updateMetaTag('name', 'twitter:image', absoluteOgImage);
     updateMetaTag('name', 'twitter:image:alt', dynamicTitle);
     updateMetaTag('name', 'twitter:site', '@MapEstate');
     updateMetaTag('name', 'twitter:creator', '@MapEstate');
@@ -738,7 +765,7 @@ export function SEOHead({
     updateMetaTag('name', 'pinterest-rich-pin', 'true');
     updateMetaTag('name', 'pinterest:title', dynamicTitle);
     updateMetaTag('name', 'pinterest:description', dynamicDescription);
-    updateMetaTag('name', 'pinterest:image', ogImage);
+    updateMetaTag('name', 'pinterest:image', absoluteOgImage);
     
     // Enhanced social sharing for Arabic and Kurdish content
     if (currentLanguage === 'ar' || currentLanguage === 'kur') {
@@ -758,10 +785,10 @@ export function SEOHead({
       // WhatsApp and Telegram optimization (popular in Middle East)
       updateMetaTag('property', 'whatsapp:title', dynamicTitle);
       updateMetaTag('property', 'whatsapp:description', dynamicDescription);
-      updateMetaTag('property', 'whatsapp:image', ogImage);
+      updateMetaTag('property', 'whatsapp:image', absoluteOgImage);
       updateMetaTag('property', 'telegram:title', dynamicTitle);
       updateMetaTag('property', 'telegram:description', dynamicDescription);
-      updateMetaTag('property', 'telegram:image', ogImage);
+      updateMetaTag('property', 'telegram:image', absoluteOgImage);
     }
     
     // WhatsApp uses Open Graph tags, ensure mobile compatibility
