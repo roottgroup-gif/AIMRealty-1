@@ -1,0 +1,1002 @@
+root@srv1027249:~# history
+  309  pm2 restart mapestate-app
+  310  pm2 logs mapestate-app --lines 15
+  311  # Install Nginx
+  312  apt update
+  313  apt install nginx -y
+  314  # Create Nginx configuration for your domain
+  315  cat > /etc/nginx/sites-available/dailynewscrypto.net << 'EOF'
+  316  server {
+  317      listen 80;
+  318      listen [::]:80;
+  319      server_name dailynewscrypto.net www.dailynewscrypto.net;
+  320      # Security headers
+  321      add_header X-Frame-Options "SAMEORIGIN" always;
+  322      add_header X-Content-Type-Options "nosniff" always;
+  323      add_header X-XSS-Protection "1; mode=block" always;
+  324      # Proxy to Node.js app
+  325      location / {
+  326          proxy_pass http://localhost:5000;
+  327          proxy_http_version 1.1;
+  328          proxy_set_header Upgrade $http_upgrade;
+  329          proxy_set_header Connection 'upgrade';
+  330          proxy_set_header Host $host;
+  331          proxy_set_header X-Real-IP $remote_addr;
+  332          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  333          proxy_set_header X-Forwarded-Proto $scheme;
+  334          proxy_cache_bypass $http_upgrade;
+  335      }
+  336      # SSE endpoint configuration
+  337      location /api/properties/stream {
+  338          proxy_pass http://localhost:5000;
+  339          proxy_http_version 1.1;
+  340          proxy_set_header Connection '';
+  341          proxy_set_header Host $host;
+  342          proxy_set_header X-Real-IP $remote_addr;
+  343          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  344          proxy_set_header X-Forwarded-Proto $scheme;
+  345          proxy_buffering off;
+  346          proxy_cache off;
+  347          chunked_transfer_encoding on;
+  348      }
+  349  }
+  350  EOF
+  351  # Enable the site
+  352  ln -sf /etc/nginx/sites-available/dailynewscrypto.net /etc/nginx/sites-enabled/
+  353  # Remove default site
+  354  rm -f /etc/nginx/sites-enabled/default
+  355  # Test Nginx configuration
+  356  nginx -t
+  357  # Restart Nginx
+  358  systemctl restart nginx
+  359  systemctl enable nginx
+  360  # Allow HTTP and HTTPS
+  361  ufw allow 80/tcp
+  362  ufw allow 443/tcp
+  363  ufw status
+  364  dailynewscrypto.net → 72.60.134.44
+  365  www.dailynewscrypto.net → 72.60.134.44
+  366  # Install Certbot for Nginx
+  367  apt install certbot python3-certbot-nginx -y
+  368  # Get and install SSL certificate
+  369  certbot --nginx -d dailynewscrypto.net -d www.dailynewscrypto.net
+  370  # Follow the prompts:
+  371  # 1. Enter your email address
+  372  # 2. Agree to terms of service (Y)
+  373  # 3. Choose whether to share email (Y or N)
+  374  # 4. Certbot will automatically configure HTTPS
+  375  # Set up auto-renewal
+  376  systemctl enable certbot.timer
+  377  systemctl start certbot.timer
+  378  # Test auto-renewal
+  379  certbot renew --dry-run
+  380  # Connect to MySQL
+  381  mysql -u mapestate -p'Mapestate123!' mapestate
+  382  cd /root/dailynewscrypto.net
+  383  nano ecosystem.config.cjs
+  384  mkdir -p /root/dailynewscrypto.net/server/uploads/{avatar,customer,properties}
+  385  chmod -R 755 /root/dailynewscrypto.net/server/uploads
+  386  nano /etc/nginx/sites-available/dailynewscrypto.net
+  387  # Test Nginx config
+  388  nginx -t
+  389  # Reload Nginx
+  390  systemctl reload nginx
+  391  # Restart PM2 with new config
+  392  pm2 delete mapestate
+  393  pm2 start ecosystem.config.cjs
+  394  pm2 save
+  395  # Check PM2 environment variables
+  396  pm2 env 0
+  397  # Check if uploads directory has files
+  398  ls -la /root/dailynewscrypto.net/server/uploads/properties/
+  399  # Test image access (replace with actual filename)
+  400  curl -I https://dailynewscrypto.net/uploads/properties/your-image.jpg
+  401  ls
+  402  cd server
+  403  ls
+  404  cd uploads
+  405  ls
+  406  properties
+  407  cd properties
+  408  ls
+  409  sudo systemctl status mysql
+  410  sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+  411  sudo mysql -u root -p
+  412  sudo ufw allow 3306/tcp
+  413  sudo ufw status
+  414  sudo systemctl restart mysql
+  415  sudo ss -tlnp | grep 3306
+  416  celar
+  417  clear
+  418  ls
+  419  cd dailynewscrypto.net
+  420  ls
+  421  cd ~/dailynewscrypto.net
+  422  # Stop the running application
+  423  pm2 stop all
+  424  # Pull latest changes from GitHub
+  425  git pull origin main
+  426  # Install any new dependencies
+  427  npm install
+  428  # Build the project
+  429  npm run build
+  430  # Restart the application
+  431  pm2 restart all
+  432  # Save PM2 configuration
+  433  pm2 save
+  434  # Create a tarball of your project (excluding node_modules)
+  435  tar -czf project-update.tar.gz   --exclude=node_modules   --exclude=dist   --exclude=.git   client server shared package.json package-lock.json   tsconfig.json vite.config.ts tailwind.config.ts   postcss.config.js drizzle.config.ts components.json
+  436  cd ~/dailynewscrypto.net
+  437  # Stop the application
+  438  pm2 stop all
+  439  # Backup current version
+  440  tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz .
+  441  # Upload the new files (use scp or transfer method)
+  442  # Then extract:
+  443  tar -xzf project-update.tar.gz
+  444  # Install dependencies
+  445  npm install
+  446  # Build the project
+  447  npm run build
+  448  # Restart
+  449  pm2 restart all
+  450  pm2 save
+  451  # From your local machine or Replit
+  452  scp -r server/ root@72.60.134.44:~/dailynewscrypto.net/
+  453  scp -r client/ root@72.60.134.44:~/dailynewscrypto.net/
+  454  scp -r shared/ root@72.60.134.44:~/dailynewscrypto.net/
+  455  cd ~/dailynewscrypto.net
+  456  pm2 restart all
+  457  # Check PM2 status
+  458  pm2 status
+  459  # View logs
+  460  pm2 logs
+  461  # Check if the server is responding
+  462  curl http://localhost:5000
+  463  celar
+  464  clear
+  465  # Check PM2 status
+  466  pm2 status
+  467  # View logs
+  468  pm2 logs
+  469  # Check if the server is responding
+  470  curl http://localhost:5000
+  471  cd ~/dailynewscrypto.net
+  472  # 1. Stop applications
+  473  pm2 stop all
+  474  # 2. Pull latest changes from GitHub
+  475  git pull origin main
+  476  # Or if your branch is different:
+  477  # git pull origin master
+  478  # 3. Install any new dependencies
+  479  npm install
+  480  # 4. Rebuild the application
+  481  npm run build
+  482  # 5. Restart applications
+  483  pm2 restart all
+  484  # 6. Check status
+  485  pm2 status
+  486  # 7. View logs to confirm everything is working
+  487  pm2 logs --lines 20
+  488  git fetch origin
+  489  git reset --hard origin/main
+  490  npm install
+  491  npm run build
+  492  pm2 restart all
+  493  # Connect to MySQL
+  494  mysql -u mapestate -p
+  495  # Enter password: Mapestate123!
+  496  mysql -u mapestate -p
+  497  cd ~/dailynewscrypto.net
+  498  # Push the schema changes to MySQL
+  499  npm run db:push
+  500  npm run db:push -- --force
+  501  mysql -u mapestate -p
+  502  cd ~/dailynewscrypto.net
+  503  # 1. Remove the conflicting file
+  504  rm mapestate-database.sql
+  505  # 2. Pull the latest code
+  506  git pull origin main
+  507  # 3. Update the database schema to match the code
+  508  npm run db:push
+  509  # If it warns about data loss, force it:
+  510  # npm run db:push -- --force
+  511  # 4. Rebuild the application
+  512  npm run build
+  513  # 5. Restart PM2
+  514  pm2 restart all
+  515  # 6. Check the logs
+  516  pm2 logs --lines 30
+  517  ls
+  518  cd dailynewscrypto.net
+  519  ls
+  520  cd server
+  521  ls
+  522  cd uploads
+  523  ls
+  524  cd properties
+  525  ls
+  526  cd ~
+  527  ls
+  528  dailynewscrypto.net
+  529  ls
+  530  cd dailynewscrypto.net
+  531  # Pull and merge any changes from GitHub first
+  532  git pull origin main --no-rebase
+  533  # Then push your changes
+  534  git push origin main
+  535  pm2 list
+  536  cd ~/dailynewscrypto.net
+  537  npm run build
+  538  pm2 restart all
+  539  # or
+  540  pm2 start ecosystem.config.js
+  541  cd ~/dailynewscrypto.net
+  542  npm run build
+  543  pm2 restart all
+  544  # or
+  545  pm2 start ecosystem.config.js
+  546  UPLOADS_PATH=/var/www/shared/uploads
+  547  IMAGE_BASE_URL=https://dailynewscrypto.net
+  548  PORT=3000
+  549  mkdir -p /var/www/shared/uploads/properties
+  550  mkdir -p /var/www/shared/uploads/avatar
+  551  mkdir -p /var/www/shared/uploads/customer
+  552  chmod -R 755 /var/www/shared/uploads
+  553  chown -R www-data:www-data /var/www/shared/uploads
+  554  nano /etc/nginx/sites-available/dailynewscrypto.net
+  555  nginx -t
+  556  systemctl reload nginx
+  557  pm2 restart all
+  558  pm2 logs
+  559  ls
+  560  cd dailynewscrypto.net
+  561  git init
+  562  git remote add origin https://github.com/roottgroup-gif/AIMRealty-1.git
+  563  git pull origin main
+  564  git pull origin main --allow-unrelated-histories
+  565  ls
+  566  cd dailynewscrypto.net
+  567  git status
+  568  git add . 
+  569  git commit -m "Save work before update"
+  570  git pull origin main
+  571  pm2 restart ecosystem.config.cjs
+  572  # or
+  573  pm2 restart all
+  574  git pull origin main
+  575  cd ..
+  576  cd ~/dailynewscrypto.net
+  577  git fetch --all
+  578  git reset --hard origin/main
+  579  npm install
+  580  pm2 restart all
+  581  git status
+  582  git add . 
+  583  git commit -m "Save work before update"
+  584  ls
+  585  git fetch --all
+  586  git reset --hard origin/main
+  587  git fetch --all
+  588  git reset --hard origin/main
+  589  npm install --production
+  590  pm2 restart all
+  591  git clone https://github.com/roottgroup-gif/AIMRealty-1.git
+  592  ls
+  593  -rm AIMRealty-1  
+  594  clear
+  595  ls
+  596  rm -rf AIMRealty-1
+  597  ls
+  598  git init
+  599  git remote add origin https://github.com/roottgroup-gif/AIMRealty-1.git
+  600  # Or if remote exists, update it
+  601  git remote set-url origin https://github.com/roottgroup-gif/AIMRealty-1.git
+  602  git init
+  603  git remote add origin https://github.com/roottgroup-gif/AIMRealty-1.git
+  604  clear
+  605  git init
+  606  git remote add origin https://github.com/roottgroup-gif/AIMRealty-1.git
+  607  git remote set-url origin https://github.com/roottgroup-gif/AIMRealty-1.git
+  608  cat > ~/dailynewscrypto.net/deploy.sh << 'EOF'
+  609  #!/bin/bash
+  610  echo "🚀 Starting deployment..."
+  611  # Backup database
+  612  echo "📦 Backing up database..."
+  613  mysqldump -u mapestate -p'Mapestate123!' -h 72.60.134.44 mapestate > backup-$(date +%Y%m%d-%H%M%S).sql
+  614  # Backup .env file
+  615  echo "📄 Backing up .env..."
+  616  cp .env .env.backup-$(date +%Y%m%d-%H%M%S)
+  617  # Pull latest code
+  618  echo "⬇️ Pulling latest code from GitHub..."
+  619  git fetch origin main
+  620  git reset --hard origin/main
+  621  # Install dependencies
+  622  echo "📦 Installing dependencies..."
+  623  npm ci
+  624  # Build the application
+  625  echo "🔨 Building application..."
+  626  npm run build
+  627  # Restart the application (using PM2)
+  628  echo "🔄 Restarting application..."
+  629  pm2 restart all || npm run dev &
+  630  echo "✅ Deployment complete!"
+  631  EOF
+  632  # Make it executable
+  633  chmod +x deploy.sh
+  634  cat > ~/dailynewscrypto.net/deploy.sh << 'EOF'
+  635  #!/bin/bash
+  636  echo "🚀 Starting deployment..."
+  637  # Backup database
+  638  echo "📦 Backing up database..."
+  639  mysqldump -u mapestate -p'Mapestate123!' -h 72.60.134.44 mapestate > backup-$(date +%Y%m%d-%H%M%S).sql
+  640  # Backup .env file
+  641  echo "📄 Backing up .env..."
+  642  cp .env .env.backup-$(date +%Y%m%d-%H%M%S)
+  643  # Pull latest code
+  644  echo "⬇️ Pulling latest code from GitHub..."
+  645  git fetch origin main
+  646  git reset --hard origin/main
+  647  # Install dependencies
+  648  echo "📦 Installing dependencies..."
+  649  npm ci
+  650  # Build the application
+  651  echo "🔨 Building application..."
+  652  npm run build
+  653  # Restart the application (using PM2)
+  654  echo "🔄 Restarting application..."
+  655  pm2 restart all || npm run dev &
+  656  echo "✅ Deployment complete!"
+  657  EOF
+  658  # Make it executable
+  659  chmod +x deploy.sh
+  660  nano ~/.dailynewscrypto.net/.env
+  661  ls
+  662  npm install -g pm2
+  663  # Create PM2 ecosystem file
+  664  cat > ecosystem.config.js << 'EOF'
+  665  module.exports = {
+  666    apps: [{
+  667      name: 'mapestate',
+  668      script: 'npm',
+  669      args: 'run dev',
+  670      env: {
+  671        NODE_ENV: 'production'
+  672      },
+  673      instances: 1,
+  674      autorestart: true,
+  675      watch: false,
+  676      max_memory_restart: '1G',
+  677    }]
+  678  }
+  679  EOF
+  680  # Start with PM2
+  681  pm2 start ecosystem.config.js
+  682  pm2 save
+  683  pm2 startup
+  684  cd ~/dailynewscrypto.net
+  685  ./deploy.sh
+  686  ls
+  687  cd dailynewscrypto.net
+  688  ls
+  689  cd    server
+  690  ls
+  691  cd uploads
+  692  ls
+  693  cdproperties
+  694  cd properties
+  695  ls
+  696  cd dailynewscrypto.net
+  697  ls
+  698  cd ..
+  699  sudo apt update
+  700  sudo apt install nginx -y
+  701  sudo nano /etc/nginx/sites-available/mapestate.net
+  702  sudo ln -s /etc/nginx/sites-available/mapestate.net /etc/nginx/sites-enabled/
+  703  sudo rm -f /etc/nginx/sites-enabled/default
+  704  sudo nginx -t
+  705  sudo systemctl reload nginx
+  706  sudo apt install certbot python3-certbot-nginx -y
+  707  sudo certbot --nginx -d mapestate.net -d www.mapestate.net
+  708  sudo crontab -e
+  709  cd ~/dailynewscrypto.net
+  710  grep -r "dailynewscrypto.net" .
+  711  clea
+  712  clear
+  713  cd ..
+  714  ls
+  715  curl ifconfig.me
+  716  ls
+  717  clear
+  718  sudo apt update
+  719  sudo apt install certbot python3-certbot-nginx -y
+  720  sudo certbot --nginx -d mapestate.net -d www.mapestate.net
+  721  sudo nginx -t
+  722  sudo systemctl reload nginx
+  723  sudo cat /etc/nginx/sites-available/mapestate.net
+  724  sudo tail -n 30 /var/log/nginx/error.log
+  725  sudo nginx -t
+  726  sudo systemctl restart nginx
+  727  sudo systemctl restart php8.2-fpm
+  728  sudo tail -n 30 /var/log/nginx/error.log
+  729  sudo nginx -t
+  730  nginx: configuration file /etc/nginx/nginx.conf test is successful
+  731  sudo systemctl restart nginx
+  732  sudo systemctl restart php8.2-fpm
+  733  sudo cat /etc/nginx/sites-available/mapestate.net
+  734  sudo nginx -t
+  735  sudo systemctl reload nginx
+  736  root /root/dailynewscrypto.net/dist;
+  737  sudo mkdir -p /var/www/mapestate.net
+  738  sudo mv /root/dailynewscrypto.net/dist/* /var/www/mapestate.net/
+  739  sudo chown -R www-data:www-data /var/www/mapestate.net
+  740  sudo chmod -R 755 /var/www/mapestate.net
+  741  clear
+  742  npm run build
+  743  sudo nano /etc/nginx/sites-available/mapestate.net
+  744  root /root/dailynewscrypto.net/dist;
+  745  root /var/www/mapestate.net;
+  746  sudo nginx -t
+  747  sudo systemctl reload nginx
+  748  # Install PM2 globally
+  749  npm install -g pm2
+  750  # Create a .env file with your MySQL credentials on the VPS
+  751  cd /var/www/mapestate.net
+  752  nano .env
+  753  pm2 start server/index.js --name mapestate
+  754  pm2 save
+  755  pm2 startup
+  756  cpm2 start server/index.js --name mapestate
+  757  pm2 save
+  758  pm2 startup
+  759  clear
+  760  ls
+  761  cd ..
+  762  ls
+  763  # On your VPS
+  764  cd /var/www
+  765  git clone <your-repository-url> mapestate.net
+  766  cd mapestate.net
+  767  cd ..
+  768  ls
+  769  cd  mapestate.net 
+  770  cd /var/www
+  771  rm -rf mapestate.net  # Remove old files
+  772  git clone https://github.com/roottgroup-gif/AIMRealty-1 mapestate.net
+  773  cd mapestate.net
+  774  npm install
+  775  nano .env
+  776  npm run build
+  777  sudo nano /etc/nginx/sites-available/mapestate.net
+  778  sudo nginx -t
+  779  sudo systemctl reload nginx
+  780  # Stop any existing PM2 processes
+  781  pm2 delete all
+  782  # Start your app (it uses npm run dev which works with tsx)
+  783  pm2 start npm --name "mapestate" -- run dev
+  784  # Save PM2 configuration
+  785  pm2 save
+  786  # Check status
+  787  pm2 status
+  788  pm2 logs mapestate
+  789  sudo chown -R www-data:www-data /var/www/mapestate.net
+  790  sudo chmod -R 755 /var/www/mapestate.net
+  791  pm2 status
+  792  pm2 logs mapestate --lines 50
+  793  cd /var/www/mapestate.net
+  794  cat > ecosystem.config.js << 'EOF'
+  795  module.exports = {
+  796    apps: [{
+  797      name: 'mapestate',
+  798      script: 'npm',
+  799      args: 'run dev',
+  800      env: {
+  801        NODE_ENV: 'production',
+  802        MYSQL_HOST: '72.60.134.44',
+  803        MYSQL_USER: 'mapestate',
+  804        MYSQL_PASSWORD: 'Mapestate123!',
+  805        MYSQL_DATABASE: 'mapestate',
+  806        MYSQL_PORT: '3306'
+  807      }
+  808    }]
+  809  }
+  810  EOF
+  811  pm2 delete all
+  812  pm2 start ecosystem.config.js
+  813  pm2 save
+  814  pm2 status
+  815  pm2 logs mapestate --lines 30
+  816  npm install -g pm2-dotenv
+  817  pm2 delete all
+  818  pm2 start npm --name mapestate -- run dev --env .env
+  819  pm2 save
+  820  pm2 logs mapestate --lines 50
+  821  clar
+  822  clear
+  823  cd /var/www/mapestate.net
+  824  cat > ecosystem.config.js << 'EOF'
+  825  module.exports = {
+  826    apps: [{
+  827      name: 'mapestate',
+  828      script: 'npm',
+  829      args: 'run dev',
+  830      env: {
+  831        NODE_ENV: 'production',
+  832        MYSQL_HOST: '72.60.134.44',
+  833        MYSQL_USER: 'mapestate',
+  834        MYSQL_PASSWORD: 'Mapestate123!',
+  835        MYSQL_DATABASE: 'mapestate',
+  836        MYSQL_PORT: '3306'
+  837      }
+  838    }]
+  839  }
+  840  EOF
+  841  pm2 delete all
+  842  pm2 start ecosystem.config.js
+  843  pm2 save
+  844  pm2 status
+  845  pm2 logs mapestate --lines 30
+  846  pm2 logs mapestate --lines 50
+  847  [200~pm2 logs mapestate --lines 50~
+  848  clear
+  849  # Remove the old file and create the correct one
+  850  rm ecosystem.config.js
+  851  cat > ecosystem.config.cjs << 'EOF'
+  852  module.exports = {
+  853    apps: [{
+  854      name: 'mapestate',
+  855      script: 'npm',
+  856      args: 'run dev',
+  857      env: {
+  858        NODE_ENV: 'production',
+  859        MYSQL_HOST: '72.60.134.44',
+  860        MYSQL_USER: 'mapestate',
+  861        MYSQL_PASSWORD: 'Mapestate123!',
+  862        MYSQL_DATABASE: 'mapestate',
+  863        MYSQL_PORT: '3306'
+  864      }
+  865    }]
+  866  }
+  867  EOF
+  868  # Now start PM2 with the correct file
+  869  pm2 start ecosystem.config.cjs
+  870  pm2 save
+  871  pm2 status
+  872  pm2 logs mapestate --lines 30
+  873  clear
+  874  pm2 status
+  875  pm2 logs mapestate
+  876  pm2 restart mapestate
+  877  pm2 logs mapestate --lines 100
+  878  # Check nginx error logs
+  879  sudo tail -n 50 /var/log/nginx/error.log
+  880  # Also check the nginx configuration
+  881  sudo cat /etc/nginx/sites-available/mapestate.net
+  882  ls -la /var/www/mapestate.net/dist/
+  883  sudo cat /etc/nginx/sites-available/mapestate.net
+  884  clear
+  885  sudo cat /etc/nginx/sites-available/mapestate.net
+  886  sudo nano /etc/nginx/sites-available/mapestate.net
+  887  root /var/www/mapestate.net/dist/public;
+  888  proxy_pass http://localhost:5000;
+  889  sudo nginx -t
+  890  sudo systemctl reload nginx
+  891  clear
+  892  sudo nano /etc/nginx/sites-available/mapestate.net
+  893  sudo nginx -t
+  894  sudo systemctl reload nginx
+  895  sudo cat > /etc/nginx/sites-available/mapestate.net << 'EOF'
+  896  server {
+  897      server_name mapestate.net www.mapestate.net;
+  898      root /var/www/mapestate.net/dist/public;
+  899      index index.html;
+  900      # Security headers
+  901      add_header X-Frame-Options "SAMEORIGIN" always;
+  902      add_header X-XSS-Protection "1; mode=block" always;
+  903      add_header X-Content-Type-Options "nosniff" always;
+  904      # Gzip compression
+  905      gzip on;
+  906      gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+  907      location / {
+  908          try_files $uri $uri/ /index.html;
+  909      }
+  910      # API proxy
+  911      location /api/ {
+  912          proxy_pass http://localhost:5000;
+  913          proxy_http_version 1.1;
+  914          proxy_set_header Upgrade $http_upgrade;
+  915          proxy_set_header Connection 'upgrade';
+  916          proxy_set_header Host $host;
+  917          proxy_set_header X-Real-IP $remote_addr;
+  918          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  919          proxy_set_header X-Forwarded-Proto $scheme;
+  920          proxy_cache_bypass $http_upgrade;
+  921      }
+  922      listen 443 ssl;
+  923      ssl_certificate /etc/letsencrypt/live/mapestate.net/fullchain.pem;
+  924      ssl_certificate_key /etc/letsencrypt/live/mapestate.net/privkey.pem;
+  925      include /etc/letsencrypt/options-ssl-nginx.conf;
+  926      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+  927  }
+  928  server {
+  929      listen 80;
+  930      server_name mapestate.net www.mapestate.net;
+  931      return 301 https://$host$request_uri;
+  932  }
+  933  EOF
+  934  # Test and reload
+  935  sudo nginx -t
+  936  sudo systemctl reload nginx
+  937  # On your VPS, update nginx config to proxy /uploads requests too
+  938  sudo nano /etc/nginx/sites-available/mapestate.net
+  939  sudo nginx -t
+  940  sudo systemctl reload nginx
+  941  # On your VPS, update nginx config to proxy /uploads requests too
+  942  sudo nano /etc/nginx/sites-available/mapestate.net
+  943  sudo nginx -t
+  944  sudo systemctl reload nginx
+  945  # 1. Update package list
+  946  apt update
+  947  # 2. Upgrade all installed packages
+  948  apt upgrade -y
+  949  # 3. Handle any dependency changes
+  950  apt dist-upgrade -y
+  951  # 4. Remove unnecessary packages
+  952  apt autoremove -y
+  953  # 5. Clean up package cache
+  954  apt clean
+  955  apt update && apt upgrade -y && apt dist-upgrade -y && apt autoremove -y
+  956  reboot
+  957  # Check MySQL is running
+  958  systemctl status mysql
+  959  # 1. Update package list
+  960  apt update
+  961  # 2. Upgrade all installed packages
+  962  apt upgrade -y
+  963  # 3. Handle any dependency changes
+  964  apt dist-upgrade -y
+  965  # 4. Remove unnecessary packages
+  966  apt autoremove -y
+  967  # 5. Clean up package cache
+  968  apt clean
+  969  apt update && apt upgrade -y && apt dist-upgrade -y && apt autoremove -y
+  970  reboot
+  971  # Check MySQL is running
+  972  systemctl status mysql
+  973  # Check what was updated
+  974  cat /var/log/apt/history.log
+  975  clear
+  976  # Common locations:
+  977  ls /var/www/
+  978  ls /home/
+  979  ls /root/
+  980  # Or search for it:
+  981  find / -name "AIMRealty-1" 2>/dev/null
+  982  cd /var/www/mapestate.net
+  983  ls -la
+  984  ls -la server/uploads
+  985  cd /var/www/mapestate.net
+  986  cp -r server/uploads /tmp/uploads_backup_$(date +%Y%m%d)
+  987  git status
+  988  git stash
+  989  git pull origin main
+  990  ls -la server/uploads
+  991  cp -r /tmp/uploads_backup_* server/uploads/
+  992  npm install
+  993  npm run build
+  994  pm2 restart all
+  995  pm2 status
+  996  ls
+  997  cd client
+  998  ls
+  999  cd public
+ 1000  ls
+ 1001  cd ..
+ 1002  cd src
+ 1003  ls
+ 1004  cd ..
+ 1005  ls
+ 1006  cd dist
+ 1007  ls
+ 1008  cd public
+ 1009  ls
+ 1010  nano index.html
+ 1011  cd ..
+ 1012  ls
+ 1013  clear
+ 1014  ks
+ 1015  git
+ 1016  ls
+ 1017  cd /var/www/mapestate.net
+ 1018  # Backup uploads first
+ 1019  cp -r server/uploads /tmp/uploads_backup
+ 1020  # Pull latest code
+ 1021  git pull origin main
+ 1022  # Install any new packages
+ 1023  npm install
+ 1024  # Rebuild
+ 1025  npm run build
+ 1026  # Restart application
+ 1027  pm2 restart all
+ 1028  pm2 status
+ 1029  ls
+ 1030  cd dist
+ 1031  ls
+ 1032  cd public
+ 1033  ls
+ 1034  nano index.html  
+ 1035  cd ..
+ 1036  cd..
+ 1037  npm run build
+ 1038  ls
+ 1039  cd dist  
+ 1040  la
+ 1041  cd public
+ 1042  ls
+ 1043  nano index.html 
+ 1044  cd ,,
+ 1045  cd ..
+ 1046  clear
+ 1047  git add .
+ 1048  la
+ 1049  ls
+ 1050  cp -r server/uploads /tmp/uploads_backup_$(date +%Y%m%d_%H%M%S)
+ 1051  git status
+ 1052  git stash
+ 1053  git pull origin main
+ 1054  clear
+ 1055  git pull origin main
+ 1056  git config --global --add safe.directory /var/www/mapestate.net
+ 1057  git pull origin main
+ 1058  # Install dependencies
+ 1059  npm install
+ 1060  # Build the project
+ 1061  npm run build
+ 1062  # Restart application
+ 1063  pm2 restart all
+ 1064  # Check status
+ 1065  pm2 status
+ 1066  ls
+ 1067  cd dist
+ 1068  ls
+ 1069  cd public
+ 1070  nano index.html
+ 1071  rm dist
+ 1072  cd ,,
+ 1073  cd..
+ 1074  cd ..
+ 1075  rm dist
+ 1076  rm -rf dist
+ 1077  npm run build
+ 1078  cd dist
+ 1079  ls
+ 1080  cd public
+ 1081  nano index.html
+ 1082  cd ..
+ 1083  cd..
+ 1084  cd ..
+ 1085  clea
+ 1086  clear
+ 1087  cd /var/www/mapestate.net
+ 1088  # Backup uploads first
+ 1089  cp -r server/uploads /tmp/uploads_backup_now
+ 1090  # Configure git to use merge strategy
+ 1091  git config pull.rebase false
+ 1092  # Force pull from GitHub (this will overwrite local changes)
+ 1093  git reset --hard origin/main
+ 1094  git pull origin main
+ 1095  # Restore uploads if needed
+ 1096  ls -la server/uploads
+ 1097  # If uploads are missing, restore them:
+ 1098  cp -r /tmp/uploads_backup_now/* server/uploads/ 2>/dev/null || true
+ 1099  # Install dependencies
+ 1100  npm install
+ 1101  # Build project
+ 1102  npm run build
+ 1103  # Restart application
+ 1104  pm2 restart all
+ 1105  pm2 status
+ 1106  ;s
+ 1107  ls
+ 1108  cd dist
+ 1109  ls
+ 1110  cd public
+ 1111  ls
+ 1112  nano index.html
+ 1113  cd /var/www/mapestate.net
+ 1114  ls
+ 1115  ç
+ 1116  # 1. Navigate to your project
+ 1117  cd /var/www/mapestate.net
+ 1118  # 2. Backup your critical data first (IMPORTANT!)
+ 1119  cp -r server/uploads server/uploads.backup
+ 1120  mysqldump -u mapestate -p mapestate > backup-$(date +%Y%m%d-%H%M%S).sql
+ 1121  # 3. Make sure uploads and database are not tracked by git
+ 1122  echo "server/uploads/*" >> .gitignore
+ 1123  echo "*.sql" >> .gitignore
+ 1124  echo ".env" >> .gitignore
+ 1125  # 4. Tell Git to keep these files locally
+ 1126  git update-index --skip-worktree server/uploads/*
+ 1127  # 5. Stash any local changes
+ 1128  git stash push -m "Preserve local config"
+ 1129  # 6. Pull updates from GitHub
+ 1130  git pull origin main
+ 1131  # 7. Restore your backups if needed (only if they got overwritten)
+ 1132  # cp -r server/uploads.backup/* server/uploads/
+ 1133  # 8. Install dependencies if package.json changed
+ 1134  npm install
+ 1135  # 9. Rebuild the project
+ 1136  npm run build
+ 1137  # 10. Restart PM2 process
+ 1138  pm2 restart all
+ 1139  # or if using ecosystem.config.cjs:
+ 1140  pm2 restart ecosystem.config.cjs
+ 1141  cd /var/www/mapestate.net
+ 1142  lls
+ 1143  ls
+ 1144  cd dist
+ 1145  ls
+ 1146  cd public
+ 1147  ls
+ 1148  nano index.html
+ 1149  cd ..
+ 1150  cd..
+ 1151  cd ..
+ 1152  cd /var/www/mapestate.net
+ 1153  ./deploy.sh
+ 1154  #!/bin/bash
+ 1155  set -e
+ 1156  APP_DIR="/var/www/mapestate.net"
+ 1157  BACKUP_DIR="/var/backups/mapestate"
+ 1158  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+ 1159  echo "🚀 Starting deployment for MapEstate..."
+ 1160  # Create backup directory
+ 1161  mkdir -p "$BACKUP_DIR"
+ 1162  cd "$APP_DIR"
+ 1163  # 1. Backup uploads folder
+ 1164  echo "📦 Backing up uploads folder..."
+ 1165  cp -r server/uploads "$BACKUP_DIR/uploads-$TIMESTAMP"
+ 1166  # 2. Backup database
+ 1167  echo "💾 Backing up database..."
+ 1168  mysqldump -u mapestate -p mapestate > "$BACKUP_DIR/db-backup-$TIMESTAMP.sql"
+ 1169  #!/bin/bash
+ 1170  set -e
+ 1171  APP_DIR="/var/www/mapestate.net"
+ 1172  BACKUP_DIR="/var/backups/mapestate"
+ 1173  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+ 1174  echo "🚀 Starting deployment for MapEstate..."
+ 1175  # Create backup directory
+ 1176  mkdir -p "$BACKUP_DIR"
+ 1177  cd "$APP_DIR"
+ 1178  # 1. Backup uploads folder
+ 1179  echo "📦 Backing up uploads folder..."
+ 1180  cp -r server/uploads "$BACKUP_DIR/uploads-$TIMESTAMP"
+ 1181  # 2. Backup database
+ 1182  echo "💾 Backing up database..."
+ 1183  mysqldump -u mapestate -p mapestate > "$BACKUP_DIR/db-backup-$TIMESTAMP.sql"
+ 1184  # 3. Preserve .env file
+ 1185  echo "🔐 Backing up .env file..."
+ 1186  cp .env "$BACKUP_DIR/.env-$TIMESTAMP"
+ 1187  # 4. Stash local changes
+ 1188  echo "📥 Stashing local changes..."
+ 1189  git stash push -u -m "Deployment stash $TIMESTAMP"
+ 1190  # 5. Pull latest changes from GitHub
+ 1191  echo "⬇️  Pulling latest changes from GitHub..."
+ 1192  git pull origin main
+ 1193  # 6. Restore preserved files if they were overwritten
+ 1194  echo "♻️  Ensuring uploads and .env are preserved..."
+ 1195  if [ ! -d "server/uploads" ] || [ -z "$(ls -A server/uploads)" ]; then     echo "⚠️  Uploads missing, restoring from backup...";     cp -r "$BACKUP_DIR/uploads-$TIMESTAMP"/* server/uploads/; fi
+ 1196  if [ ! -f ".env" ]; then     echo "⚠️  .env missing, restoring from backup...";     cp "$BACKUP_DIR/.env-$TIMESTAMP" .env; fi
+ 1197  # 7. Install dependencies
+ 1198  echo "📚 Installing dependencies..."
+ 1199  npm install
+ 1200  # 8. Build the project
+ 1201  echo "🏗️  Building project..."
+ 1202  npm run build
+ 1203  # 9. Restart PM2
+ 1204  echo "♻️  Restarting application..."
+ 1205  pm2 restart all
+ 1206  echo "✅ Deployment complete!"
+ 1207  echo "📁 Backups stored in: $BACKUP_DIR"
+ 1208  # Keep only last 5 backups
+ 1209  echo "🧹 Cleaning old backups (keeping last 5)..."
+ 1210  cd "$BACKUP_DIR"
+ 1211  ls -t db-backup-*.sql | tail -n +6 | xargs -r rm
+ 1212  ls -td uploads-* | tail -n +6 | xargs -r rm -r
+ 1213  echo "🎉 All done!"
+ 1214  ls
+ 1215  cd /var/log/unattended-upgrades/unattended-upgrades.log
+ 1216  sudo nano /var/log/unattended-upgrades/unattended-upgrades.log
+ 1217  # Navigate to your old MapEstate directory
+ 1218  cd /root/dailynewscrypto.net
+ 1219  # Create a compressed archive of all property images
+ 1220  tar -czf property-images.tar.gz server/uploads/properties/
+ 1221  # Download the archive to your local computer using SCP
+ 1222  # Run this from your LOCAL computer (not VPS):
+ 1223  # scp root@72.60.134.44:/root/dailynewscrypto.net/property-images.tar.gz ~/Downloads/
+ 1224  cd ..
+ 1225  # Navigate to your old MapEstate directory
+ 1226  cd /root/dailynewscrypto.net
+ 1227  # Create a compressed archive of all property images
+ 1228  tar -czf property-images.tar.gz server/uploads/properties/
+ 1229  # Download the archive to your local computer using SCP
+ 1230  # Run this from your LOCAL computer (not VPS):
+ 1231  # scp root@72.60.134.44:/root/dailynewscrypto.net/property-images.tar.gz ~/Downloads/
+ 1232  cd ..
+ 1233  ls
+ 1234  cd /root/dailynewscrypto.net
+ 1235  tar -czf property-images.tar.gz server/uploads/properties/
+ 1236  ls
+ 1237  # Check if the old images directory exists
+ 1238  ls -lh /root/dailynewscrypto.net/server/uploads/properties/ | head -20
+ 1239  # Count total images
+ 1240  echo "Total images: $(ls -1 /root/dailynewscrypto.net/server/uploads/properties/ 2>/dev/null | wc -l)"
+ 1241  # Navigate to your old MapEstate directory
+ 1242  cd /root/dailynewscrypto.net
+ 1243  # Check if images exist
+ 1244  ls -lh server/uploads/properties/
+ 1245  # Create a compressed backup
+ 1246  tar -czf property-images-backup.tar.gz server/uploads/properties/
+ 1247  # Verify the backup was created
+ 1248  ls -lh property-images-backup.tar.gz
+ 1249  bash restore-images.sh property-images-backup.tar.gz
+ 1250  clear
+ 1251  ls
+ 1252  cd server
+ 1253  ls
+ 1254  cd uploads
+ 1255  ls
+ 1256  cd properties
+ 1257  ls
+ 1258  cd ~/dailynewscrypto.net
+ 1259  tar -xzf property-images-backup.tar.gz -C server/uploads/properties/
+ 1260  cd ~/dailynewscrypto.net
+ 1261  tar -xzf property-images.tar.gz -C server/uploads/properties/
+ 1262  tar -tzf property-images-backup.tar.gz
+ 1263  ls -la server/uploads/properties/
+ 1264  cd server
+ 1265  ls
+ 1266  cd server
+ 1267  cd uploads
+ 1268  ls
+ 1269  cd properties
+ 1270  la
+ 1271  cd server
+ 1272  ls
+ 1273  cd uploads
+ 1274  ls
+ 1275  cd properties
+ 1276  ls
+ 1277  cd..
+ 1278  ls
+ 1279  cd dailynewscrypto.net
+ 1280  ls
+ 1281  cd server
+ 1282  ls
+ 1283  cd uploads
+ 1284  ls
+ 1285  cd properties
+ 1286  ls
+ 1287  cd ..
+ 1288  cd .
+ 1289  cd ..
+ 1290  ls
+ 1291  cd ..
+ 1292  ls
+ 1293  clear
+ 1294  ls
+ 1295  cd ..
+ 1296  ls
+ 1297  cd /var/log
+ 1298  ls
+ 1299  cat /var/log/syslog
+ 1300  cd ..
+ 1301  cd .
+ 1302  cd ..
+ 1303  ls
+ 1304  clear
+ 1305  ls
+ 1306  clea
+ 1307  clear
+ 1308  history
+root@srv1027249:~# 
