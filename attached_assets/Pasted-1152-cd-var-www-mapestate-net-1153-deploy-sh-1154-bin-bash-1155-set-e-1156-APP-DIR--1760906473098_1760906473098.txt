@@ -1,0 +1,63 @@
+1152  cd /var/www/mapestate.net
+ 1153  ./deploy.sh
+ 1154  #!/bin/bash
+ 1155  set -e
+ 1156  APP_DIR="/var/www/mapestate.net"
+ 1157  BACKUP_DIR="/var/backups/mapestate"
+ 1158  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+ 1159  echo "🚀 Starting deployment for MapEstate..."
+ 1160  # Create backup directory
+ 1161  mkdir -p "$BACKUP_DIR"
+ 1162  cd "$APP_DIR"
+ 1163  # 1. Backup uploads folder
+ 1164  echo "📦 Backing up uploads folder..."
+ 1165  cp -r server/uploads "$BACKUP_DIR/uploads-$TIMESTAMP"
+ 1166  # 2. Backup database
+ 1167  echo "💾 Backing up database..."
+ 1168  mysqldump -u mapestate -p mapestate > "$BACKUP_DIR/db-backup-$TIMESTAMP.sql"
+ 1169  #!/bin/bash
+ 1170  set -e
+ 1171  APP_DIR="/var/www/mapestate.net"
+ 1172  BACKUP_DIR="/var/backups/mapestate"
+ 1173  TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+ 1174  echo "🚀 Starting deployment for MapEstate..."
+ 1175  # Create backup directory
+ 1176  mkdir -p "$BACKUP_DIR"
+ 1177  cd "$APP_DIR"
+ 1178  # 1. Backup uploads folder
+ 1179  echo "📦 Backing up uploads folder..."
+ 1180  cp -r server/uploads "$BACKUP_DIR/uploads-$TIMESTAMP"
+ 1181  # 2. Backup database
+ 1182  echo "💾 Backing up database..."
+ 1183  mysqldump -u mapestate -p mapestate > "$BACKUP_DIR/db-backup-$TIMESTAMP.sql"
+ 1184  # 3. Preserve .env file
+ 1185  echo "🔐 Backing up .env file..."
+ 1186  cp .env "$BACKUP_DIR/.env-$TIMESTAMP"
+ 1187  # 4. Stash local changes
+ 1188  echo "📥 Stashing local changes..."
+ 1189  git stash push -u -m "Deployment stash $TIMESTAMP"
+ 1190  # 5. Pull latest changes from GitHub
+ 1191  echo "⬇️  Pulling latest changes from GitHub..."
+ 1192  git pull origin main
+ 1193  # 6. Restore preserved files if they were overwritten
+ 1194  echo "♻️  Ensuring uploads and .env are preserved..."
+ 1195  if [ ! -d "server/uploads" ] || [ -z "$(ls -A server/uploads)" ]; then     echo "⚠️  Uploads missing, restoring from backup...";     cp -r "$BACKUP_DIR/uploads-$TIMESTAMP"/* server/uploads/; fi
+ 1196  if [ ! -f ".env" ]; then     echo "⚠️  .env missing, restoring from backup...";     cp "$BACKUP_DIR/.env-$TIMESTAMP" .env; fi
+ 1197  # 7. Install dependencies
+ 1198  echo "📚 Installing dependencies..."
+ 1199  npm install
+ 1200  # 8. Build the project
+ 1201  echo "🏗️  Building project..."
+ 1202  npm run build
+ 1203  # 9. Restart PM2
+ 1204  echo "♻️  Restarting application..."
+ 1205  pm2 restart all
+ 1206  echo "✅ Deployment complete!"
+ 1207  echo "📁 Backups stored in: $BACKUP_DIR"
+ 1208  # Keep only last 5 backups
+ 1209  echo "🧹 Cleaning old backups (keeping last 5)..."
+ 1210  cd "$BACKUP_DIR"
+ 1211  ls -t db-backup-*.sql | tail -n +6 | xargs -r rm
+ 1212  ls -td uploads-* | tail -n +6 | xargs -r rm -r
+ 1213  echo "🎉 All done!"
+ 

@@ -1,0 +1,47 @@
+root@srv1027249:/var/www# cd /var/www
+tar -czf mapestate-uploads.tar.gz shared/uploads/
+root@srv1027249:/var/www# ls
+html  mapestate-uploads.tar.gz  mapestate.net  shared
+root@srv1027249:/var/www# cd mapestate.net
+root@srv1027249:/var/www/mapestate.net# ls
+attached_assets          dist                    netlify.toml       postcss.config.js  shared              vps-setup-guide.txt
+client                   drizzle.config.ts       node_modules       replit.md          tailwind.config.ts
+components.json          export-database.ts      package-lock.json  scripts            tsconfig.json
+create-vps-database.sql  mapestate-database.sql  package.json       server             vite.config.ts
+root@srv1027249:/var/www/mapestate.net# cd server
+root@srv1027249:/var/www/mapestate.net/server# ls
+auth.ts  db.ts          index.ts       middleware  routes.ts  show-all-images.ts  storageFactory.ts  vite.local.ts
+config   import-sql.ts  memStorage.ts  routes      scripts    storage.ts          uploads            vite.ts
+root@srv1027249:/var/www/mapestate.net/server# cd uploads
+root@srv1027249:/var/www/mapestate.net/server/uploads# ls
+avatar  customer  properties
+root@srv1027249:/var/www/mapestate.net/server/uploads# cd properties
+root@srv1027249:/var/www/mapestate.net/server/uploads/properties# ls
+1759436872838-ke5qjlp5h.jpg  1759436884439-ygx51jboi.jpg  1759438133981-oagafpqzf.jpg  1759438157443-befysmbj8.jpg
+1759436879848-mmq68re6x.jpg  1759438130692-amygp1evx.jpg  1759438153462-sufwcor7f.jpg
+root@srv1027249:/var/www/mapestate.net/server/uploads/properties# ls -lah /var/www/mapestate.net/server/uploads/properties/
+total 536K
+drwxr-xr-x 2 www-data www-data  12K Oct 19 20:06 .
+drwxr-xr-x 5 www-data www-data 4.0K Oct 19 20:06 ..
+-rw-r--r-- 1 root     root      86K Oct 19 09:21 1759436872838-ke5qjlp5h.jpg
+-rw-r--r-- 1 root     root      70K Oct 19 09:21 1759436879848-mmq68re6x.jpg
+-rw-r--r-- 1 root     root      37K Oct 19 09:21 1759436884439-ygx51jboi.jpg
+-rw-r--r-- 1 root     root      70K Oct 19 09:21 1759438130692-amygp1evx.jpg
+-rw-r--r-- 1 root     root      86K Oct 19 09:21 1759438133981-oagafpqzf.jpg
+-rw-r--r-- 1 root     root      70K Oct 19 09:21 1759438153462-sufwcor7f.jpg
+-rw-r--r-- 1 root     root      86K Oct 19 09:21 1759438157443-befysmbj8.jpg
+root@srv1027249:/var/www/mapestate.net/server/uploads/properties# cd /var/www
+# Extract to temporary location first
+mkdir -p /tmp/restore-check
+tar -xzf mapestate-uploads.tar.gz -C /tmp/restore-check/
+
+# Check what's there
+ls -lah /tmp/restore-check/shared/uploads/properties/
+
+# If files look good, copy them back
+cp -r /tmp/restore-check/shared/uploads/properties/* /var/www/mapestate.net/server/uploads/properties/
+total 8.0K
+drwxr-xr-x 2 www-data www-data 4.0K Oct  3 14:27 .
+drwxr-xr-x 5 www-data www-data 4.0K Oct  3 14:27 ..
+cp: cannot stat '/tmp/restore-check/shared/uploads/properties/*': No such file or directory
+root@srv1027249:/var/www# 
