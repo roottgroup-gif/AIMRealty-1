@@ -120,7 +120,6 @@ export default function SettingsPage() {
       <SEOHead
         pageType="settings"
         canonicalUrl={undefined}
-        ogImage={`/uploads/properties/1759082074149-xrejrtvx6.jpg`}
         breadcrumbs={[
           { name: 'Home', url: '/' },
           { name: 'Settings', url: '/settings' }

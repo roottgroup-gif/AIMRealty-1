@@ -14,7 +14,6 @@ export default function AboutPage() {
       <SEOHead
         pageType="about"
         canonicalUrl={undefined}
-        ogImage={`/uploads/properties/1759082074149-xrejrtvx6.jpg`}
         breadcrumbs={[
           { name: 'Home', url: '/' },
           { name: 'About', url: '/about' }

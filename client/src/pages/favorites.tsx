@@ -82,7 +82,6 @@ export default function FavoritesPage() {
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <SEOHead
         pageType="favorites"
-        ogImage={`/uploads/properties/1759082074149-xrejrtvx6.jpg`}
         structuredData={getFavoritesStructuredData()}
         breadcrumbs={[
           { name: 'Home', url: '/' },
