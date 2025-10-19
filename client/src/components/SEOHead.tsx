@@ -283,7 +283,7 @@ function makeAbsoluteUrl(url: string | undefined | null): string {
   if (!url || typeof url !== 'string') {
     // Return default image as absolute URL
     const baseUrl = window.location.origin;
-    return `${baseUrl}/uploads/properties/1759082074149-xrejrtvx6.jpg`;
+    return `${baseUrl}/mapestate-social-preview.png`;
   }
   
   // If already absolute URL, return as is
@@ -604,7 +604,7 @@ export function SEOHead({
   title,
   description,
   keywords,
-  ogImage = `/uploads/properties/1759082074149-xrejrtvx6.jpg`,
+  ogImage = `/mapestate-social-preview.png`,
   canonicalUrl,
   structuredData,
   breadcrumbs,
