@@ -584,28 +584,6 @@ export default function CustomerDashboard() {
     return issues;
   };
 
-  // Filter and search user properties
-  const filteredUserProperties = userProperties.filter(property => {
-    // Search filter
-    const searchLower = myPropertiesSearch.toLowerCase();
-    const matchesSearch = !myPropertiesSearch || 
-      property.title.toLowerCase().includes(searchLower) ||
-      property.description?.toLowerCase().includes(searchLower) ||
-      property.city?.toLowerCase().includes(searchLower) ||
-      property.address?.toLowerCase().includes(searchLower);
-    
-    // Type filter
-    const matchesType = myPropertiesTypeFilter === 'all' || property.type === myPropertiesTypeFilter;
-    
-    // Listing type filter
-    const matchesListing = myPropertiesListingFilter === 'all' || property.listingType === myPropertiesListingFilter;
-    
-    // Status filter
-    const matchesStatus = myPropertiesStatusFilter === 'all' || property.status === myPropertiesStatusFilter;
-    
-    return matchesSearch && matchesType && matchesListing && matchesStatus;
-  });
-
   // Property form
   const propertyForm = useForm<PropertyFormValues>({
     resolver: zodResolver(propertyFormSchema),
@@ -765,6 +743,28 @@ export default function CustomerDashboard() {
       return response.json();
     },
     enabled: !!user?.id,
+  });
+
+  // Filter and search user properties
+  const filteredUserProperties = userProperties.filter(property => {
+    // Search filter
+    const searchLower = myPropertiesSearch.toLowerCase();
+    const matchesSearch = !myPropertiesSearch || 
+      property.title.toLowerCase().includes(searchLower) ||
+      property.description?.toLowerCase().includes(searchLower) ||
+      property.city?.toLowerCase().includes(searchLower) ||
+      property.address?.toLowerCase().includes(searchLower);
+    
+    // Type filter
+    const matchesType = myPropertiesTypeFilter === 'all' || property.type === myPropertiesTypeFilter;
+    
+    // Listing type filter
+    const matchesListing = myPropertiesListingFilter === 'all' || property.listingType === myPropertiesListingFilter;
+    
+    // Status filter
+    const matchesStatus = myPropertiesStatusFilter === 'all' || property.status === myPropertiesStatusFilter;
+    
+    return matchesSearch && matchesType && matchesListing && matchesStatus;
   });
 
   // Note: Wave selection simplified to only show "Premium Wave" and "No Wave" options
