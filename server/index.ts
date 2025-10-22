@@ -289,11 +289,12 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
   }
 }
 
-app.use(injectPropertyMetaTags);
-
 (async () => {
   // Initialize storage (with automatic MySQL/MemStorage detection)
   storage = await StorageFactory.getStorage();
+  
+  // Add meta tag injection middleware AFTER storage is initialized
+  app.use(injectPropertyMetaTags);
 
   // Fix existing users' language permissions on startup
   try {
