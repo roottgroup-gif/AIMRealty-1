@@ -553,12 +553,57 @@ export default function CustomerDashboard() {
   const [showBalanceModal, setShowBalanceModal] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [showLanguageSelection, setShowLanguageSelection] = useState(true);
+  
+  // My Properties search and filter state
+  const [myPropertiesSearch, setMyPropertiesSearch] = useState('');
+  const [myPropertiesTypeFilter, setMyPropertiesTypeFilter] = useState<string>('all');
+  const [myPropertiesListingFilter, setMyPropertiesListingFilter] = useState<string>('all');
+  const [myPropertiesStatusFilter, setMyPropertiesStatusFilter] = useState<string>('all');
 
   // Listen for real-time property updates
   usePropertyEvents({
     onPropertyCreated: (property) => {
       console.log('New property created in dashboard:', property.title);
     }
+  });
+
+  // Property validation function
+  const validateProperty = (property: PropertyWithDetails) => {
+    const issues: string[] = [];
+    
+    if (!property.title || property.title.trim() === '') issues.push('Title is missing');
+    if (!property.description || property.description.trim() === '') issues.push('Description is missing');
+    if (!property.price || property.price === '0' || property.price === '0.00') issues.push('Price is missing or zero');
+    if (!property.address || property.address.trim() === '') issues.push('Address is missing');
+    if (!property.city || property.city.trim() === '') issues.push('City is missing');
+    if (!property.country || property.country.trim() === '') issues.push('Country is missing');
+    if (!property.contactPhone || property.contactPhone.trim() === '') issues.push('Contact phone is missing');
+    if (!property.images || property.images.length === 0) issues.push('No images uploaded');
+    if (!property.latitude || !property.longitude) issues.push('Location not set on map');
+    
+    return issues;
+  };
+
+  // Filter and search user properties
+  const filteredUserProperties = userProperties.filter(property => {
+    // Search filter
+    const searchLower = myPropertiesSearch.toLowerCase();
+    const matchesSearch = !myPropertiesSearch || 
+      property.title.toLowerCase().includes(searchLower) ||
+      property.description?.toLowerCase().includes(searchLower) ||
+      property.city?.toLowerCase().includes(searchLower) ||
+      property.address?.toLowerCase().includes(searchLower);
+    
+    // Type filter
+    const matchesType = myPropertiesTypeFilter === 'all' || property.type === myPropertiesTypeFilter;
+    
+    // Listing type filter
+    const matchesListing = myPropertiesListingFilter === 'all' || property.listingType === myPropertiesListingFilter;
+    
+    // Status filter
+    const matchesStatus = myPropertiesStatusFilter === 'all' || property.status === myPropertiesStatusFilter;
+    
+    return matchesSearch && matchesType && matchesListing && matchesStatus;
   });
 
   // Property form
@@ -2516,12 +2561,118 @@ export default function CustomerDashboard() {
             <TabsContent value="my-properties" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>My Properties</CardTitle>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>My Properties</span>
+                    <Badge variant="secondary" className="text-sm">
+                      {filteredUserProperties.length} of {userProperties.length}
+                    </Badge>
+                  </CardTitle>
                   <CardDescription>
-                    Manage the properties you've posted ({userProperties.length} total)
+                    Manage the properties you've posted
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Search and Filter Controls */}
+                  {userProperties.length > 0 && (
+                    <div className="mb-6 space-y-4">
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        {/* Search Input */}
+                        <div className="flex-1">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              placeholder="Search by title, city, address..."
+                              value={myPropertiesSearch}
+                              onChange={(e) => setMyPropertiesSearch(e.target.value)}
+                              className="pl-10"
+                              data-testid="input-my-properties-search"
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Filter Dropdowns */}
+                        <div className="flex gap-2">
+                          <Select value={myPropertiesTypeFilter} onValueChange={setMyPropertiesTypeFilter}>
+                            <SelectTrigger className="w-[140px]" data-testid="select-type-filter">
+                              <SelectValue placeholder="Type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Types</SelectItem>
+                              <SelectItem value="house">House</SelectItem>
+                              <SelectItem value="apartment">Apartment</SelectItem>
+                              <SelectItem value="villa">Villa</SelectItem>
+                              <SelectItem value="land">Land</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          
+                          <Select value={myPropertiesListingFilter} onValueChange={setMyPropertiesListingFilter}>
+                            <SelectTrigger className="w-[130px]" data-testid="select-listing-filter">
+                              <SelectValue placeholder="Listing" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Listings</SelectItem>
+                              <SelectItem value="sale">For Sale</SelectItem>
+                              <SelectItem value="rent">For Rent</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          
+                          <Select value={myPropertiesStatusFilter} onValueChange={setMyPropertiesStatusFilter}>
+                            <SelectTrigger className="w-[130px]" data-testid="select-status-filter">
+                              <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Status</SelectItem>
+                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="inactive">Inactive</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      {/* Active Filters Display */}
+                      {(myPropertiesSearch || myPropertiesTypeFilter !== 'all' || myPropertiesListingFilter !== 'all' || myPropertiesStatusFilter !== 'all') && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <Filter className="h-4 w-4" />
+                          <span>Active filters:</span>
+                          {myPropertiesSearch && (
+                            <Badge variant="secondary" className="text-xs">
+                              Search: {myPropertiesSearch}
+                            </Badge>
+                          )}
+                          {myPropertiesTypeFilter !== 'all' && (
+                            <Badge variant="secondary" className="text-xs">
+                              Type: {myPropertiesTypeFilter}
+                            </Badge>
+                          )}
+                          {myPropertiesListingFilter !== 'all' && (
+                            <Badge variant="secondary" className="text-xs">
+                              Listing: {myPropertiesListingFilter}
+                            </Badge>
+                          )}
+                          {myPropertiesStatusFilter !== 'all' && (
+                            <Badge variant="secondary" className="text-xs">
+                              Status: {myPropertiesStatusFilter}
+                            </Badge>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setMyPropertiesSearch('');
+                              setMyPropertiesTypeFilter('all');
+                              setMyPropertiesListingFilter('all');
+                              setMyPropertiesStatusFilter('all');
+                            }}
+                            className="h-6 text-xs"
+                            data-testid="button-clear-filters"
+                          >
+                            Clear all
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {userPropertiesLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {Array.from({ length: 3 }).map((_, i) => (
@@ -2548,11 +2699,57 @@ export default function CustomerDashboard() {
                         Add Your First Property
                       </Button>
                     </div>
+                  ) : filteredUserProperties.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                      <Search className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <p>No properties match your search criteria.</p>
+                      <Button
+                        variant="outline"
+                        className="mt-4"
+                        onClick={() => {
+                          setMyPropertiesSearch('');
+                          setMyPropertiesTypeFilter('all');
+                          setMyPropertiesListingFilter('all');
+                          setMyPropertiesStatusFilter('all');
+                        }}
+                        data-testid="button-clear-search"
+                      >
+                        Clear Search
+                      </Button>
+                    </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {userProperties.map((property) => (
-                        <Card key={property.id} className="group relative">
+                      {filteredUserProperties.map((property) => {
+                        const validationIssues = validateProperty(property);
+                        const hasIssues = validationIssues.length > 0;
+                        
+                        return (
+                        <Card key={property.id} className={`group relative ${hasIssues ? 'border-orange-300 dark:border-orange-700' : ''}`}>
                           <CardContent className="p-0">
+                            {/* Validation Warning Banner */}
+                            {hasIssues && (
+                              <div className="bg-orange-50 dark:bg-orange-900/20 border-b border-orange-200 dark:border-orange-800 p-2">
+                                <div className="flex items-start gap-2">
+                                  <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium text-orange-800 dark:text-orange-300">
+                                      Property has {validationIssues.length} issue{validationIssues.length > 1 ? 's' : ''}
+                                    </p>
+                                    <ul className="mt-1 space-y-0.5 text-xs text-orange-700 dark:text-orange-400">
+                                      {validationIssues.slice(0, 3).map((issue, idx) => (
+                                        <li key={idx} className="truncate">• {issue}</li>
+                                      ))}
+                                      {validationIssues.length > 3 && (
+                                        <li className="text-orange-600 dark:text-orange-500 italic">
+                                          +{validationIssues.length - 3} more
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
                             <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-t-lg relative overflow-hidden">
                               {property.images && property.images.length > 0 ? (
                                 <OptimizedImage 
@@ -2564,8 +2761,11 @@ export default function CustomerDashboard() {
                                   data-testid={`img-property-${property.id}`}
                                 />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Home className="h-12 w-12 text-gray-400" />
+                                <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                                  <div className="text-center">
+                                    <Home className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                    <p className="text-xs text-gray-500">No image</p>
+                                  </div>
                                 </div>
                               )}
                               <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -2597,10 +2797,16 @@ export default function CustomerDashboard() {
                                   <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
-                              <div className="absolute top-2 left-2">
+                              <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
                                 <Badge variant={property.listingType === 'sale' ? 'default' : 'secondary'}>
                                   {property.listingType === 'sale' ? 'For Sale' : 'For Rent'}
                                 </Badge>
+                                {hasIssues && (
+                                  <Badge variant="destructive" className="bg-orange-500 text-white text-xs">
+                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                    Issues
+                                  </Badge>
+                                )}
                               </div>
                               <div className="absolute bottom-2 left-2 flex space-x-1">
                                 <Badge 
@@ -2677,7 +2883,8 @@ export default function CustomerDashboard() {
                             </div>
                           </CardContent>
                         </Card>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
