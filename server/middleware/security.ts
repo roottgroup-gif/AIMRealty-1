@@ -5,6 +5,11 @@ import type { Request, Response, NextFunction } from "express";
  * Adds CSP, HSTS, COOP, and other security headers
  */
 export function securityHeaders(req: Request, res: Response, next: NextFunction) {
+  // Skip security headers in development to avoid blocking SVG icons
+  if (process.env.NODE_ENV !== 'production') {
+    return next();
+  }
+  
   // Content Security Policy - Allow necessary resources
   const csp = [
     "default-src 'self'",
