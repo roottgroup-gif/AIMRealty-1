@@ -30,13 +30,13 @@ export function securityHeaders(req: Request, res: Response, next: NextFunction)
   }
   
   // Cross-Origin-Opener-Policy
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   
-  // Cross-Origin-Embedder-Policy
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  // Cross-Origin-Embedder-Policy - REMOVED to allow third-party resources like OpenStreetMap tiles
+  // Note: COEP require-corp breaks external map tiles and CDN resources
   
-  // Cross-Origin-Resource-Policy
-  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+  // Cross-Origin-Resource-Policy - Allow cross-origin for compatibility
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   
   // X-Content-Type-Options
   res.setHeader('X-Content-Type-Options', 'nosniff');

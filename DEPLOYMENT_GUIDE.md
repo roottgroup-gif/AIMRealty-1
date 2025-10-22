@@ -17,15 +17,19 @@ This guide will help you deploy the latest optimizations to your VPS to achieve 
 
 ## Step 1: Environment Variables Setup
 
+**⚠️ SECURITY WARNING:** Never commit the `.env` file to Git! It should be listed in `.gitignore`.
+
 On your VPS, create a `.env` file in your project root with these variables:
 
 ```bash
 # Navigate to your project
 cd /var/www/mapestate.net
 
-# Create .env file
+# Create .env file (this file should NEVER be committed to Git)
 nano .env
 ```
+
+**IMPORTANT:** Replace all placeholder values below with your actual credentials:
 
 Add the following content:
 
@@ -37,15 +41,16 @@ PORT=5000
 # REQUIRED: Base URL for proper sitemap generation
 BASE_URL=https://mapestate.net
 
-# MySQL Database (already configured via secrets)
-MYSQL_HOST=72.60.134.44
-MYSQL_USER=mapestate
-MYSQL_PASSWORD=Mapestate123!
-MYSQL_DATABASE=mapestate
+# MySQL Database - Replace with your actual database credentials
+MYSQL_HOST=your_database_host
+MYSQL_USER=your_database_user
+MYSQL_PASSWORD=your_database_password
+MYSQL_DATABASE=your_database_name
 MYSQL_PORT=3306
 
-# Session Secret (CHANGE THIS!)
-SESSION_SECRET=$(openssl rand -base64 32)
+# Session Secret - Generate a secure random secret
+# Generate one with: openssl rand -base64 32
+SESSION_SECRET=your-secure-random-session-secret
 
 # Image serving
 IMAGE_BASE_URL=https://mapestate.net
