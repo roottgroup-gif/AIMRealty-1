@@ -89,6 +89,7 @@ export default function HomePage() {
   >(null);
   const [visiblePropertiesCount, setVisiblePropertiesCount] = useState<number>(0);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const filterPanelRef = useRef<HTMLDivElement>(null);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark")
@@ -149,6 +150,30 @@ export default function HomePage() {
       }
     }
   }, []);
+
+  // Click outside to close filters
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showFilters &&
+        filterPanelRef.current &&
+        !filterPanelRef.current.contains(event.target as Node)
+      ) {
+        setShowFilters(false);
+      }
+    };
+
+    // Add event listener when filters are shown
+    if (showFilters) {
+      // Use capture phase to ensure we catch clicks before other handlers
+      document.addEventListener("mousedown", handleClickOutside, true);
+    }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside, true);
+    };
+  }, [showFilters]);
 
   // Filter properties by language when language changes
   useEffect(() => {
@@ -337,6 +362,7 @@ export default function HomePage() {
 
         {/* Absolute Blurred Filter Section inside Map */}
         <div
+          ref={filterPanelRef}
           className="absolute top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-4 z-[9999] max-h-[calc(100vh-120px)] max-h-[calc(100dvh-120px)] overflow-hidden"
           style={{ position: "absolute" }}
         >
