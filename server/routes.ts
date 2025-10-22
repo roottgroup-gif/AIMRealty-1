@@ -17,7 +17,7 @@ import { extractPropertyIdentifier } from "@shared/slug-utils";
 import { hashPassword, requireAuth, requireRole, requireAnyRole, populateUser, validateLanguagePermission, checkExpiration } from "./auth";
 import session from "express-session";
 import { z } from "zod";
-import sitemapRouter from "./routes/sitemap";
+import sitemapRouter, { setSitemapStorage } from "./routes/sitemap";
 import { registerPerformanceRoutes } from "./routes/performance";
 import { 
   authRateLimit, searchRateLimit, apiRateLimit, adminRateLimit, 
@@ -63,6 +63,9 @@ import type { IStorage } from "./storage";
 export async function registerRoutes(app: Express, storageInstance?: IStorage): Promise<Server> {
   // Use provided storage or get from factory
   const storage = storageInstance || StorageFactory.getInstance();
+
+  // Initialize sitemap with storage
+  setSitemapStorage(storage);
 
   // Session configuration
   app.use(session({

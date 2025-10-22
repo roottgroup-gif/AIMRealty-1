@@ -1,7 +1,10 @@
-import { Router } from 'express';
-import { storage } from '../storage';
+import { Router, type Request, type Response } from 'express';
+import type { IStorage } from '../storage';
 
 const router = Router();
+
+// Storage will be injected via middleware
+let storageInstance: IStorage;
 
 // Supported languages for multilingual SEO
 const SUPPORTED_LANGUAGES = ['en', 'ar', 'kur'] as const;
@@ -101,14 +104,18 @@ Disallow: /*.temp$
 Crawl-delay: 1`;
 }
 
-router.get('/sitemap.xml', async (req, res) => {
+router.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
+    if (!storageInstance) {
+      return res.status(503).send('Service temporarily unavailable');
+    }
+    
     const rawBaseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     const baseUrl = normalizeBaseUrl(rawBaseUrl);
     const currentDate = new Date().toISOString().split('T')[0];
     
     // Get all properties for sitemap
-    const properties = await storage.getProperties({ limit: 1000 });
+    const properties = await storageInstance.getProperties({ limit: 1000 });
     
     const urlEntries: string[] = [];
     
@@ -175,7 +182,7 @@ ${urlEntries.join('\n')}
 });
 
 // Robots.txt endpoint
-router.get('/robots.txt', async (req, res) => {
+router.get('/robots.txt', async (req: Request, res: Response) => {
   try {
     const rawBaseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     const baseUrl = normalizeBaseUrl(rawBaseUrl);
@@ -188,5 +195,10 @@ router.get('/robots.txt', async (req, res) => {
     res.status(500).send('Error generating robots.txt');
   }
 });
+
+// Function to initialize the sitemap router with storage
+export function setSitemapStorage(storage: IStorage) {
+  storageInstance = storage;
+}
 
 export default router;
