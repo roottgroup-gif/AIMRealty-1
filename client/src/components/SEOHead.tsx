@@ -597,7 +597,16 @@ function generateCombinedStructuredData(
     schemas.push(customStructuredData);
   }
 
-  return schemas.length === 1 ? schemas[0] : schemas;
+  // Return single schema directly, or wrap multiple schemas in @graph
+  if (schemas.length === 1) {
+    return schemas[0];
+  }
+  
+  // Use @graph to combine multiple schemas (Google-compatible format)
+  return {
+    "@context": "https://schema.org",
+    "@graph": schemas
+  };
 }
 
 export function SEOHead({ 
