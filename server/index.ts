@@ -3,6 +3,7 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite.local";
 import { performanceLogger, requestSizeMonitor } from "./middleware/performance";
+import { securityHeaders, staticAssetsCaching } from "./middleware/security";
 import { StorageFactory } from "./storageFactory";
 import fs from "fs";
 import path from "path";
@@ -12,6 +13,12 @@ const app = express();
 // Trust proxy for correct protocol detection behind reverse proxies
 // Only trust first proxy for security (Replit's proxy)
 app.set('trust proxy', 1);
+
+// Security headers (CSP, HSTS, COOP, etc.)
+app.use(securityHeaders);
+
+// Static assets caching
+app.use(staticAssetsCaching);
 
 // Enable gzip compression for all responses
 app.use(compression({

@@ -1,0 +1,164 @@
+PageSpeed ​​Insights logo
+PageSpeed ​​Insights
+Report created on 10/22/2025, 1:07:33 PM .
+https://mapestate.net/
+Enter a valid URL.
+
+
+smartphone
+Mobile
+
+computer
+desktop computer
+
+Understanding user experience
+No data.
+
+Diagnosing performance issues
+64
+Performance
+92
+accessibility
+92
+Best practices
+92
+Search Engine Optimization
+64
+FCP
++2
+LCP
++2
+TBT
++30
+CLS
++25
+SI
++6
+الأداء
+Values ​​are estimated and subject to change. Performance scores are calculated directly from these metrics. See the calculator.
+0–49
+50–89
+90–100
+Final Screenshot
+
+Scales
+Expand the offer
+First Contentful Paint
+4.4 seconds
+Largest Contentful Paint
+6.5 seconds
+Total Blocking Time
+0 milliseconds
+Cumulative Layout Shift
+0
+Speed ​​Index
+5.4 seconds
+Captured at October 22, 2025, 1:07 PM GMT+3
+Moto G Power in emulation mode with Lighthouse 13.0.0
+One-page session
+Initial page load
+Slow page loading throttling on 4G network
+Using HeadlessChromium 137.0.7151.119 with lr
+
+View the "Structure Plan"
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+Screenshot
+View audits associated with metrics:
+
+All
+
+FCP
+
+LCP
+
+TBT
+
+CLS
+Statistics
+Using effective caching periods  Estimated savings: 276 KB
+Display block requests  Estimated savings: 2,380 ms
+Improved image display  Estimated savings: 82 KB
+Mandatory reflow
+View LCP applications
+Network Dependency Tree
+Line width  Estimated savings: 20 ms
+Reasons for design changes
+Largest Content Delivery (LCP) Speed ​​Details
+External parties
+These statistics are also available in the Chrome Developer Tools Performance panel, and you can record a trace to view more detailed information.
+Diagnostic data
+Limit unused JavaScript content  Estimated savings: 66 KB
+Limit unused CSS content  Estimated savings: 40 KB
+Avoid long main task chains.  One long task was found.
+More information about your app's performance These numbers do not directly affect your performance score.
+Successfully pass audits (14)
+an offer
+92
+accessibility
+These checks identify opportunities to improve web application usability . Automatic detection can only detect a subset of issues and does not guarantee web application usability, so we recommend also performing manual testing .
+Names and classifications
+Buttons do not have an accessible name.
+These are opportunities to improve the semantics of app controls. This may improve the experience for users of assistive technology, such as screen readers.
+Best practices
+The document does not include a major landmark.
+These elements define common best practices related to accessibility.
+Additional items for manual verification (10)
+an offer
+تعالج هذه العناصر المناطق التي يتعذر على أداة الاختبار المبرمجة تغطيتها. تعرّف على مزيد من المعلومات في دليلنا حول مراجعة إمكانية الوصول.
+اجتياز عمليات التدقيق بنجاح (20)
+عرض
+غير سارٍ (38)
+عرض
+92
+أفضل الممارسات
+انطباع المستخدم
+يتم عرض الصور بدقة منخفضة
+عام
+تم تسجيل أخطاء المتصفح في وحدة التحكّم
+مكتبات JavaScript التي تم رصدها
+الثقة والأمان
+التأكُّد من فاعلية سياسة CSP ضد هجمات XSS
+استخدام سياسة HSTS قوية
+ضمان عزل النطاق بشكلٍ صحيح باستخدام سياسة COOP
+الحدّ من هجمات XSS المستنِدة إلى DOM باستخدام Trusted Types
+اجتياز عمليات التدقيق بنجاح (11)
+عرض
+غير سارٍ (2)
+عرض
+92
+تحسين محركات البحث
+تضمن عمليات التحقّق هذه اتّباع صفحتك للنصائح الأساسية الخاصة بتحسين محركات البحث. هناك العديد من العوامل الإضافية التي تتسبب في عدم تحقيق أداة Lighthouse لأي نقاط هنا والتي قد تؤثّر في ترتيب نتائج البحث، بما في ذلك الأداء في ما يخص مؤشرات أداء الويب الأساسية. مزيد من المعلومات حول "أساسيات بحث Google"
+الزحف والفهرسة
+ملف "robots.txt" غير صالح تم العثور على خطأ واحد
+للظهور في نتائج البحث، تحتاج برامج الزحف إلى الوصول إلى تطبيقك.
+عناصر إضافية للتحقُّق يدويًا (1)
+عرض
+تشغيل أدوات التحقُّق الإضافية هذه على موقعك الإلكتروني للتحقُّق من أفضل ممارسات تحسين محركات البحث الإضافية.
+اجتياز عمليات التدقيق بنجاح (9)
+عرض
+More about PageSpeed ​​Insights
+New events
+Documents
+Find out information about web performance
+Ask questions on Stack Overflow
+Mailing list
+Related Content
+Updates
+Web Basics
+Case studies
+Podcast
+Communication methods
+Twitter
+YouTube
+Google Developers Logo
+Chrome
+Firebase
+All products
+Terms and Privacy Policy
+For details, please see  the Google Developers website policies .
