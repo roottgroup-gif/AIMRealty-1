@@ -526,7 +526,7 @@ export default function PropertyDetailPage() {
 
         {/* Image Gallery */}
         <Card className="bg-white/20 dark:bg-black/20 backdrop-blur-xl border-white/30 dark:border-white/10 overflow-hidden mb-8">
-          <div className="relative h-64 md:h-96">
+          <div className="relative w-full aspect-video">
             <img
               src={images[currentImageIndex]}
               alt={`${property.title} - Image ${currentImageIndex + 1}`}
