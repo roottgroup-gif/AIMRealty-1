@@ -636,32 +636,32 @@ export default function PropertyDetailPage() {
               </DropdownMenu>
             </div>
           </div>
-
-          {/* Thumbnail Gallery */}
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto p-4">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 cursor-pointer rounded-lg overflow-hidden border-2 ${
-                    index === currentImageIndex
-                      ? "border-primary shadow-md"
-                      : "border-transparent hover:border-white/30"
-                  }`}
-                  onClick={() => setCurrentImageIndex(index)}
-                  data-testid={`thumbnail-${index}`}
-                >
-                  <img
-                    src={image}
-                    alt={`${property.title} thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
         </Card>
+
+        {/* Thumbnail Gallery */}
+        {images.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto px-4 -mt-2 mb-8">
+            {images.map((image, index) => (
+              <div
+                key={index}
+                className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 cursor-pointer rounded-lg overflow-hidden border-2 ${
+                  index === currentImageIndex
+                    ? "border-primary shadow-md"
+                    : "border-transparent hover:border-white/30"
+                }`}
+                onClick={() => setCurrentImageIndex(index)}
+                data-testid={`thumbnail-${index}`}
+              >
+                <img
+                  src={image}
+                  alt={`${property.title} thumbnail ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Full Screen Modal */}
         {isFullScreen && (
