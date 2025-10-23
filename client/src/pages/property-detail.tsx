@@ -548,7 +548,7 @@ export default function PropertyDetailPage() {
                 {images.map((image, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                       index === currentImageIndex 
                         ? 'border-primary shadow-md' 
                         : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
@@ -559,7 +559,7 @@ export default function PropertyDetailPage() {
                     <img
                       src={image}
                       alt={`${property.title} thumbnail ${index + 1}`}
-                      className="w-16 h-16 md:w-20 md:h-20 object-cover"
+                      className="w-full h-full object-cover"
                       loading="lazy"
                     />
                   </div>
