@@ -548,10 +548,10 @@ export default function PropertyDetailPage() {
                 {images.map((image, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 cursor-pointer rounded-lg overflow-hidden border-2 transition-all backdrop-blur-sm ${
+                    className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                       index === currentImageIndex 
-                        ? 'border-primary shadow-md bg-white/10' 
-                        : 'border-white/30 dark:border-white/20 hover:border-white/50 dark:hover:border-white/30 bg-white/5'
+                        ? 'border-primary shadow-md' 
+                        : 'border-white/30 dark:border-white/20 hover:border-white/50 dark:hover:border-white/30'
                     }`}
                     onClick={() => setCurrentImageIndex(index)}
                     data-testid={`thumbnail-${index}`}
