@@ -545,11 +545,11 @@ export type InsertClientLocation = z.infer<typeof insertClientLocationSchema>;
 
 // Property with relations
 export type PropertyWithDetails = Property & {
-  agent: User | null;
+  agent: Omit<User, 'password'> | null;
   wave: Wave | null;
   images: PropertyImage[];
-  amenities: PropertyAmenity[];
-  features: PropertyFeature[];
+  amenities: string[];
+  features: string[];
   inquiries: Inquiry[];
   favorites: Favorite[];
 };
