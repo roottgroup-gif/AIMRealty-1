@@ -543,7 +543,7 @@ export default function PropertyDetailPage() {
           
           {/* Thumbnail Gallery */}
           {images.length > 1 && (
-            <div className="p-4 bg-gray-50 dark:bg-gray-800">
+            <div className="p-4">
               <div className="flex gap-2 overflow-x-auto">
                 {images.map((image, index) => (
                   <div
