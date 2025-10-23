@@ -90,24 +90,32 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
   if (!storage) {
     return next();
   }
-  // Match both legacy and language-prefixed property URLs
-  const propertyMatch = req.path.match(/^(?:\/(en|ar|kur))?\/property\/(.+)$/);
+  // Match both legacy and language-prefixed property URLs (remove trailing slashes)
+  const propertyMatch = req.path.match(/^(?:\/(en|ar|kur))?\/property\/([^\/]+)\/?$/);
   
   if (!propertyMatch) {
     return next();
   }
   
+  let propertyId = propertyMatch[2]; // Extract property ID from second capture group
+  // Remove any trailing slashes from propertyId
+  propertyId = propertyId.replace(/\/+$/, '');
   const userAgent = req.get('User-Agent') || '';
+  const isCrawler = isCrawlerBot(userAgent);
+  
+  // Log all property page requests for debugging
+  console.log(`🔍 Property page request: ${req.path}, User-Agent: ${userAgent.substring(0, 50)}..., Is Crawler: ${isCrawler}`);
   
   // Only inject for crawler bots (social media and search engines) to avoid affecting normal users
-  if (!isCrawlerBot(userAgent)) {
+  if (!isCrawler) {
     return next();
   }
   
-  const propertyId = propertyMatch[2]; // Extract property ID from second capture group
+  console.log(`🤖 Social media crawler detected! Injecting dynamic meta tags for ${propertyId}`);
   
   try {
     // Try to get property by slug first, then by ID (similar to API route logic)
+    console.log(`🔍 Social crawler looking up property: "${propertyId}"`);
     let property = await storage.getPropertyBySlug(propertyId);
     
     if (!property) {
@@ -119,6 +127,8 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
       console.log(`❌ Property not found for social crawler with slug or ID: ${propertyId}`);
       return next();
     }
+    
+    console.log(`✅ Social crawler found property: ${property.title}`);
     
     // Load HTML template if not cached
     if (!htmlTemplate) {
@@ -144,12 +154,19 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     
     // Handle property images - can be array of strings or array of objects with imageUrl
     const firstImage = property.images && property.images.length > 0 ? property.images[0] : null;
-    let propertyImage = `${protocol}://${req.get('host')}/logo_1757848527935.png`;
+    let propertyImage = `${protocol}://${req.get('host')}/mapestate-social-preview.png`;
     
     if (firstImage) {
       // Check if it's an object with imageUrl property or just a string
       const imageUrl = typeof firstImage === 'object' && firstImage.imageUrl ? firstImage.imageUrl : firstImage;
-      propertyImage = imageUrl.startsWith('http') ? imageUrl : `${protocol}://${req.get('host')}${imageUrl}`;
+      
+      // Make absolute URL
+      if (imageUrl) {
+        propertyImage = imageUrl.startsWith('http') ? imageUrl : `${protocol}://${req.get('host')}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+        console.log(`✅ Using property image for SEO: ${propertyImage}`);
+      }
+    } else {
+      console.log(`⚠️ No property image found for ${propertyId}, using fallback image`);
     }
     // Generate property URL with language prefix if present
     const language = propertyMatch[1] || 'en';
