@@ -642,7 +642,7 @@ export default function PropertyDetailPage() {
                 {images.map((image, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 cursor-pointer rounded-md overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 cursor-pointer rounded-full overflow-hidden border-2 ${
                       index === currentImageIndex
                         ? "border-primary shadow-md"
                         : "border-transparent hover:border-white/30"
