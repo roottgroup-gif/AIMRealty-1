@@ -44,35 +44,61 @@
     <meta property="twitter:description" content="Find your perfect home with AI-powered recommendations. Discover properties for rent and sale worldwide." />
     <meta property="twitter:image" content="https://mapestate.net/mapestate-social-preview.png" />
     
-    <!-- Structured Data -->
+    <!-- Structured Data for Google Knowledge Graph -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "MapEstate",
-      "url": "https://mapestate.net/",
-      "description": "AI-powered real estate platform for finding properties worldwide",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://mapestate.net/properties?search={search_term_string}",
-        "query-input": "required name=search_term_string"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "MapEstate",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://mapestate.net/logo_1757848527935.png"
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://mapestate.net/#organization",
+          "name": "MapEstate",
+          "url": "https://mapestate.net/",
+          "logo": {
+            "@type": "ImageObject",
+            "@id": "https://mapestate.net/#logo",
+            "url": "https://mapestate.net/favicon-512x512.png",
+            "contentUrl": "https://mapestate.net/favicon-512x512.png",
+            "caption": "MapEstate Logo",
+            "inLanguage": "en",
+            "width": "512",
+            "height": "512"
+          },
+          "image": {
+            "@id": "https://mapestate.net/#logo"
+          },
+          "description": "AI-powered real estate platform for finding properties worldwide",
+          "sameAs": []
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://mapestate.net/#website",
+          "url": "https://mapestate.net/",
+          "name": "MapEstate",
+          "description": "AI-powered real estate platform for finding properties worldwide",
+          "publisher": {
+            "@id": "https://mapestate.net/#organization"
+          },
+          "inLanguage": "en",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://mapestate.net/properties?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
         }
-      }
+      ]
     }
     </script>
     
-    <!-- Favicon and App Icons -->
-    <link rel="icon" type="image/png" href="/logo_1757848527935.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/logo_1757848527935.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/logo_1757848527935.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/logo_1757848527935.png" />
+    <!-- Favicon and App Icons - Optimized for Google Search Results -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
     
     <!-- Mobile Web App (modern replacement for deprecated apple-mobile-web-app-capable) -->
