@@ -73,6 +73,7 @@ export default function HomePage() {
   const [mapFilters, setMapFilters] = useState<PropertyFilters>({
     limit: 100, // Get more properties for the map
     language: language, // Initialize with current language
+    status: 'active', // Only show visible properties on public map
   });
   const [priceRange, setPriceRange] = useState([1, 10000000]);
   const [cityInput, setCityInput] = useState("");
@@ -181,6 +182,7 @@ export default function HomePage() {
       ...prevFilters,
       language: language, // Filter properties to show only those matching the selected language
       limit: 100, // Always maintain the limit for map
+      status: 'active', // Always show only visible properties on public map
     }));
   }, [language]);
 
@@ -196,6 +198,7 @@ export default function HomePage() {
     setMapFilters({
       ...filters,
       limit: 100, // Always maintain the limit for map
+      status: 'active', // Always show only visible properties on public map
     });
   };
 
@@ -254,7 +257,7 @@ export default function HomePage() {
   };
 
   const clearFilters = () => {
-    setMapFilters({ limit: 100, language: language }); // Retain current language when clearing filters
+    setMapFilters({ limit: 100, language: language, status: 'active' }); // Retain current language and status when clearing filters
     setPriceRange([0, 1000000]);
     setCityInput("");
   };

@@ -23,7 +23,7 @@ import { SUPPORTED_LANGUAGES, LANGUAGE_NAMES, insertCurrencyRateSchema, updateCu
 import { 
   Shield, Users, Building2, Settings, Plus, Edit, Trash2, 
   LogOut, UserPlus, Key, BarChart3, Activity, Calendar,
-  Search, Filter, MoreVertical, AlertTriangle, Eye, MapPin,
+  Search, Filter, MoreVertical, AlertTriangle, Eye, EyeOff, MapPin,
   Home, DollarSign, ImageIcon, Languages, CreditCard
 } from 'lucide-react';
 import { CustomerAnalytics } from '@/components/CustomerAnalytics';
@@ -286,6 +286,32 @@ export default function AdminDashboard() {
   // Properties hooks
   const { data: allProperties = [], isLoading: propertiesLoading } = useProperties();
   const deletePropertyMutation = useDeleteProperty();
+  
+  // Toggle property visibility mutation
+  const togglePropertyVisibilityMutation = useMutation({
+    mutationFn: async ({ id, currentStatus }: { id: string; currentStatus: string }) => {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      const response = await apiRequest(`/api/properties/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/properties'] });
+      toast({
+        title: 'Success',
+        description: 'Property visibility updated successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to update property visibility',
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Handle avatar file selection and upload to server
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2057,8 +2083,9 @@ export default function AdminDashboard() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                    className="text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                                     data-testid={`button-view-${property.id}`}
+                                    title="View property"
                                   >
                                     <Eye className="h-4 w-4" />
                                   </Button>
@@ -2066,10 +2093,26 @@ export default function AdminDashboard() {
                                 <Button
                                   variant="outline"
                                   size="sm"
+                                  onClick={() => togglePropertyVisibilityMutation.mutate({ id: property.id, currentStatus: property.status || 'active' })}
+                                  disabled={togglePropertyVisibilityMutation.isPending}
+                                  className={
+                                    property.status === 'active'
+                                      ? "text-green-600 dark:text-green-400 border-green-200 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
+                                      : "text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20"
+                                  }
+                                  data-testid={`button-toggle-visibility-${property.id}`}
+                                  title={property.status === 'active' ? 'Hide from map' : 'Show on map'}
+                                >
+                                  {property.status === 'active' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
                                   onClick={() => handleDeleteProperty(property.id, property.title)}
                                   disabled={deletePropertyMutation.isPending}
-                                  className="text-red-600 border-red-200 hover:bg-red-50"
+                                  className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                                   data-testid={`button-delete-property-${property.id}`}
+                                  title="Delete property"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>

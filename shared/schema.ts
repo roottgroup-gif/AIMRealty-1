@@ -581,6 +581,7 @@ export interface PropertyFilters {
   search?: string;
   sortBy?: "price" | "date" | "views";
   sortOrder?: "asc" | "desc";
+  status?: string;
   limit?: number;
   offset?: number;
 }

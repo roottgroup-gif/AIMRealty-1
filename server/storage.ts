@@ -383,6 +383,9 @@ export class DatabaseStorage implements IStorage {
     if (filters.language) {
       conditions.push(eq(properties.language, filters.language));
     }
+    if (filters.status) {
+      conditions.push(eq(properties.status, filters.status));
+    }
     if (filters.minPrice) {
       conditions.push(gte(properties.price, filters.minPrice.toString()));
     }

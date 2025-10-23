@@ -1210,8 +1210,23 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         sortBy,
         sortOrder,
         limit = "20",
-        offset = "0"
+        offset = "0",
+        status
       } = req.query;
+
+      // Determine status filter based on authentication and explicit status parameter
+      // - If status is explicitly provided, use it (including 'all' to show all properties)
+      // - If user is authenticated (admin/agent/user), default to showing all properties
+      // - If user is not authenticated (public), default to showing only active properties
+      let statusFilter: string | undefined = undefined;
+      if (status) {
+        // Explicit status parameter provided - use it unless it's 'all'
+        statusFilter = status === 'all' ? undefined : status as string;
+      } else if (!req.user) {
+        // Public users - only show active properties by default
+        statusFilter = 'active';
+      }
+      // Otherwise (authenticated user, no status param) - show all properties
 
       const filters = {
         type: type as string,
@@ -1228,6 +1243,7 @@ export async function registerRoutes(app: Express, storageInstance?: IStorage): 
         sortOrder: sortOrder as "asc" | "desc",
         limit: parseInt(limit as string),
         offset: parseInt(offset as string),
+        status: statusFilter,
       };
 
       const properties = await storage.getProperties(filters);
