@@ -638,11 +638,11 @@ export default function PropertyDetailPage() {
 
             {/* Thumbnail Gallery */}
             {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 overflow-x-auto max-w-full px-4">
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1 md:gap-2 overflow-x-auto max-w-full px-2">
                 {images.map((image, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 cursor-pointer rounded-lg overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 cursor-pointer rounded-md overflow-hidden border-2 ${
                       index === currentImageIndex
                         ? "border-primary shadow-md"
                         : "border-transparent hover:border-white/30"
