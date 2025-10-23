@@ -117,7 +117,7 @@ export default function LocationSelectionMap({
           // Center on user's location if available, otherwise Kurdistan/Iraq region
           const defaultLocation = [36.1911, 44.0094]; // Kurdistan/Iraq fallback
           const centerLocation = userLocation ? [userLocation.lat, userLocation.lng] : defaultLocation;
-          const zoomLevel = userLocation ? 10 : 8; // Closer zoom if we have user location
+          const zoomLevel = userLocation ? 6 : 4; // Zoomed out to show countries and regions
           
           const map = L.map(mapRef.current).setView(centerLocation, zoomLevel);
 
@@ -227,7 +227,7 @@ export default function LocationSelectionMap({
   useEffect(() => {
     if (mapInstanceRef.current && userLocation && isMapLoaded) {
       // Smoothly animate to user's location
-      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 10, {
+      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 6, {
         animate: true,
         duration: 1.5
       });
