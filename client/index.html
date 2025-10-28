@@ -61,38 +61,39 @@
           "@type": "Organization",
           "@id": "https://mapestate.net/#organization",
           "name": "MapEstate",
-          "url": "https://mapestate.net/",
+          "alternateName": "MapEstate Real Estate",
+          "url": "https://mapestate.net/en/",
           "logo": {
             "@type": "ImageObject",
             "@id": "https://mapestate.net/#logo",
             "url": "https://mapestate.net/favicon-512x512.png",
             "contentUrl": "https://mapestate.net/favicon-512x512.png",
-            "caption": "MapEstate Logo",
+            "caption": "MapEstate - AI-Powered Real Estate Finder",
             "inLanguage": "en",
-            "width": "512",
-            "height": "512"
+            "width": 512,
+            "height": 512
           },
           "image": {
             "@id": "https://mapestate.net/#logo"
           },
-          "description": "AI-powered real estate platform for finding properties worldwide",
+          "description": "AI-powered real estate platform for finding properties for sale and rent worldwide with intelligent search, interactive maps, and expert agents",
           "sameAs": []
         },
         {
           "@type": "WebSite",
           "@id": "https://mapestate.net/#website",
-          "url": "https://mapestate.net/",
+          "url": "https://mapestate.net/en/",
           "name": "MapEstate",
-          "description": "AI-powered real estate platform for finding properties worldwide",
+          "description": "AI-powered real estate platform for finding properties for sale and rent worldwide",
           "publisher": {
             "@id": "https://mapestate.net/#organization"
           },
-          "inLanguage": "en",
+          "inLanguage": ["en", "ar", "ku"],
           "potentialAction": {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://mapestate.net/properties?search={search_term_string}"
+              "urlTemplate": "https://mapestate.net/en/properties?search={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           }
