@@ -85,6 +85,184 @@ function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
+// Language-specific SEO translations
+const seoTranslations = {
+  en: {
+    homeTitle: "MapEstate - AI-Powered Real Estate Finder | Find Your Perfect Property",
+    homeDescription: "Find your perfect home with AI-powered recommendations. Discover properties for rent and sale worldwide with intelligent search, detailed maps, and expert agents. Search apartments, houses, villas, and land with advanced filters.",
+    propertiesTitle: "Properties for Sale and Rent Worldwide | MapEstate",
+    propertiesDescription: "Browse thousands of properties for sale and rent worldwide. Find apartments, houses, villas, and land with advanced search, AI recommendations, and detailed property information.",
+    language: "English",
+    locale: "en_US"
+  },
+  ar: {
+    homeTitle: "MapEstate - محرك البحث العقاري المدعوم بالذكاء الاصطناعي | اعثر على عقارك المثالي",
+    homeDescription: "اعثر على منزلك المثالي مع التوصيات المدعومة بالذكاء الاصطناعي. اكتشف العقارات للإيجار والبيع في جميع أنحاء العالم مع البحث الذكي والخرائط التفصيلية والوكلاء الخبراء.",
+    propertiesTitle: "عقارات للبيع والإيجار في جميع أنحاء العالم | MapEstate",
+    propertiesDescription: "تصفح آلاف العقارات للبيع والإيجار في جميع أنحاء العالم. ابحث عن شقق ومنازل وفيلات وأراضي مع البحث المتقدم والتوصيات الذكية والمعلومات التفصيلية عن العقارات.",
+    language: "Arabic",
+    locale: "ar_IQ"
+  },
+  kur: {
+    homeTitle: "MapEstate - دۆزەرەوەی خانووبەرەی پاڵپشتیکراو بە AI | خانووبەرەی تەواوت بدۆزەرەوە",
+    homeDescription: "ماڵی تەواوی خۆت بدۆزەرەوە لەگەڵ پێشنیارەکانی پاڵپشتیکراو بە AI. خانووبەرەکان بۆ کرێ و فرۆشتن لە سەرانسەری جیهان بدۆزەرەوە لەگەڵ گەڕانی زیرەک و نەخشەی ورد و بریکارە شارەزاکان.",
+    propertiesTitle: "خانووبەرە بۆ فرۆشتن و کرێ لە سەرانسەری جیهان | MapEstate",
+    propertiesDescription: "هەزاران خانووبەرە بۆ فرۆشتن و کرێ لە سەرانسەری جیهان بگەڕێ. شوقە، ماڵ، ڤیلا و زەوی بدۆزەرەوە لەگەڵ گەڕانی پێشکەوتوو، پێشنیاری AI و زانیاری ورد لەسەر خانووبەرەکان.",
+    language: "Kurdish",
+    locale: "ckb_IQ"
+  }
+};
+
+// Language-specific meta tag injection for home and other pages
+async function injectLanguageSpecificMetaTags(req: Request, res: Response, next: NextFunction) {
+  // Only inject for crawler bots
+  const userAgent = req.get('User-Agent') || '';
+  const isCrawler = isCrawlerBot(userAgent);
+  
+  if (!isCrawler) {
+    return next();
+  }
+  
+  // Match language-prefixed URLs: /:lang or /:lang/ or /:lang/properties etc
+  const languageMatch = req.path.match(/^\/(en|ar|kur)(?:\/([^\/]+)?)?(?:\/)?$/);
+  
+  if (!languageMatch) {
+    return next();
+  }
+  
+  const language = languageMatch[1] as 'en' | 'ar' | 'kur';
+  const page = languageMatch[2] || 'home'; // Default to home if no page specified
+  
+  console.log(`🤖 Social media crawler detected on /${language}${page !== 'home' ? `/${page}` : ''} - Injecting ${language.toUpperCase()} meta tags`);
+  
+  try {
+    // Load HTML template if not cached
+    if (!htmlTemplate) {
+      const htmlPath = path.join(process.cwd(), 'client', 'index.html');
+      htmlTemplate = fs.readFileSync(htmlPath, 'utf-8');
+    }
+    
+    let html = htmlTemplate;
+    
+    // Get translations for the current language
+    const trans = seoTranslations[language];
+    
+    // Determine page-specific title and description
+    let title = trans.homeTitle;
+    let description = trans.homeDescription;
+    
+    if (page === 'properties') {
+      title = trans.propertiesTitle;
+      description = trans.propertiesDescription;
+    }
+    
+    // Use HTTPS for production URLs
+    const protocol = req.get('X-Forwarded-Proto') || req.protocol || 'https';
+    const host = req.get('host');
+    const pageUrl = `${protocol}://${host}/${language}${page !== 'home' ? `/${page}` : '/'}`;
+    const imageUrl = `${protocol}://${host}/mapestate-social-preview.png`;
+    const secureImageUrl = imageUrl.replace('http://', 'https://');
+    
+    // Generate hreflang links for all languages
+    const allLanguages = ['en', 'ar', 'kur'];
+    const hreflangMap: { [key: string]: string } = {
+      'en': 'en',
+      'ar': 'ar-IQ',
+      'kur': 'ku-IQ'
+    };
+    
+    const hreflangLinks = allLanguages
+      .map(lang => {
+        const url = `${protocol}://${host}/${lang}${page !== 'home' ? `/${page}` : '/'}`;
+        return `<link rel="alternate" hreflang="${hreflangMap[lang]}" href="${url}" />`;
+      })
+      .join('\n    ') + '\n    ' + `<link rel="alternate" hreflang="x-default" href="${protocol}://${host}/en${page !== 'home' ? `/${page}` : '/'}" />`;
+    
+    // Get alternate OG locales
+    const alternateLocales = allLanguages
+      .filter(lang => lang !== language)
+      .map(lang => seoTranslations[lang as 'en' | 'ar' | 'kur'].locale);
+    
+    // Build comprehensive meta tags for social media
+    const socialMetaTags = `
+    <!-- Language-specific meta tags for ${language.toUpperCase()} - Social Media Crawlers -->
+    <html lang="${language}">
+    <title>${escapeHtml(title)}</title>
+    <meta name="title" content="${escapeHtml(title)}" />
+    <meta name="description" content="${escapeHtml(description)}" />
+    <meta name="language" content="${trans.language}" />
+    <link rel="canonical" href="${pageUrl}" />
+    ${hreflangLinks}
+    
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="${escapeHtml(title)}" />
+    <meta property="og:description" content="${escapeHtml(description)}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:secure_url" content="${secureImageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="MapEstate - Real Estate Platform" />
+    <meta property="og:url" content="${pageUrl}" />
+    <meta property="og:site_name" content="MapEstate" />
+    <meta property="og:locale" content="${trans.locale}" />
+    ${alternateLocales.map(locale => `<meta property="og:locale:alternate" content="${locale}" />`).join('\n    ')}
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${escapeHtml(title)}" />
+    <meta name="twitter:description" content="${escapeHtml(description)}" />
+    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:image:alt" content="MapEstate - Real Estate Platform" />
+    <meta name="twitter:site" content="@MapEstate" />
+    
+    <!-- Additional meta tags -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content="MapEstate" />
+    `;
+    
+    // Remove default meta tags to avoid duplicates
+    html = html.replace(/<html lang="en">/g, '');
+    html = html.replace(/<meta property="og:type"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:url"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:title"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:description"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image:width"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image:height"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:image:secure_url"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:site_name"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:locale"[^>]*>/g, '');
+    html = html.replace(/<meta property="og:locale:alternate"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:card"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:url"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:title"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:description"[^>]*>/g, '');
+    html = html.replace(/<meta property="twitter:image"[^>]*>/g, '');
+    html = html.replace(/<meta name="twitter:card"[^>]*>/g, '');
+    html = html.replace(/<meta name="twitter:title"[^>]*>/g, '');
+    html = html.replace(/<meta name="twitter:description"[^>]*>/g, '');
+    html = html.replace(/<meta name="twitter:image"[^>]*>/g, '');
+    html = html.replace(/<meta name="title"[^>]*>/g, '');
+    html = html.replace(/<meta name="description"[^>]*>/g, '');
+    html = html.replace(/<meta name="language"[^>]*>/g, '');
+    html = html.replace(/<link rel="canonical"[^>]*>/g, '');
+    html = html.replace(/<link rel="alternate" hreflang="[^"]*"[^>]*>/g, '');
+    html = html.replace(/<title>.*?<\/title>/g, '');
+    
+    // Inject language-specific tags before </head> tag
+    html = html.replace('</head>', `${socialMetaTags}  </head>`);
+    
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+    res.send(html);
+    
+  } catch (error) {
+    console.error('Error injecting language-specific meta tags:', error);
+    next();
+  }
+}
+
 async function injectPropertyMetaTags(req: Request, res: Response, next: NextFunction) {
   // Skip if storage is not initialized yet
   if (!storage) {
@@ -318,6 +496,9 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
   storage = await StorageFactory.getStorage();
   
   // Add meta tag injection middleware AFTER storage is initialized
+  // Language-specific meta tags for home/properties pages (must come before property-specific)
+  app.use(injectLanguageSpecificMetaTags);
+  // Property-specific meta tags for individual property pages
   app.use(injectPropertyMetaTags);
 
   // Fix existing users' language permissions on startup
