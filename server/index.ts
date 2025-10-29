@@ -330,27 +330,33 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     const propertyTitle = escapeHtml(`${property.title} - ${formatPrice(property.price, property.currency || 'USD', property.listingType)} | MapEstate`);
     const propertyDescription = escapeHtml(`${property.description || `${property.bedrooms} bedroom ${property.type} for ${property.listingType} in ${property.city}, ${property.country}.`} View details, photos, and contact information.`);
     
-    // Handle property images - can be array of strings or array of objects with imageUrl
-    const firstImage = property.images && property.images.length > 0 ? property.images[0] : null;
-    let propertyImage = `${protocol}://${req.get('host')}/mapestate-social-preview.png`;
+    // Handle property images - Facebook needs ALL images with width/height
+    let propertyImages: string[] = [];
     
-    if (firstImage) {
-      // Check if it's an object with imageUrl property or just a string
-      const imageUrl = typeof firstImage === 'object' && firstImage.imageUrl ? firstImage.imageUrl : firstImage;
+    if (property.images && property.images.length > 0) {
+      // Convert all property images to absolute URLs (Facebook allows up to 6 images)
+      propertyImages = property.images.slice(0, 6).map((img: any) => {
+        const imageUrl = typeof img === 'object' && img.imageUrl ? img.imageUrl : img;
+        if (imageUrl) {
+          const absoluteUrl = imageUrl.startsWith('http') ? imageUrl : `${protocol}://${req.get('host')}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+          return absoluteUrl.replace('http://', 'https://'); // Force HTTPS
+        }
+        return null;
+      }).filter(Boolean) as string[];
       
-      // Make absolute URL
-      if (imageUrl) {
-        propertyImage = imageUrl.startsWith('http') ? imageUrl : `${protocol}://${req.get('host')}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
-        console.log(`✅ Using property image for SEO: ${propertyImage}`);
-      }
-    } else {
-      console.log(`⚠️ No property image found for ${propertyId}, using fallback image`);
+      console.log(`✅ Found ${propertyImages.length} property images for SEO`);
     }
+    
+    // If no property images, use fallback
+    if (propertyImages.length === 0) {
+      propertyImages = [`${protocol}://${req.get('host')}/mapestate-social-preview.png`.replace('http://', 'https://')];
+      console.log(`⚠️ No property images found for ${propertyId}, using fallback image`);
+    }
+    
     // Generate property URL with language prefix if present
     const language = propertyMatch[1] || 'en';
     const languagePrefix = language !== 'en' ? `/${language}` : '';
     const propertyUrl = `${protocol}://${req.get('host')}${languagePrefix}/property/${property.slug || property.id}`;
-    const secureImageUrl = propertyImage.replace('http://', 'https://');
     
     // Map language to OG locale
     const localeMap: { [key: string]: string } = {
@@ -379,6 +385,15 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
       })
       .join('\n    ') + '\n    ' + `<link rel="alternate" hreflang="x-default" href="${protocol}://${req.get('host')}/property/${property.slug || property.id}" />`;
     
+    // Build Open Graph image tags - EACH image needs its own width/height for Facebook
+    const ogImageTags = propertyImages.map(imageUrl => `
+    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:image:secure_url" content="${imageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="800" />
+    <meta property="og:image:alt" content="${escapeHtml(property.title)}" />
+    <meta property="og:image:type" content="image/jpeg" />`).join('');
+    
     // Build comprehensive meta tags for social media
     const socialMetaTags = `
     <!-- Property-specific meta tags for social media crawlers -->
@@ -388,15 +403,10 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     <link rel="canonical" href="${propertyUrl}" />
     ${hreflangLinks}
     
-    <!-- Open Graph / Facebook / LinkedIn -->
+    <!-- Open Graph / Facebook / LinkedIn - All images with width/height -->
     <meta property="og:type" content="product" />
     <meta property="og:title" content="${propertyTitle}" />
-    <meta property="og:description" content="${propertyDescription}" />
-    <meta property="og:image" content="${propertyImage}" />
-    <meta property="og:image:secure_url" content="${secureImageUrl}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="${escapeHtml(property.title)}" />
+    <meta property="og:description" content="${propertyDescription}" />${ogImageTags}
     <meta property="og:url" content="${propertyUrl}" />
     <meta property="og:site_name" content="MapEstate" />
     <meta property="og:locale" content="${ogLocale}" />
@@ -406,7 +416,7 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${propertyTitle}" />
     <meta name="twitter:description" content="${propertyDescription}" />
-    <meta name="twitter:image" content="${propertyImage}" />
+    <meta name="twitter:image" content="${propertyImages[0]}" />
     <meta name="twitter:image:alt" content="${escapeHtml(property.title)}" />
     <meta name="twitter:site" content="@MapEstate" />
     <meta name="twitter:creator" content="@MapEstate" />
@@ -416,13 +426,13 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     <meta name="author" content="MapEstate" />
     `;
     
-    // Property-specific structured data
+    // Property-specific structured data with all images
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "Product",
       "name": property.title,
       "description": property.description || `${property.bedrooms} bedroom ${property.type} in ${property.city}`,
-      "image": propertyImage,
+      "image": propertyImages, // Include all images for rich snippets
       "url": propertyUrl,
       "offers": {
         "@type": "Offer",
