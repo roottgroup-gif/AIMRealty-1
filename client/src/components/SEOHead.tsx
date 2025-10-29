@@ -36,9 +36,9 @@ const translations: { [key: string]: { en: string; ar: string; kur: string } } =
     kur: "{propertyType}ی {bedrooms} ژووری نوستن بۆ {listingType} لە {city}. {description} پەیوەندی بە بریکارە شارەزاکانمانەوە بکە بۆ بینین و وردەکاری.",
   },
   "seo.keywords": {
-    en: "real estate, properties for sale, properties for rent, apartments, houses, villas, land, AI search, property finder, real estate platform, buy property, rent property, property search, home finder",
-    ar: "عقارات، عقارات للبيع، عقارات للإيجار، شقق، منازل، فيلات، أراضي، بحث ذكي، محرك بحث عقاري، منصة عقارية، شراء عقار، استئجار عقار",
-    kur: "خانووبەرە، خانووبەرە بۆ فرۆشتن، خانووبەرە بۆ کرێ، شوقە، ماڵ، ڤیلا، زەوی، گەڕانی AI، دۆزەرەوەی خانووبەرە، پلاتفۆرمی خانووبەرە، کڕینی خانووبەرە، کرێی خانووبەرە",
+    en: "real estate, properties for sale, properties for rent, apartments, houses, villas, land, AI search, property finder, real estate platform, buy property, rent property, property search, home finder, Iraq real estate, Kurdistan property, Erbil apartments, Sulaymaniyah houses, Dohuk real estate, Middle East property, luxury homes, residential property, commercial property, investment property, property listings, real estate agent, property valuation, mortgage, home loan, property market, real estate investment",
+    ar: "عقارات، عقارات للبيع، عقارات للإيجار، شقق، منازل، فيلات، أراضي، بحث ذكي، محرك بحث عقاري، منصة عقارية، شراء عقار، استئجار عقار، عقارات العراق، عقارات كردستان، شقق أربيل، منازل السليمانية، عقارات دهوك، عقارات الشرق الأوسط، منازل فاخرة، عقارات سكنية، عقارات تجارية، عقارات استثمارية، قوائم العقارات، وكيل عقارات، تقييم العقارات، رهن عقاري، قرض سكني",
+    kur: "خانووبەرە، خانووبەرە بۆ فرۆشتن، خانووبەرە بۆ کرێ، شوقە، ماڵ، ڤیلا، زەوی، گەڕانی AI، دۆزەرەوەی خانووبەرە، پلاتفۆرمی خانووبەرە، کڕینی خانووبەرە، کرێی خانووبەرە، خانووبەرەی عێراق، خانووبەرەی کوردستان، شوقەکانی هەولێر، ماڵەکانی سلێمانی، خانووبەرەی دهۆک، خانووبەرەی ڕۆژهەڵاتی ناوەڕاست، ماڵی لوکس، خانووبەرەی نیشتەجێبوون، خانووبەرەی بازرگانی، خانووبەرەی وەبەرهێنان، لیستی خانووبەرە، بریکاری خانووبەرە، هەڵسەنگاندنی خانووبەرە",
   },
   "seo.propertyType.apartment": {
     en: "Apartment",
@@ -493,7 +493,7 @@ function generateCombinedStructuredData(
     schemas.push(breadcrumbSchema);
   }
 
-  // Property schema using proper Residence/Apartment/House types
+  // Enhanced RealEstateListing schema for property pages (2025 best practices)
   if (propertyData) {
     const propertyType = propertyData.propertyType?.toLowerCase();
     const schemaPropertyType = propertyType === 'apartment' ? 'Apartment' : 
@@ -501,10 +501,67 @@ function generateCombinedStructuredData(
                                propertyType === 'villa' ? 'House' :
                                propertyType === 'land' ? 'LandParcel' : 'Residence';
     
-    const propertySchema = {
+    // RealEstateListing wrapper for better real estate SEO
+    const realEstateListingSchema = {
+      "@context": "https://schema.org",
+      "@type": "RealEstateListing",
+      "@id": canonicalUrl,
+      "url": canonicalUrl,
+      "name": `${propertyData.propertyType || 'Property'} for ${propertyData.listingType || 'Sale'} in ${propertyData.city || ''}`,
+      "description": `${propertyData.bedrooms ? `${propertyData.bedrooms} bedroom ` : ''}${propertyData.propertyType || 'property'} ${propertyData.address ? `located at ${propertyData.address}` : ''} in ${propertyData.city || ''}, ${propertyData.country || ''}. Professional real estate listing with MapEstate.`,
+      "datePosted": currentDate,
+      "leaseLength": propertyData.listingType === 'rent' ? {
+        "@type": "QuantitativeValue",
+        "value": 12,
+        "unitText": "months"
+      } : undefined,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": propertyData.address || "",
+        "addressLocality": propertyData.city || "",
+        "addressRegion": "Kurdistan Region",
+        "postalCode": "",
+        "addressCountry": propertyData.country || "IQ"
+      },
+      "geo": propertyData.city ? {
+        "@type": "GeoCoordinates",
+        "latitude": propertyData.city === 'Erbil' ? "36.1911" : propertyData.city === 'Sulaymaniyah' ? "35.5558" : "36.8619",
+        "longitude": propertyData.city === 'Erbil' ? "44.0093" : propertyData.city === 'Sulaymaniyah' ? "45.4347" : "42.9922"
+      } : undefined,
+      "numberOfRooms": propertyData.bedrooms,
+      "numberOfBedrooms": propertyData.bedrooms,
+      "numberOfBathroomsTotal": propertyData.bathrooms,
+      "floorSize": propertyData.area ? {
+        "@type": "QuantitativeValue",
+        "value": propertyData.area,
+        "unitText": "square meters",
+        "unitCode": "MTK"
+      } : undefined,
+      "offers": {
+        "@type": "Offer",
+        "price": propertyData.price?.replace(/[^0-9.]/g, '') || '0',
+        "priceCurrency": propertyData.currency || "USD",
+        "availability": "https://schema.org/InStock",
+        "priceValidUntil": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        "validFrom": currentDate,
+        "businessFunction": propertyData.listingType === 'rent' ? "http://purl.org/goodrelations/v1#LeaseOut" : "http://purl.org/goodrelations/v1#Sell",
+        "seller": {
+          "@type": "RealEstateAgent",
+          "name": "MapEstate",
+          "url": baseUrl,
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${baseUrl}/logo_1757848527935.png`
+          }
+        }
+      }
+    };
+    
+    // Add the underlying property type as well for rich results
+    const propertyTypeSchema = {
       "@context": "https://schema.org",
       "@type": schemaPropertyType,
-      "@id": canonicalUrl,
+      "@id": `${canonicalUrl}#property`,
       "url": canonicalUrl,
       "name": `${propertyData.propertyType || 'Property'} in ${propertyData.city || ''}`,
       "description": `${propertyData.bedrooms ? `${propertyData.bedrooms} bedroom ` : ''}${propertyData.propertyType || 'property'} ${propertyData.address ? `located at ${propertyData.address}` : ''} in ${propertyData.city || ''}, ${propertyData.country || ''}`,
@@ -513,12 +570,12 @@ function generateCombinedStructuredData(
         "streetAddress": propertyData.address || "",
         "addressLocality": propertyData.city || "",
         "addressRegion": "Kurdistan Region",
-        "addressCountry": propertyData.country || "Iraq"
+        "addressCountry": propertyData.country || "IQ"
       },
       "geo": propertyData.city ? {
         "@type": "GeoCoordinates",
-        "latitude": propertyData.city === 'Erbil' ? 36.1911 : propertyData.city === 'Sulaymaniyah' ? 35.5558 : 36.8619,
-        "longitude": propertyData.city === 'Erbil' ? 44.0093 : propertyData.city === 'Sulaymaniyah' ? 45.4347 : 42.9922
+        "latitude": propertyData.city === 'Erbil' ? "36.1911" : propertyData.city === 'Sulaymaniyah' ? "35.5558" : "36.8619",
+        "longitude": propertyData.city === 'Erbil' ? "44.0093" : propertyData.city === 'Sulaymaniyah' ? "45.4347" : "42.9922"
       } : undefined,
       "numberOfRooms": propertyData.bedrooms,
       "numberOfBathroomsTotal": propertyData.bathrooms,
@@ -539,22 +596,10 @@ function generateCombinedStructuredData(
           "name": "Property Status",
           "value": "Available"
         }
-      ],
-      "offers": {
-        "@type": "Offer",
-        "price": propertyData.price?.replace(/[^0-9.]/g, '') || '0',
-        "priceCurrency": propertyData.currency || "USD",
-        "availability": "https://schema.org/InStock",
-        "validFrom": currentDate,
-        "validThrough": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        "seller": {
-          "@type": "RealEstateAgent",
-          "name": "MapEstate",
-          "url": baseUrl
-        }
-      }
+      ]
     };
-    schemas.push(propertySchema);
+    
+    schemas.push(realEstateListingSchema, propertyTypeSchema);
   }
 
   // Only add FAQ schema for pages that actually have FAQ content

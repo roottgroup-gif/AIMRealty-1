@@ -79,29 +79,91 @@ function generateAlternates(path: string, baseUrl: string): string {
   return alternates.join('\n');
 }
 
-// Generate robots.txt content with sitemap reference
+// Generate robots.txt content with sitemap reference (2025 SEO best practices)
 function generateRobotsTxt(baseUrl: string): string {
-  return `User-agent: *
-Allow: /
+  return `# MapEstate - Real Estate Platform Robots.txt
+# Updated for optimal SEO and multilingual support
 
-# Language-specific content
+# Default crawlers
+User-agent: *
+Allow: /
+Crawl-delay: 1
+
+# Language-specific content (explicitly allow for better indexing)
 Allow: /en/
 Allow: /ar/
 Allow: /kur/
 
-# Sitemap
+# Allow property pages and images
+Allow: /property/
+Allow: /properties
+Allow: /uploads/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+
+# Sitemap location
 Sitemap: ${baseUrl}/sitemap.xml
 
-# Block admin areas
+# Block admin and API areas
 Disallow: /admin/
 Disallow: /api/
+Disallow: /settings
+Disallow: /favorites
 
-# Block temporary files
+# Block temporary and system files
 Disallow: /*.tmp$
 Disallow: /*.temp$
+Disallow: /*.log$
 
-# Allow search engines to index language-specific pages
-Crawl-delay: 1`;
+# Google-specific crawlers
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Googlebot-Image
+Allow: /uploads/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+
+# Bing crawler
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Mobile Googlebot
+User-agent: Googlebot-Mobile
+Allow: /
+Crawl-delay: 0
+
+# Block scrapers and bad bots
+User-agent: AhrefsBot
+Crawl-delay: 5
+
+User-agent: SemrushBot
+Crawl-delay: 5
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: dotbot
+Disallow: /
+
+# Social media crawlers (allow for rich previews)
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /`;
 }
 
 router.get('/sitemap.xml', async (req: Request, res: Response) => {
