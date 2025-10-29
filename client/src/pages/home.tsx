@@ -72,8 +72,8 @@ export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<string>("sale");
   const [mapFilters, setMapFilters] = useState<PropertyFilters>({
     limit: 100, // Get more properties for the map
-    language: language, // Initialize with current language
     status: 'active', // Only show visible properties on public map
+    // No language filter - show properties from all languages (en, ar, kur)
   });
   const [priceRange, setPriceRange] = useState([1, 10000000]);
   const [cityInput, setCityInput] = useState("");
@@ -176,15 +176,15 @@ export default function HomePage() {
     };
   }, [showFilters]);
 
-  // Filter properties by language when language changes
-  useEffect(() => {
-    setMapFilters((prevFilters) => ({
-      ...prevFilters,
-      language: language, // Filter properties to show only those matching the selected language
-      limit: 100, // Always maintain the limit for map
-      status: 'active', // Always show only visible properties on public map
-    }));
-  }, [language]);
+  // Don't filter properties by language - show all properties from all languages (en, ar, kur)
+  // useEffect(() => {
+  //   setMapFilters((prevFilters) => ({
+  //     ...prevFilters,
+  //     language: language,
+  //     limit: 100,
+  //     status: 'active',
+  //   }));
+  // }, [language]);
 
   const handleSearchResults = (results: AISearchResponse) => {
     setSearchResults(results);
@@ -257,7 +257,7 @@ export default function HomePage() {
   };
 
   const clearFilters = () => {
-    setMapFilters({ limit: 100, language: language, status: 'active' }); // Retain current language and status when clearing filters
+    setMapFilters({ limit: 100, status: 'active' }); // Show all properties from all languages
     setPriceRange([0, 1000000]);
     setCityInput("");
   };
@@ -840,10 +840,10 @@ export default function HomePage() {
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      setMapFilters((prevFilters) => ({
+                      setMapFilters({
                         limit: 100,
-                        language: prevFilters.language,
-                      }))
+                        status: 'active',
+                      })
                     }
                     className="h-6 px-2 text-xs border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                     data-testid="clear-filters-button"

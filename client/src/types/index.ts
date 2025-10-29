@@ -69,6 +69,7 @@ export interface PropertyFilters {
   sortOrder?: "asc" | "desc";
   limit?: number;
   offset?: number;
+  status?: string;
 }
 
 export interface AISearchResponse {
