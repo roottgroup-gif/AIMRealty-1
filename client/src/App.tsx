@@ -35,6 +35,21 @@ function Router() {
 
   // Enhanced language detection and redirect effect
   useEffect(() => {
+    // Skip language redirection for backend routes and static files
+    const backendRoutes = [
+      '/sitemap.xml',
+      '/robots.txt',
+      '/api/',
+      '/uploads/'
+    ];
+    
+    const isBackendRoute = backendRoutes.some(route => location.startsWith(route));
+    
+    if (isBackendRoute) {
+      // Don't redirect backend routes - let server handle them
+      return;
+    }
+    
     // Get full URL including query parameters
     const fullUrl = window.location.href;
     const { language: detectedLang, source } = detectLanguageFromUrlEnhanced(fullUrl);
