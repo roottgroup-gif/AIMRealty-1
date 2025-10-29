@@ -815,6 +815,11 @@ export default function PropertyMap({
       "Syria": "Syria",
       "سوريا": "Syria",
       "سووریا": "Syria",
+      // United Arab Emirates variations
+      "United Arab Emirates": "United Arab Emirates",
+      "الإمارات العربية المتحدة": "United Arab Emirates",
+      "میرنشینە یەکگرتووە عەرەبییەکان": "United Arab Emirates",
+      "UAE": "United Arab Emirates",
       // Default cases
       "Unknown Country": "Unknown Country",
     };
