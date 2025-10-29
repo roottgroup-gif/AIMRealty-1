@@ -72,8 +72,8 @@ export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<string>("sale");
   const [mapFilters, setMapFilters] = useState<PropertyFilters>({
     limit: 100, // Get more properties for the map
+    language: language, // Filter by current language
     status: 'active', // Only show visible properties on public map
-    // No language filter - show properties from all languages (en, ar, kur)
   });
   const [priceRange, setPriceRange] = useState([1, 10000000]);
   const [cityInput, setCityInput] = useState("");
@@ -176,15 +176,15 @@ export default function HomePage() {
     };
   }, [showFilters]);
 
-  // Don't filter properties by language - show all properties from all languages (en, ar, kur)
-  // useEffect(() => {
-  //   setMapFilters((prevFilters) => ({
-  //     ...prevFilters,
-  //     language: language,
-  //     limit: 100,
-  //     status: 'active',
-  //   }));
-  // }, [language]);
+  // Filter properties by language when language changes
+  useEffect(() => {
+    setMapFilters((prevFilters) => ({
+      ...prevFilters,
+      language: language, // Show only properties matching the current language
+      limit: 100,
+      status: 'active',
+    }));
+  }, [language]);
 
   const handleSearchResults = (results: AISearchResponse) => {
     setSearchResults(results);
@@ -257,7 +257,7 @@ export default function HomePage() {
   };
 
   const clearFilters = () => {
-    setMapFilters({ limit: 100, status: 'active' }); // Show all properties from all languages
+    setMapFilters({ limit: 100, language: language, status: 'active' }); // Keep current language filter
     setPriceRange([0, 1000000]);
     setCityInput("");
   };
@@ -842,6 +842,7 @@ export default function HomePage() {
                     onClick={() =>
                       setMapFilters({
                         limit: 100,
+                        language: language,
                         status: 'active',
                       })
                     }
