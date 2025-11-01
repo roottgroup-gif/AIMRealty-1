@@ -14,6 +14,18 @@ const app = express();
 // Only trust first proxy for security (Replit's proxy)
 app.set('trust proxy', 1);
 
+// Force www to non-www redirect for canonical URLs (must be before other middleware)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const host = req.get('host');
+  if (host && host.startsWith('www.')) {
+    const protocol = req.get('X-Forwarded-Proto') || req.protocol || 'https';
+    const nonWwwUrl = `${protocol}://${host.replace('www.', '')}${req.originalUrl}`;
+    console.log(`📍 Redirecting www to non-www: ${host} → ${host.replace('www.', '')}`);
+    return res.redirect(301, nonWwwUrl);
+  }
+  next();
+});
+
 // Security headers (CSP, HSTS, COOP, etc.)
 app.use(securityHeaders);
 

@@ -235,7 +235,8 @@ ${alternates}${imageData}
 ${urlEntries.join('\n')}
 </urlset>`;
 
-    res.set('Content-Type', 'application/xml');
+    res.set('Content-Type', 'application/xml; charset=utf-8');
+    res.set('Cache-Control', 'public, max-age=3600');
     res.send(sitemap);
   } catch (error) {
     console.error('Error generating sitemap:', error);
@@ -258,31 +259,8 @@ router.get('/robots.txt', async (req: Request, res: Response) => {
   }
 });
 
-// Language-prefixed sitemap routes (redirect to main sitemap)
-router.get('/:lang/sitemap.xml', async (req: Request, res: Response) => {
-  const lang = req.params.lang;
-  
-  // Validate language parameter
-  if (!SUPPORTED_LANGUAGES.includes(lang as Language)) {
-    return res.status(404).send('Not found');
-  }
-  
-  // Redirect to canonical sitemap without language prefix
-  res.redirect(301, '/sitemap.xml');
-});
-
-// Language-prefixed robots.txt routes (redirect to main robots.txt)
-router.get('/:lang/robots.txt', async (req: Request, res: Response) => {
-  const lang = req.params.lang;
-  
-  // Validate language parameter
-  if (!SUPPORTED_LANGUAGES.includes(lang as Language)) {
-    return res.status(404).send('Not found');
-  }
-  
-  // Redirect to canonical robots.txt without language prefix
-  res.redirect(301, '/robots.txt');
-});
+// Note: Language-prefixed sitemap/robots routes removed to avoid redirect issues in Google Search Console
+// Only canonical /sitemap.xml and /robots.txt routes are served
 
 // Function to initialize the sitemap router with storage
 export function setSitemapStorage(storage: IStorage) {
