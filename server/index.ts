@@ -333,30 +333,36 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     // Handle property images - Facebook needs ALL images with width/height
     let propertyImages: string[] = [];
     
+    console.log(`📸 Property images array:`, JSON.stringify(property.images, null, 2));
+    
     if (property.images && property.images.length > 0) {
       // Convert all property images to absolute URLs (Facebook allows up to 6 images)
       propertyImages = property.images.slice(0, 6).map((img: any) => {
         const imageUrl = typeof img === 'object' && img.imageUrl ? img.imageUrl : img;
         if (imageUrl) {
           const absoluteUrl = imageUrl.startsWith('http') ? imageUrl : `${protocol}://${req.get('host')}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
-          return absoluteUrl.replace('http://', 'https://'); // Force HTTPS
+          const secureUrl = absoluteUrl.replace('http://', 'https://'); // Force HTTPS
+          console.log(`   ✅ Processed image: ${imageUrl} → ${secureUrl}`);
+          return secureUrl;
         }
         return null;
       }).filter(Boolean) as string[];
       
-      console.log(`✅ Found ${propertyImages.length} property images for SEO`);
+      console.log(`✅ Found ${propertyImages.length} property images for SEO:`, propertyImages);
     }
     
     // If no property images, use fallback
     if (propertyImages.length === 0) {
       propertyImages = [`${protocol}://${req.get('host')}/mapestate-social-preview.png`.replace('http://', 'https://')];
-      console.log(`⚠️ No property images found for ${propertyId}, using fallback image`);
+      console.log(`⚠️ No property images found for ${propertyId}, using fallback image: ${propertyImages[0]}`);
     }
     
-    // Generate property URL with language prefix if present
+    // Generate property URL with language prefix (always include language)
     const language = propertyMatch[1] || 'en';
-    const languagePrefix = language !== 'en' ? `/${language}` : '';
+    const languagePrefix = `/${language}`;
     const propertyUrl = `${protocol}://${req.get('host')}${languagePrefix}/property/${property.slug || property.id}`;
+    
+    console.log(`🌐 Generated property URL: ${propertyUrl}`);
     
     // Map language to OG locale
     const localeMap: { [key: string]: string } = {
@@ -379,11 +385,11 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     
     const hreflangLinks = allLanguages
       .map(lang => {
-        const prefix = lang !== 'en' ? `/${lang}` : '';
+        const prefix = `/${lang}`;
         const url = `${protocol}://${req.get('host')}${prefix}/property/${property.slug || property.id}`;
         return `<link rel="alternate" hreflang="${hreflangMap[lang]}" href="${url}" />`;
       })
-      .join('\n    ') + '\n    ' + `<link rel="alternate" hreflang="x-default" href="${protocol}://${req.get('host')}/property/${property.slug || property.id}" />`;
+      .join('\n    ') + '\n    ' + `<link rel="alternate" hreflang="x-default" href="${protocol}://${req.get('host')}/en/property/${property.slug || property.id}" />`;
     
     // Build Open Graph image tags - EACH image needs its own width/height for Facebook
     const ogImageTags = propertyImages.map(imageUrl => `
@@ -491,6 +497,12 @@ async function injectPropertyMetaTags(req: Request, res: Response, next: NextFun
     
     // Inject property-specific tags before </head> tag
     html = html.replace('</head>', `${socialMetaTags}${structuredDataScript}  </head>`);
+    
+    console.log(`📋 Final meta tags injected for property ${propertyId}:`);
+    console.log(`   Title: ${propertyTitle}`);
+    console.log(`   Images: ${propertyImages.join(', ')}`);
+    console.log(`   URL: ${propertyUrl}`);
+    console.log(`🎉 Successfully injected dynamic SEO meta tags for social media crawler!`);
     
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
