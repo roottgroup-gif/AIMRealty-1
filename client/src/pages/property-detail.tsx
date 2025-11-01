@@ -794,10 +794,10 @@ export default function PropertyDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                   {property.bedrooms && (
                     <div
-                      className="flex items-center gap-3 md:flex-col md:items-center md:justify-center text-start md:text-center"
+                      className="flex items-center gap-3 md:flex-col md:items-start md:justify-center text-start"
                       data-testid="bedrooms-info"
                     >
-                      <Bed className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary md:mx-auto shrink-0" />
+                      <Bed className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary shrink-0" />
                       <div>
                         <div className="font-semibold text-base sm:text-lg md:text-xl">
                           {property.bedrooms}
@@ -810,10 +810,10 @@ export default function PropertyDetailPage() {
                   )}
                   {property.bathrooms && (
                     <div
-                      className="flex items-center gap-3 md:flex-col md:items-center md:justify-center text-start md:text-center"
+                      className="flex items-center gap-3 md:flex-col md:items-start md:justify-center text-start"
                       data-testid="bathrooms-info"
                     >
-                      <Bath className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary md:mx-auto shrink-0" />
+                      <Bath className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary shrink-0" />
                       <div>
                         <div className="font-semibold text-base sm:text-lg md:text-xl">
                           {property.bathrooms}
@@ -826,10 +826,10 @@ export default function PropertyDetailPage() {
                   )}
                   {property.area && (
                     <div
-                      className="flex items-center gap-3 md:flex-col md:items-center md:justify-center text-start md:text-center"
+                      className="flex items-center gap-3 md:flex-col md:items-start md:justify-center text-start"
                       data-testid="area-info"
                     >
-                      <Square className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary md:mx-auto shrink-0" />
+                      <Square className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary shrink-0" />
                       <div>
                         <div className="font-semibold text-base sm:text-lg md:text-xl">
                           {property.area.toLocaleString()}
