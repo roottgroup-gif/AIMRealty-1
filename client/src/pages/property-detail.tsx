@@ -840,17 +840,6 @@ export default function PropertyDetailPage() {
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 md:flex-col md:items-center md:justify-center text-start md:text-center">
-                    <Car className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary md:mx-auto shrink-0" />
-                    <div>
-                      <div className="font-semibold text-base sm:text-lg md:text-xl">
-                        2
-                      </div>
-                      <div className="text-[11px] sm:text-xs md:text-sm text-muted-foreground leading-tight">
-                        {t("property.parking")}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
