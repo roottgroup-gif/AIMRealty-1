@@ -852,7 +852,7 @@ export default function PropertyDetailPage() {
                     {t("property.description")}
                   </h3>
                   <p
-                    className="text-muted-foreground leading-relaxed"
+                    className="text-muted-foreground leading-relaxed text-justify"
                     data-testid="property-description"
                   >
                     {property.description}
